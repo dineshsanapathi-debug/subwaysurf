@@ -46,8 +46,10 @@ export default function useMangoShield() {
     return true;
   }, []);
 
-  // Automatically update the shield countdown
+  // Automatically update the shield countdown only when active
   useEffect(() => {
+    if (!shieldActive) return;
+
     const timer = setInterval(() => {
       const remaining = Math.max(
         0,
@@ -63,7 +65,7 @@ export default function useMangoShield() {
     }, 100);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [shieldActive]);
 
   return {
     mangoProgress,

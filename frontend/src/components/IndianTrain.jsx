@@ -23,7 +23,7 @@ export function Coach({ z = 0, coachIndex = 0 }) {
       </mesh>
 
       {/* 3. Coach Curved / Beveled Silver Roof */}
-      <mesh position={[0, 2.95, 0]} castShadow receiveShadow>
+      <mesh position={[0, 2.95, 0]} receiveShadow>
         <boxGeometry args={[2.88, 0.18, 6.9]} />
         <meshStandardMaterial color="#d9e3ed" roughness={0.4} metalness={0.25} />
       </mesh>

@@ -294,7 +294,7 @@ function Scene({
   );
 }
 
-export default function Game({
+function GameComponent({
   selectedCharacter = 'Dash',
   adaptiveSettings = {},
   onGameOver,
@@ -457,7 +457,7 @@ export default function Game({
 
       <Canvas
         shadows
-        dpr={[1, 1.5]}
+        dpr={[1, 1.25]}
         camera={{ position: [0, 4.8, 7.0], fov: 62 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >
@@ -572,3 +572,6 @@ export default function Game({
     </div>
   );
 }
+
+export const Game = React.memo(GameComponent);
+export default Game;

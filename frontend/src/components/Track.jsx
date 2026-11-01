@@ -255,7 +255,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
               <meshStandardMaterial map={leftWallTex} roughness={0.8} />
             </mesh>
             {/* Wall Top Ledge / Curb */}
-            <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
+            <mesh position={[0, 2.8, 0]} receiveShadow>
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
               <meshStandardMaterial color={wallTopColor} roughness={0.6} />
             </mesh>
@@ -268,7 +268,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
               <meshStandardMaterial map={rightWallTex} roughness={0.8} />
             </mesh>
             {/* Wall Top Ledge / Curb */}
-            <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
+            <mesh position={[0, 2.8, 0]} receiveShadow>
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
               <meshStandardMaterial color={wallTopColor} roughness={0.6} />
             </mesh>
@@ -308,7 +308,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             <React.Fragment key={i}>
               {/* Left Skyscraper / City House */}
               <group position={[-11.5, b.heightL / 2 + 5.2, b.z]}>
-                <mesh castShadow receiveShadow>
+                <mesh receiveShadow>
                   <boxGeometry args={[9, b.heightL, 9.5]} />
                   <meshStandardMaterial color={b.colorL} roughness={0.5} />
                 </mesh>
@@ -328,7 +328,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
 
               {/* Right Skyscraper / City House */}
               <group position={[11.5, b.heightR / 2 + 5.2, b.z]}>
-                <mesh castShadow receiveShadow>
+                <mesh receiveShadow>
                   <boxGeometry args={[9, b.heightR, 9.5]} />
                   <meshStandardMaterial color={b.colorR} roughness={0.5} />
                 </mesh>
@@ -354,7 +354,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
       {!isSkyway && [-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (
         <group key={gi} position={[0, 0, gantryZ]}>
           {/* Main Crossbeam Arch */}
-          <mesh position={[0, 6.8, 0]} castShadow>
+          <mesh position={[0, 6.8, 0]}>
             <boxGeometry args={[TRACK_WIDTH + 1.2, 0.45, 0.45]} />
             <meshStandardMaterial
               color={gantryColor}
@@ -365,11 +365,11 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             />
           </mesh>
           {/* Support Legs */}
-          <mesh position={[-TRACK_WIDTH / 2 - 0.2, 4.2, 0]} castShadow>
+          <mesh position={[-TRACK_WIDTH / 2 - 0.2, 4.2, 0]}>
             <boxGeometry args={[0.35, 5.8, 0.35]} />
             <meshStandardMaterial color={gantryColor} metalness={0.5} />
           </mesh>
-          <mesh position={[TRACK_WIDTH / 2 + 0.2, 4.2, 0]} castShadow>
+          <mesh position={[TRACK_WIDTH / 2 + 0.2, 4.2, 0]}>
             <boxGeometry args={[0.35, 5.8, 0.35]} />
             <meshStandardMaterial color={gantryColor} metalness={0.5} />
           </mesh>

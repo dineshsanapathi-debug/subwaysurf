@@ -342,6 +342,10 @@ function IndianStationLandmark({ position = [0, 0, -85] }) {
   );
 }
 
+// Reusable Three.js colors to prevent 120 allocations/sec GC churn in useFrame
+const _tempSkyColor = new THREE.Color();
+const _tempFogColor = new THREE.Color();
+
 /**
  * WorldThemes Component
  * Manages dynamic world theming:
@@ -389,18 +393,18 @@ export default function WorldThemes({
 
     const currentTheme = THEMES[targetIdx];
 
-    // Smoothly interpolate scene background and fog colors
-    const targetSkyColor = new THREE.Color(currentTheme.sky);
-    const targetFogColor = new THREE.Color(currentTheme.fog);
+    // Smoothly interpolate scene background and fog colors with zero GC allocations
+    _tempSkyColor.set(currentTheme.sky);
+    _tempFogColor.set(currentTheme.fog);
 
     if (scene.background) {
-      scene.background.lerp(targetSkyColor, delta * 2.5);
+      scene.background.lerp(_tempSkyColor, delta * 2.5);
     } else {
-      scene.background = targetSkyColor.clone();
+      scene.background = _tempSkyColor.clone();
     }
 
     if (scene.fog) {
-      scene.fog.color.lerp(targetFogColor, delta * 2.5);
+      scene.fog.color.lerp(_tempFogColor, delta * 2.5);
       scene.fog.near = THREE.MathUtils.lerp(scene.fog.near, currentTheme.fogNear, delta * 2.0);
       scene.fog.far = THREE.MathUtils.lerp(scene.fog.far, currentTheme.fogFar, delta * 2.0);
     } else {

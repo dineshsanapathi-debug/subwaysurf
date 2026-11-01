@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import Game from './game/Game';
 import Controls from './game/Controls';
@@ -123,7 +123,7 @@ export default function App() {
   };
 
   // Game Over Handler
-  const handleGameOver = async (finalData) => {
+  const handleGameOver = useCallback(async (finalData) => {
     soundEffects.stopMusic();
     setScreen('gameover');
 
@@ -190,7 +190,7 @@ export default function App() {
     } finally {
       setIsAiLoading(false);
     }
-  };
+  }, [highScore, totalCoins, user, selectedCharacter]);
 
   // AI Coach interactive chat
   const handleAskAiCoach = async (question) => {
