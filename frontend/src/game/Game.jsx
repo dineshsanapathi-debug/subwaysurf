@@ -148,16 +148,18 @@ function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
       <Coins coins={engine?.coinsList || []} powerups={engine?.powerupsList || []} />
 
       {/* Player Character */}
-      <Player
-        lane={engine?.lane || 0}
-        posY={engine?.posY || 0}
-        isJumping={engine?.isJumping}
-        isSliding={engine?.isSliding}
-        isOnTrain={engine?.isOnTrain}
-        isCrashing={engine?.isGameOver}
-        characterName={selectedCharacter}
-        powerups={engine?.powerups || {}}
-      />
+      <React.Suspense fallback={null}>
+        <Player
+          lane={engine?.lane || 0}
+          posY={engine?.posY || 0}
+          isJumping={engine?.isJumping}
+          isSliding={engine?.isSliding}
+          isOnTrain={engine?.isOnTrain}
+          isCrashing={engine?.isGameOver}
+          characterName={selectedCharacter}
+          powerups={engine?.powerups || {}}
+        />
+      </React.Suspense>
 
       {/* Particle System */}
       <ParticleSystem particles={particles} />

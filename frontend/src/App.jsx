@@ -279,11 +279,13 @@ export default function App() {
             <ambientLight intensity={0.9} />
             <directionalLight position={[5, 10, 5]} intensity={1.5} />
             <pointLight position={[-3, 2, 2]} intensity={0.8} color="#38bdf8" />
-            <Player
-              characterName={selectedCharacter}
-              isMenuPreview={true}
-              posY={0.2}
-            />
+            <React.Suspense fallback={null}>
+              <Player
+                characterName={selectedCharacter}
+                isMenuPreview={true}
+                posY={0.2}
+              />
+            </React.Suspense>
             {/* Spinning pedestal */}
             <mesh position={[0, -0.2, 0]}>
               <cylinderGeometry args={[1.6, 1.8, 0.4, 32]} />
