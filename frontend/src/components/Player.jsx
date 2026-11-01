@@ -218,43 +218,15 @@ export default function Player({
         leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 1.1, delta * 14);
         rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 14);
       }
-    } else if (isDinesh) {
-      // ===== BHARGAV ENERGETIC RUNNING SPRINT (DYNAMIC STRIDE WHEN CHASED) =====
+    } else {
+      // ===== 3D CHARACTERS UPRIGHT RUNNING & FULL SPRINT (BHARGAV, JAKE, TRICKY, FRESH, YUTANI) =====
       const isChased = policeChasing || isIntro;
       const sprintSpeed = isChased ? 26 : (activePowerups.hoverboard ? 0 : 20);
-      const runBob = Math.abs(Math.sin(time * sprintSpeed)) * (isChased ? 0.16 : 0.11);
-      const runSway = Math.sin(time * (sprintSpeed * 0.5)) * (isChased ? 0.08 : 0.04);
-      const sprintLean = isChased ? 0.25 : 0.12;
-
-      if (spriteMeshRef.current) {
-        // High-energy running stride bobbing and forward sprint lean
-        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(
-          spriteMeshRef.current.position.y,
-          1.15 + runBob,
-          delta * 18
-        );
-        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.0, delta * 16);
-        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.0, delta * 16);
-        spriteMeshRef.current.scale.z = 1;
-        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, sprintLean, delta * 16);
-        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, runSway, delta * 16);
-      }
-      if (bodyRef.current) {
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, runBob * 0.5, delta * 18);
-        bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, sprintLean * 0.5, delta * 16);
-        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
-        bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, runSway * 0.5, delta * 14);
-        bodyRef.current.scale.set(1, 1, 1);
-      }
-    } else {
-      // ===== PROCEDURAL CHARACTERS UPRIGHT RUNNING (POST-SLIDE RECOVERY) =====
-      const isChased = policeChasing || isIntro;
-      const sprintLean = isChased ? 0.28 : 0.18;
-      const bounce = Math.abs(Math.sin(time * runFreq)) * (isChased ? 0.18 : 0.14);
+      const bounce = Math.abs(Math.sin(time * sprintSpeed)) * (isChased ? 0.18 : 0.13);
+      const sprintLean = isChased ? 0.26 : 0.16;
 
       if (bodyRef.current) {
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, bounce, delta * 16);
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, bounce, delta * 18);
         bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
         bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, sprintLean, delta * 14);
         bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
@@ -382,66 +354,96 @@ export default function Player({
 
       {/* Main Character Body Mesh Hierarchy */}
       <group ref={bodyRef}>
-        {/* ================= 0. BHARGAV (CUSTOM 4K CAMERA-FACING SPRITE) ================= */}
-        {isDinesh && (
+        {/* ================= 0. BHARGAV (CAMO RAIL SURFER - FULL 3D ANIMATED RUNNER) ================= */}
+        {isBhargav && (
           <group>
-            {/* Camera-Facing 4K Character Sprite (Direct, Stable Cutout) */}
-            <mesh ref={spriteMeshRef} position={[0, 1.15, 0]} castShadow>
-              <planeGeometry args={[1.55, 2.35]} />
-              <meshBasicMaterial
-                map={characterTexture}
-                transparent={true}
-                alphaTest={0.02}
-                side={THREE.DoubleSide}
-                depthWrite={false}
-              />
-            </mesh>
-
-            {/* Bhargav's Custom Graffiti Skateboard - Active ONLY when hoverboard powerup is used; hero runs on foot! */}
-            {powerups.hoverboard && (
-              <group position={[0, 0.08, 0]}>
-                <mesh castShadow receiveShadow>
-                  <boxGeometry args={[0.72, 0.07, 1.75]} />
-                  <meshStandardMaterial color="#d97706" roughness={0.3} metalness={0.4} />
-                </mesh>
-                {/* Grip tape */}
-                <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                  <planeGeometry args={[0.66, 1.65]} />
-                  <meshStandardMaterial color="#1e293b" roughness={0.9} />
-                </mesh>
-                {/* Wheels */}
-                {[-0.28, 0.28].map((wx, wi) =>
-                  [-0.6, 0.6].map((wz, wzi) => (
-                    <mesh key={`${wi}_${wzi}`} position={[wx, -0.04, wz]} rotation={[0, 0, Math.PI / 2]}>
-                      <cylinderGeometry args={[0.07, 0.07, 0.06, 12]} />
-                      <meshStandardMaterial color="#ef4444" />
-                    </mesh>
-                  ))
-                )}
-              </group>
-            )}
-
-            {/* Glowing Golden Speed Sparks under Sneakers */}
-            {!powerups.jetpack && !isSliding && (
-              <group position={[0, 0.08, 0.25]}>
-                <mesh rotation={[-Math.PI / 2, 0, 0]}>
-                  <ringGeometry args={[0.08, 0.35, 12]} />
-                  <meshBasicMaterial color="#f59e0b" transparent opacity={0.8} side={THREE.DoubleSide} />
-                </mesh>
-                <mesh position={[0, 0.04, 0.12]}>
-                  <coneGeometry args={[0.2, 0.35, 6]} rotation={[Math.PI / 2, 0, 0]} />
-                  <meshBasicMaterial color="#fbbf24" transparent opacity={0.65} />
-                </mesh>
-              </group>
-            )}
-
-            {/* Neon Cyan Aura when Hoverboard Powerup is Active */}
-            {powerups.hoverboard && (
-              <mesh position={[0, 0.06, 0]}>
-                <boxGeometry args={[0.8, 0.08, 1.6]} />
-                <meshBasicMaterial color="#06b6d4" transparent opacity={0.65} />
+            {/* Torso: Camo Tan Hoodie over Black Inner Tee */}
+            <group position={[0, 1.25, 0]}>
+              {/* Inner Black Tee */}
+              <mesh position={[0, 0, 0.04]} castShadow>
+                <boxGeometry args={[0.54, 0.70, 0.38]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.6} />
               </mesh>
-            )}
+              {/* Camo Tan Hoodie Jacket */}
+              <mesh castShadow>
+                <boxGeometry args={[0.64, 0.72, 0.44]} />
+                <meshStandardMaterial color="#d4a373" roughness={0.5} />
+              </mesh>
+              {/* Olive Green Camo Patches */}
+              <mesh position={[-0.18, 0.12, 0.23]}>
+                <planeGeometry args={[0.18, 0.22]} />
+                <meshStandardMaterial color="#526046" />
+              </mesh>
+              <mesh position={[0.18, -0.1, 0.23]}>
+                <planeGeometry args={[0.16, 0.18]} />
+                <meshStandardMaterial color="#6b4a2d" />
+              </mesh>
+              {/* Back Camo Graphic Emblem */}
+              <mesh position={[0, 0.06, -0.23]} rotation={[0, Math.PI, 0]}>
+                <planeGeometry args={[0.42, 0.45]} />
+                <meshStandardMaterial color="#526046" />
+              </mesh>
+            </group>
+
+            {/* Head with Volume Curly Dark Hair, Trimmed Beard & Black Glasses */}
+            <group position={[0, 1.85, 0]}>
+              {/* Tan Face */}
+              <mesh castShadow>
+                <sphereGeometry args={[0.29, 16, 16]} />
+                <meshStandardMaterial color="#c68642" roughness={0.6} />
+              </mesh>
+              {/* Curly Dark Hair Volume */}
+              <group position={[0, 0.14, -0.02]}>
+                <mesh castShadow>
+                  <sphereGeometry args={[0.33, 14, 14]} />
+                  <meshStandardMaterial color="#171717" roughness={0.9} />
+                </mesh>
+                {/* Curly Hair Rings */}
+                {[-0.2, -0.1, 0, 0.1, 0.2].map((hx, hi) => (
+                  <mesh key={hi} position={[hx, 0.18, hi % 2 === 0 ? 0.08 : -0.08]}>
+                    <sphereGeometry args={[0.12, 8, 8]} />
+                    <meshStandardMaterial color="#171717" roughness={0.95} />
+                  </mesh>
+                ))}
+              </group>
+              {/* Trimmed Dark Beard & Mustache */}
+              <mesh position={[0, -0.14, 0.22]}>
+                <boxGeometry args={[0.28, 0.14, 0.16]} />
+                <meshStandardMaterial color="#171717" roughness={0.9} />
+              </mesh>
+              {/* Stylish Black Glasses */}
+              <group position={[0, 0.02, 0.27]}>
+                <mesh position={[-0.1, 0, 0]}>
+                  <boxGeometry args={[0.15, 0.12, 0.03]} />
+                  <meshBasicMaterial color="#0f172a" />
+                </mesh>
+                <mesh position={[0.1, 0, 0]}>
+                  <boxGeometry args={[0.15, 0.12, 0.03]} />
+                  <meshBasicMaterial color="#0f172a" />
+                </mesh>
+                <mesh position={[0, 0.02, 0]}>
+                  <boxGeometry args={[0.07, 0.03, 0.03]} />
+                  <meshBasicMaterial color="#0f172a" />
+                </mesh>
+              </group>
+              {/* Eyes */}
+              <mesh position={[0.1, 0.02, 0.26]}>
+                <sphereGeometry args={[0.04, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              <mesh position={[-0.1, 0.02, 0.26]}>
+                <sphereGeometry args={[0.04, 8, 8]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              <mesh position={[0.1, 0.02, 0.29]}>
+                <sphereGeometry args={[0.025, 8, 8]} />
+                <meshBasicMaterial color="#0f172a" />
+              </mesh>
+              <mesh position={[-0.1, 0.02, 0.29]}>
+                <sphereGeometry args={[0.025, 8, 8]} />
+                <meshBasicMaterial color="#0f172a" />
+              </mesh>
+            </group>
           </group>
         )}
 
@@ -797,32 +799,38 @@ export default function Player({
           </group>
         )}
 
-        {/* ================= ARMS & LEGS (FOR 3D RIGGED CHARACTERS) ================= */}
-        {!isDinesh && (
-          <group>
-            {/* Left Arm */}
-            <group ref={leftArmRef} position={[-0.42, 1.48, 0]}>
-              <mesh position={[0, -0.28, 0]} castShadow>
-                <boxGeometry args={[0.18, 0.6, 0.2]} />
-                <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
+        {/* ================= ARMS & LEGS (FOR ALL CHARACTERS IN RUNNING SPRINT) ================= */}
+        <group>
+          {/* Left Arm */}
+          <group ref={leftArmRef} position={[-0.42, 1.48, 0]}>
+            <mesh position={[0, -0.28, 0]} castShadow>
+              <boxGeometry args={[0.18, 0.6, 0.2]} />
+              <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : isBhargav ? char.color || '#d4a373' : '#cbd5e1'} />
+            </mesh>
+            {/* Smartwatch on Bhargav's left wrist */}
+            {isBhargav && (
+              <mesh position={[0, -0.52, 0]}>
+                <boxGeometry args={[0.2, 0.08, 0.22]} />
+                <meshBasicMaterial color="#0f172a" />
               </mesh>
-              <mesh position={[0, -0.62, 0]}>
-                <sphereGeometry args={[0.1, 10, 10]} />
-                <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor} />
-              </mesh>
-            </group>
+            )}
+            <mesh position={[0, -0.62, 0]}>
+              <sphereGeometry args={[0.1, 10, 10]} />
+              <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor || '#c68642'} />
+            </mesh>
+          </group>
 
-            {/* Right Arm */}
-            <group ref={rightArmRef} position={[0.42, 1.48, 0]}>
-              <mesh position={[0, -0.28, 0]} castShadow>
-                <boxGeometry args={[0.18, 0.6, 0.2]} />
-                <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
-              </mesh>
-              <mesh position={[0, -0.62, 0]}>
-                <sphereGeometry args={[0.1, 10, 10]} />
-                <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor} />
-              </mesh>
-            </group>
+          {/* Right Arm */}
+          <group ref={rightArmRef} position={[0.42, 1.48, 0]}>
+            <mesh position={[0, -0.28, 0]} castShadow>
+              <boxGeometry args={[0.18, 0.6, 0.2]} />
+              <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : isBhargav ? char.color || '#d4a373' : '#cbd5e1'} />
+            </mesh>
+            <mesh position={[0, -0.62, 0]}>
+              <sphereGeometry args={[0.1, 10, 10]} />
+              <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor || '#c68642'} />
+            </mesh>
+          </group>
 
             {/* ================= LEGS ================= */}
             {/* Left Leg */}
@@ -937,8 +945,7 @@ export default function Player({
               </group>
             </group>
           </group>
-        )}
+        </group>
       </group>
-    </group>
   );
 }
