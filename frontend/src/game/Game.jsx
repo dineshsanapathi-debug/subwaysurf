@@ -14,20 +14,27 @@ import WorldThemes, { THEMES } from '../components/WorldThemes';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
-function CameraFollow({ playerX, posY, isSliding, isOnTrain, isElevated, isLanding }) {
+function CameraFollow({ playerX, posY, isSliding, isOnTrain, isElevated, isLanding, isCrashing }) {
   const { camera } = useThree();
   const currentLookY = useRef(2.0);
 
   useFrame((state, delta) => {
     // Dynamic camera horizontal follow - centers neatly on active lane to avoid perspective skew
-    const targetCamX = playerX * 0.75;
-    const targetLookX = playerX * 0.75;
+    let targetCamX = playerX * 0.75;
+    let targetLookX = playerX * 0.75;
 
     // Smooth continuous vertical camera target that perfectly follows player across ground, trains, and skyway
     let targetCamY = posY + 4.8;
     if (isSliding) targetCamY -= 0.4;
 
-    const targetCamZ = isElevated && !isLanding ? 7.5 : 7.0;
+    let targetCamZ = isElevated && !isLanding ? 7.5 : 7.0;
+
+    // Dramatic crash impact camera shudder
+    if (isCrashing) {
+      targetCamX += (Math.random() - 0.5) * 0.45;
+      targetCamY += (Math.random() - 0.5) * 0.45;
+      targetCamZ += 0.4;
+    }
 
     // Smooth lerp tracking
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
@@ -169,6 +176,7 @@ function Scene({
           isLanding={isLanding}
           isSliding={engine?.isSliding}
           isOnTrain={engine?.isOnTrain}
+          isCrashing={engine?.isGameOver}
         />
       )}
 

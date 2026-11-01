@@ -17,7 +17,7 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { CHARACTERS } from './Player';
+import { CHARACTERS } from '../game/characters';
 import { THEMES } from './WorldThemes';
 
 export default function GameUI({

@@ -31,6 +31,7 @@ export class GameEngine {
     this.isOnTrain = false;
     this.trainRoofY = 3.2;
     this.invulnerableTimer = 0;
+    this.sideBumpCooldown = 0;
 
     // Run metrics
     this.distance = 0;
@@ -126,8 +127,8 @@ export class GameEngine {
   }
 
   triggerSideCollision(obs) {
-    if (this.invulnerableTimer > 0) return;
-    this.invulnerableTimer = 0.5; // Short cooldown between bumps
+    if (this.sideBumpCooldown > 0) return;
+    this.sideBumpCooldown = 0.5; // Cooldown between side bump triggers and sound
     if (this.onSideCollision) {
       this.onSideCollision(obs);
     }
@@ -298,7 +299,7 @@ export class GameEngine {
       const trainLane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
       occupiedLanes.add(trainLane);
       const isMoving = Math.random() < 0.45;
-      const hasRamp = Math.random() < 0.65;
+      const hasRamp = Math.random() < 0.30;
       const length = 28; // Indian WAP-4 Locomotive + 3 Blue Passenger Coaches (28m rake)
 
       this.obstacles.push({
@@ -416,6 +417,9 @@ export class GameEngine {
     if (this.invulnerableTimer > 0) {
       this.invulnerableTimer -= delta;
     }
+    if (this.sideBumpCooldown > 0) {
+      this.sideBumpCooldown -= delta;
+    }
 
     // Power-ups countdown
     Object.keys(this.powerups).forEach((k) => {
@@ -455,7 +459,12 @@ export class GameEngine {
       }
     }
 
-    // 2. Move obstacles & trains forward
+    // 2. Record previous Z positions for swept continuous collision detection
+    for (const obs of this.obstacles) {
+      obs.prevZ = obs.z;
+    }
+
+    // Move obstacles & trains forward
     for (const obs of this.obstacles) {
       obs.z += moveDist;
       if (obs.isMoving) {
@@ -627,30 +636,36 @@ export class GameEngine {
     const playerX = this.lane * LANE_WIDTH;
 
     for (const obs of this.obstacles) {
-
       // Must be roughly in same lane
-      if (Math.abs(playerX - obs.x) > 1.0) continue;
+      if (Math.abs(playerX - obs.x) > 1.35) continue;
+
+      const prevZ = obs.prevZ !== undefined ? obs.prevZ : obs.z;
+      const curZ = obs.z;
 
       if (obs.type === 'low_barrier') {
-        // Low barrier: z around 0 (-0.8 to 0.8)
-        if (obs.z >= -0.8 && obs.z <= 0.8) {
-          // If player jumped high enough (y >= 1.0), clears it!
-          if (this.posY < 1.0) {
+        // Continuous swept test: did the barrier pass through player z=0?
+        const swept = (curZ >= -1.4 && prevZ <= 1.4);
+        if (swept) {
+          // If player jumped high enough (y >= 1.05), clears it!
+          if (this.posY < 1.05) {
             this.handleCollision('low_barrier');
             return;
           }
         }
       } else if (obs.type === 'high_barrier') {
-        // High barrier: z around 0 (-0.8 to 0.8)
-        if (obs.z >= -0.8 && obs.z <= 0.8) {
-          // Cleared if sliding on ground
-          if (!this.isSliding || this.posY > 0.4) {
+        // High barrier swept test
+        const swept = (curZ >= -1.4 && prevZ <= 1.4);
+        if (swept) {
+          // Cleared only if actively sliding and low to track
+          if (!this.isSliding || this.posY > 0.45) {
             this.handleCollision('high_barrier');
             return;
           }
         }
       } else if (obs.type === 'roadblock') {
-        if (obs.z >= -1.0 && obs.z <= 1.0) {
+        // Roadblock swept test
+        const swept = (curZ >= -1.6 && prevZ <= 1.6);
+        if (swept) {
           if (this.posY < 2.0) {
             this.handleCollision('roadblock');
             return;
@@ -658,34 +673,40 @@ export class GameEngine {
         }
       } else if (obs.type === 'train') {
         const halfL = (obs.length || 28) / 2;
-        const frontZ = obs.z + halfL;
-        const rearZ = obs.z - halfL;
+        const frontZ = curZ + halfL;
+        const prevFrontZ = prevZ + halfL;
+        const rearZ = curZ - halfL;
 
-        // Front ramp approach: smoothly run up ramp onto train roof floor!
-        if (obs.hasRamp && frontZ >= -2.4 && frontZ <= 2.4) {
-          this.isOnTrain = true;
-          const rampProgress = Math.max(0, Math.min(1, (frontZ + 2.4) / 3.2));
-          this.posY = Math.max(this.posY, this.trainRoofY * rampProgress);
-          if (this.posY >= this.trainRoofY - 0.25) {
-            this.posY = this.trainRoofY;
-            this.velocityY = 0;
-            this.isJumping = false;
-          }
-        }
-        // Front bumper collision (no ramp or player below roof height)
-        else if (frontZ >= -1.6 && frontZ <= 1.6) {
-          if (this.posY >= this.trainRoofY - 0.35) {
+        // Check A: Front bumper swept collision
+        const frontSwept = (frontZ >= -2.2 && prevFrontZ <= 2.2);
+
+        if (frontSwept) {
+          if (obs.hasRamp) {
+            // Front ramp approach: smoothly run up ramp onto train roof floor!
             this.isOnTrain = true;
-            this.posY = Math.max(this.posY, this.trainRoofY);
+            const rampProgress = Math.max(0, Math.min(1, (frontZ + 2.2) / 3.4));
+            this.posY = Math.max(this.posY, this.trainRoofY * rampProgress);
+            if (this.posY >= this.trainRoofY - 0.25) {
+              this.posY = this.trainRoofY;
+              this.velocityY = 0;
+              this.isJumping = false;
+            }
           } else {
-            this.handleCollision('train');
-            return;
+            // Solid locomotive bumper:
+            if (this.posY >= this.trainRoofY - 0.35) {
+              this.isOnTrain = true;
+              this.posY = Math.max(this.posY, this.trainRoofY);
+            } else {
+              // Fatal head-on collision with train!
+              this.handleCollision('train');
+              return;
+            }
           }
         }
-        // Body of train collision (side impact)
-        else if (0 >= rearZ && 0 <= frontZ) {
-          if (this.posY < this.trainRoofY - 0.3) {
-            this.triggerSideCollision(obs);
+        // Check B: Inside train body while on ground in the same lane (run over)
+        else if (rearZ <= 1.2 && frontZ >= -1.2) {
+          if (this.posY < this.trainRoofY - 0.35) {
+            this.handleCollision('train');
             return;
           }
         }

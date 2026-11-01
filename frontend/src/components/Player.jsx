@@ -1,98 +1,13 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Billboard, useTexture } from '@react-three/drei';
+import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+import { CHARACTERS } from '../game/characters';
+
+export { CHARACTERS };
 
 // Preload 4K transparent character sprite
 useTexture.preload('/player-character.png');
-
-export const CHARACTERS = {
-  Dinesh: {
-    name: 'Dinesh',
-    title: 'Camo Rail Surfer',
-    color: '#d4a373', // Camo Tan
-    hoodieColor: '#e9d5a1', // Beige hood
-    camoGreen: '#526046', // Olive camo patch
-    camoBrown: '#6b4a2d', // Earth camo patch
-    shirtColor: '#0f172a', // Black inner tee
-    pantsColor: '#1e293b', // Dark charcoal jeans
-    shoesColor: '#ef4444', // Retro red & white skate shoes
-    skinColor: '#c68642', // Warm tan tone
-    hairColor: '#171717', // Curly dark hair
-    hasSkateboard: true,
-    avatar: '/dinesh-avatar.jpg',
-    icon: '🛹',
-    description: 'Curly dark hair, trimmed beard, camo zip-up hoodie over black tee, dark jeans, retro red kicks, and a custom graffiti railboard.',
-    stats: { speed: 99, jump: 95, magnet: 92 },
-    ability: 'Speed Spark Rail Glide'
-  },
-  Jake: {
-    name: 'Jake',
-    title: 'The Mascot Runner',
-    color: '#2563eb', // Denim Blue
-    hoodieColor: '#94a3b8', // Grey hoodie
-    skinColor: '#fcd5b4',
-    capColor: '#ef4444', // Red cap
-    capBrimColor: '#22c55e', // Green graffiti brim
-    pantsColor: '#3b82f6', // Light blue jeans
-    shoesColor: '#22c55e', // Green tongue kicks
-    icon: '🧢',
-    description: 'Iconic street runner with graffiti cap, grey hoodie, denim vest, and spray paint can.',
-    stats: { speed: 95, jump: 88, magnet: 80 },
-    ability: 'Super Sprinter Dash'
-  },
-  Tricky: {
-    name: 'Tricky',
-    title: 'Geek-Chic Skater',
-    color: '#ffffff', // White crop top
-    beanieColor: '#dc2626', // Red beanie
-    hairColor: '#facc15', // Blonde hair
-    glassesColor: '#0f172a', // Thick black frames
-    skinColor: '#fde0cb',
-    waistbandColor: '#ef4444', // Red waistband
-    pantsColor: '#60a5fa', // Baggy boyfriend jeans
-    shoesColor: '#22c55e', // Skate sneakers
-    icon: '👓',
-    description: 'Red beanie, blonde pigtails, signature black square glasses, crop top, and baggy skater denim.',
-    stats: { speed: 88, jump: 98, magnet: 82 },
-    ability: 'High-Flying Airtime'
-  },
-  Fresh: {
-    name: 'Fresh',
-    title: 'Retro Beatboxer',
-    color: '#22c55e', // Green jersey
-    hairColor: '#171717', // Flat-top fade
-    glassesColor: '#0f172a', // Black glasses
-    skinColor: '#8d5b4c', // Brown skin tone
-    pantsColor: '#dc2626', // Red shorts
-    shoesColor: '#ef4444', // Red kicks
-    socksColor: '#ffffff', // White crew socks
-    hasBoombox: true,
-    icon: '📻',
-    description: 'Flat-top fade haircut, black frames, green tank top, red shorts, and an 80s boombox on shoulder.',
-    stats: { speed: 90, jump: 85, magnet: 88 },
-    ability: 'Groovy Multiplier'
-  },
-  Yutani: {
-    name: 'Yutani',
-    title: 'Alien Bug Mascot',
-    color: '#84cc16', // Lime green suit
-    suitDark: '#65a30d',
-    skinColor: '#fcd5b4',
-    eyeColor: '#ffffff',
-    stalkColor: '#7c3aed', // Purple antennae
-    isAlienSuit: true,
-    icon: '👽',
-    description: 'Full lime-green alien bug mascot suit with stalk eyes, purple antennae, cute face, and 4 arms.',
-    stats: { speed: 85, jump: 85, magnet: 100 },
-    ability: 'Cosmic Magnet Pulse'
-  }
-};
-
-// Aliases for compatibility
-CHARACTERS.Dash = CHARACTERS.Jake;
-CHARACTERS.Luna = CHARACTERS.Tricky;
-CHARACTERS.Bolt = CHARACTERS.Yutani;
 
 export default function Player({
   lane = 0,
@@ -220,6 +135,9 @@ export default function Player({
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.8, delta * 8);
       groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, -1.5, delta * 6);
       return;
+    } else {
+      groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, 0, Math.min(1, delta * 18));
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, Math.min(1, delta * 18));
     }
 
     if (activePowerups.hoverboard) {
@@ -426,18 +344,41 @@ export default function Player({
         {/* ================= 0. DINESH (CUSTOM 4K CAMERA-FACING SPRITE) ================= */}
         {isDinesh && (
           <group>
-            {/* Camera-Facing 4K Character Sprite Billboard */}
-            <Billboard follow={true} lockX={true} lockZ={true}>
-              <mesh ref={spriteMeshRef} position={[0, 1.15, 0]} castShadow>
-                <planeGeometry args={[1.5, 2.28]} />
-                <meshBasicMaterial
-                  map={characterTexture}
-                  transparent={true}
-                  alphaTest={0.05}
-                  side={THREE.DoubleSide}
-                />
-              </mesh>
-            </Billboard>
+            {/* Camera-Facing 4K Character Sprite (Direct, Stable Cutout) */}
+            <mesh ref={spriteMeshRef} position={[0, 1.15, 0]} castShadow>
+              <planeGeometry args={[1.55, 2.35]} />
+              <meshBasicMaterial
+                map={characterTexture}
+                transparent={true}
+                alphaTest={0.02}
+                side={THREE.DoubleSide}
+                depthWrite={false}
+              />
+            </mesh>
+
+            {/* Dinesh's Custom Graffiti Skateboard */}
+            {!powerups.hoverboard && (
+              <group position={[0, 0.08, 0]}>
+                <mesh castShadow receiveShadow>
+                  <boxGeometry args={[0.72, 0.07, 1.75]} />
+                  <meshStandardMaterial color="#d97706" roughness={0.3} metalness={0.4} />
+                </mesh>
+                {/* Grip tape */}
+                <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                  <planeGeometry args={[0.66, 1.65]} />
+                  <meshStandardMaterial color="#1e293b" roughness={0.9} />
+                </mesh>
+                {/* Wheels */}
+                {[-0.28, 0.28].map((wx, wi) =>
+                  [-0.6, 0.6].map((wz, wzi) => (
+                    <mesh key={`${wi}_${wzi}`} position={[wx, -0.04, wz]} rotation={[0, 0, Math.PI / 2]}>
+                      <cylinderGeometry args={[0.07, 0.07, 0.06, 12]} />
+                      <meshStandardMaterial color="#ef4444" />
+                    </mesh>
+                  ))
+                )}
+              </group>
+            )}
 
             {/* Glowing Golden Speed Sparks under Skateboard */}
             {!powerups.jetpack && (

@@ -3,7 +3,7 @@ import confetti from 'canvas-confetti';
 import Game from './game/Game';
 import Controls from './game/Controls';
 import GameUI from './components/GameUI';
-import { CHARACTERS } from './components/Player';
+import { CHARACTERS } from './game/characters';
 import { soundEffects } from './audio/SoundEffects';
 import { Canvas } from '@react-three/fiber';
 import Player from './components/Player';
