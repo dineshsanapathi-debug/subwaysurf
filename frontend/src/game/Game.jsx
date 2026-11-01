@@ -1,0 +1,250 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+import Player from '../components/Player';
+import Track from '../components/Track';
+import Obstacles from '../components/Obstacles';
+import Coins from '../components/Coins';
+import { GameEngine } from './GameLogic';
+import { soundEffects } from '../audio/SoundEffects';
+
+function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain }) {
+  const { camera } = useThree();
+  const currentLookY = useRef(2.0);
+
+  useFrame((state, delta) => {
+    // Dynamic camera horizontal follow
+    const targetCamX = playerX * 0.42;
+
+    // Smooth continuous vertical camera target (no discrete threshold jerks!)
+    const baseGroundY = isOnTrain ? 3.2 : 0;
+    let targetCamY = 4.8;
+    if (isJetpack) {
+      targetCamY = 9.8;
+    } else {
+      // Gentle, continuous elevation following without threshold snaps
+      targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.25;
+      if (isSliding) targetCamY -= 0.4;
+    }
+
+    const targetCamZ = isJetpack ? 9.8 : 7.0;
+
+    // Smooth lerp tracking
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, Math.min(1, delta * 6));
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, Math.min(1, delta * 6));
+
+    // Continuous smooth lookAt without snapping
+    const targetLookY = baseGroundY + 1.8 + Math.max(0, posY - baseGroundY) * 0.15;
+    currentLookY.current = THREE.MathUtils.lerp(currentLookY.current, targetLookY, Math.min(1, delta * 6));
+    camera.lookAt(targetCamX * 0.6, currentLookY.current, -14);
+  });
+
+  return null;
+}
+
+// Particle effects system
+function ParticleSystem({ particles = [] }) {
+  return (
+    <group>
+      {particles.map((p) => (
+        <mesh key={p.id} position={[p.x, p.y, p.z]}>
+          <sphereGeometry args={[p.size || 0.12, 8, 8]} />
+          <meshBasicMaterial color={p.color || '#facc15'} transparent opacity={p.opacity || 0.8} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
+  const [particles, setParticles] = useState([]);
+
+  useFrame((state, delta) => {
+    if (!engine) return;
+
+    engine.update(Math.min(delta, 0.1));
+    onEngineTick({
+      score: engine.score,
+      distance: Math.floor(engine.distance),
+      coins: engine.coins,
+      speed: Math.floor(engine.speed),
+      multiplier: engine.multiplier,
+      powerups: { ...engine.powerups },
+      lane: engine.lane,
+      posY: engine.posY,
+      isJumping: engine.isJumping,
+      isSliding: engine.isSliding,
+      isOnTrain: engine.isOnTrain,
+      isGameOver: engine.isGameOver,
+      isPaused: engine.isPaused
+    });
+
+    // Particle update
+    setParticles((prev) =>
+      prev
+        .map((p) => ({
+          ...p,
+          x: p.x + (p.vx || 0) * delta,
+          y: p.y + (p.vy || 0) * delta,
+          z: p.z + (p.vz || 0) * delta + engine.speed * delta * 0.5,
+          opacity: p.opacity - delta * 2
+        }))
+        .filter((p) => p.opacity > 0)
+    );
+  });
+
+  const playerX = engine ? engine.lane * 3.2 : 0;
+  const isJetpack = engine?.powerups.jetpack > 0;
+
+  return (
+    <>
+      {/* Cartoon Sunny Skybox / Background Color */}
+      <color attach="background" args={['#38bdf8']} />
+
+      {/* Atmospheric Fog */}
+      <fog attach="fog" args={['#60a5fa', 40, 110]} />
+
+      {/* Ambient Light for bright cartoon illumination */}
+      <ambientLight intensity={0.95} color="#e0f2fe" />
+
+      {/* Warm Sunny Directional Sunlight casting crisp shadows */}
+      <directionalLight
+        position={[14, 24, 16]}
+        intensity={1.6}
+        color="#fffbeb"
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-near={0.5}
+        shadow-camera-far={75}
+        shadow-camera-left={-18}
+        shadow-camera-right={18}
+        shadow-camera-top={18}
+        shadow-camera-bottom={-18}
+      />
+
+      {/* Skylight Fill */}
+      <directionalLight position={[-12, 18, -10]} intensity={0.5} color="#7dd3fc" />
+
+      {/* Camera Follow */}
+      <CameraFollow
+        playerX={playerX}
+        posY={engine?.posY || 0}
+        isJetpack={isJetpack}
+        isSliding={engine?.isSliding}
+        isOnTrain={engine?.isOnTrain}
+      />
+
+      {/* Track Chunks */}
+      {engine?.chunks.map((chunk) => (
+        <Track key={chunk.id} position={[0, 0, chunk.z]} theme={theme} />
+      ))}
+
+      {/* Obstacles & Trains */}
+      <Obstacles obstacles={engine?.obstacles || []} />
+
+      {/* Coins & Powerups */}
+      <Coins coins={engine?.coinsList || []} powerups={engine?.powerupsList || []} />
+
+      {/* Player Character */}
+      <Player
+        lane={engine?.lane || 0}
+        posY={engine?.posY || 0}
+        isJumping={engine?.isJumping}
+        isSliding={engine?.isSliding}
+        isOnTrain={engine?.isOnTrain}
+        isCrashing={engine?.isGameOver}
+        characterName={selectedCharacter}
+        powerups={engine?.powerups || {}}
+      />
+
+      {/* Particle System */}
+      <ParticleSystem particles={particles} />
+    </>
+  );
+}
+
+export default function Game({
+  selectedCharacter = 'Dash',
+  adaptiveSettings = {},
+  onGameOver,
+  onUpdateStats,
+  theme = 'sunset',
+  isPaused = false
+}) {
+  const [engine, setEngine] = useState(null);
+  const engineRef = useRef(null);
+
+  useEffect(() => {
+    const newEngine = new GameEngine({
+      character: selectedCharacter,
+      speedBase: adaptiveSettings.speedBase || 20,
+      speedMax: adaptiveSettings.speedMax || 38,
+      trainSpawnRate: adaptiveSettings.trainSpawnRate || 0.35,
+      powerupFrequency: adaptiveSettings.powerupFrequency || 0.12,
+      obstacleGap: adaptiveSettings.obstacleGap || 30
+    });
+
+    newEngine.onCoinCollect = () => soundEffects.playCoin();
+    newEngine.onPowerupCollect = () => soundEffects.playPowerup();
+    newEngine.onHoverboardBreak = () => soundEffects.playCrash();
+    newEngine.onGameOver = (finalData) => {
+      soundEffects.playCrash();
+      if (onGameOver) onGameOver(finalData);
+    };
+
+    engineRef.current = newEngine;
+    setEngine(newEngine);
+
+    return () => {
+      newEngine.isGameOver = true;
+    };
+  }, [selectedCharacter, adaptiveSettings]);
+
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.isPaused = isPaused;
+    }
+  }, [isPaused]);
+
+  useEffect(() => {
+    window.gameActions = {
+      moveLeft: () => engineRef.current?.moveLeft(),
+      moveRight: () => engineRef.current?.moveRight(),
+      jump: () => {
+        if (engineRef.current?.jump()) soundEffects.playJump();
+      },
+      slide: () => {
+        if (engineRef.current?.slide()) soundEffects.playSlide();
+      },
+      hoverboard: () => {
+        engineRef.current?.activateHoverboard();
+        soundEffects.playHoverboard();
+      }
+    };
+
+    return () => {
+      delete window.gameActions;
+    };
+  }, []);
+
+  return (
+    <div className="w-full h-full relative">
+      <Canvas
+        shadows
+        camera={{ position: [0, 4.8, 7.0], fov: 62 }}
+        gl={{ antialias: true, powerPreference: 'high-performance' }}
+      >
+        {engine && (
+          <Scene
+            engine={engine}
+            onEngineTick={onUpdateStats}
+            selectedCharacter={selectedCharacter}
+            theme={theme}
+          />
+        )}
+      </Canvas>
+    </div>
+  );
+}
