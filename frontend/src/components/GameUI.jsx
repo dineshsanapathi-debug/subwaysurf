@@ -18,6 +18,7 @@ import {
   ArrowDown
 } from 'lucide-react';
 import { CHARACTERS } from './Player';
+import { THEMES } from './WorldThemes';
 
 export default function GameUI({
   screen = 'menu', // 'menu', 'characters', 'playing', 'pause', 'gameover'
@@ -37,7 +38,7 @@ export default function GameUI({
   adaptiveSettings = {},
   onAskAiCoach,
   onUpdateDifficultyMode,
-  theme = 'sunset',
+  theme = 'auto',
   onChangeTheme,
   user = null,
   onLogin,
@@ -48,6 +49,7 @@ export default function GameUI({
   const [showAiModal, setShowAiModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showWorldSelect, setShowWorldSelect] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -348,34 +350,59 @@ export default function GameUI({
                           </div>
 
                             {/* Bottom Control Bar */}
-                            <div className="w-full max-w-md mx-auto flex flex-col items-center gap-3">
-                              {/* Selected Runner Badge */}
-                              <div
-                                onClick={() => onSelectCharacter('next')}
-                                className="cursor-pointer bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-cyan-400/50 rounded-full px-4 py-1.5 flex items-center gap-2.5 shadow-2xl active:scale-95 transition-all"
-                              >
-                                {CHARACTERS[selectedCharacter]?.avatar ? (
-                                  <img
-                                    src={CHARACTERS[selectedCharacter].avatar}
-                                    alt={selectedCharacter}
-                                    className="w-7 h-7 rounded-full object-cover border border-amber-400 shadow"
-                                  />
-                                ) : (
-                                  <div
-                                    className="w-7 h-7 rounded-full flex items-center justify-center text-base shadow"
-                                    style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
-                                  >
-                                    {CHARACTERS[selectedCharacter]?.icon || '🧢'}
+                            <div className="w-full max-w-lg mx-auto flex flex-col items-center gap-3">
+                              {/* Runner & World Badges */}
+                              <div className="flex flex-col sm:flex-row items-center gap-2 w-full justify-center">
+                                {/* Selected Runner Badge */}
+                                <div
+                                  onClick={() => onSelectCharacter('next')}
+                                  className="cursor-pointer bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-cyan-400/50 rounded-full px-4 py-1.5 flex items-center justify-between gap-2.5 shadow-2xl active:scale-95 transition-all flex-1 w-full"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {CHARACTERS[selectedCharacter]?.avatar ? (
+                                      <img
+                                        src={CHARACTERS[selectedCharacter].avatar}
+                                        alt={selectedCharacter}
+                                        className="w-7 h-7 rounded-full object-cover border border-amber-400 shadow"
+                                      />
+                                    ) : (
+                                      <div
+                                        className="w-7 h-7 rounded-full flex items-center justify-center text-base shadow"
+                                        style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
+                                      >
+                                        {CHARACTERS[selectedCharacter]?.icon || '🧢'}
+                                      </div>
+                                    )}
+                                    <div className="text-left text-xs">
+                                      <span className="text-slate-400 text-[10px] block leading-tight font-semibold">Runner:</span>
+                                      <strong className="text-white font-black truncate max-w-[110px] block">{selectedCharacter}</strong>
+                                    </div>
                                   </div>
-                                )}
-                                <div className="text-left text-xs">
-                                  <span className="text-slate-400 text-[10px] block leading-tight font-semibold">Runner:</span>
-                                  <strong className="text-white font-black">{selectedCharacter}</strong>
-                                  <span className="text-cyan-400 text-[10px] ml-1.5 font-bold">({CHARACTERS[selectedCharacter]?.title})</span>
+                                  <span className="text-[10px] font-bold text-amber-400 uppercase bg-amber-400/20 px-2 py-0.5 rounded-full ml-1">
+                                    Switch
+                                  </span>
                                 </div>
-                                <span className="text-[10px] font-bold text-amber-400 uppercase bg-amber-400/20 px-2 py-0.5 rounded-full ml-2">
-                                  Switch
-                                </span>
+
+                                {/* World Tour Location Badge */}
+                                <div
+                                  onClick={() => setShowWorldSelect(true)}
+                                  className="cursor-pointer bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-amber-400/50 rounded-full px-4 py-1.5 flex items-center justify-between gap-2.5 shadow-2xl active:scale-95 transition-all flex-1 w-full"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">
+                                      {theme === 'auto' ? '🌐' : (THEMES.find((t) => t.id === theme)?.icon || '🚂')}
+                                    </span>
+                                    <div className="text-left text-xs">
+                                      <span className="text-slate-400 text-[10px] block leading-tight font-semibold">World Tour:</span>
+                                      <strong className="text-white font-black truncate max-w-[110px] block">
+                                        {theme === 'auto' ? 'All 5 Worlds' : (THEMES.find((t) => t.id === theme)?.name || 'Indian Rail')}
+                                      </strong>
+                                    </div>
+                                  </div>
+                                  <span className="text-[10px] font-bold text-cyan-400 uppercase bg-cyan-400/20 px-2 py-0.5 rounded-full ml-1">
+                                    {theme === 'auto' ? '500m Loop' : 'Change'}
+                                  </span>
+                                </div>
                               </div>
 
                                 {/* Giant Arcade Play Button */}
@@ -840,6 +867,127 @@ export default function GameUI({
                                     className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-sm text-white transition-all"
                                   >
                                     Close
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* ================= WORLD TOUR / LOCATIONS MODAL ================= */}
+                            {showWorldSelect && (
+                              <div className="w-full h-full flex items-center justify-center p-3 sm:p-4 pointer-events-auto bg-slate-950/85 backdrop-blur-md z-50">
+                                <div className="bg-slate-900 border-2 border-amber-400/50 rounded-3xl p-4 sm:p-6 max-w-lg w-full shadow-[0_10px_40px_rgba(245,158,11,0.3)] flex flex-col gap-4 max-h-[92vh] overflow-hidden">
+                                  {/* Modal Header */}
+                                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div className="flex items-center gap-2.5">
+                                      <span className="text-2xl">🌐</span>
+                                      <div>
+                                        <h3 className="text-lg sm:text-xl font-black text-white leading-none">WORLD TOUR</h3>
+                                        <span className="text-[11px] font-bold text-amber-300">5 Themed Game Locations</span>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() => setShowWorldSelect(false)}
+                                      className="w-8 h-8 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all"
+                                    >
+                                      <X size={18} />
+                                    </button>
+                                  </div>
+
+                                  {/* World Tour Auto-Progression Option */}
+                                  <div
+                                    onClick={() => {
+                                      onChangeTheme('auto');
+                                      setShowWorldSelect(false);
+                                    }}
+                                    className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between shadow-lg ${
+                                      theme === 'auto'
+                                        ? 'bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-cyan-500/20 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.3)]'
+                                        : 'bg-slate-800/60 hover:bg-slate-800 border-slate-700/80'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 via-pink-500 to-cyan-400 flex items-center justify-center text-xl shadow">
+                                        🌐
+                                      </div>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <strong className="text-sm font-black text-white">World Tour Mode</strong>
+                                          <span className="bg-amber-400 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded-full uppercase">
+                                            Recommended
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-300 mt-0.5">
+                                          Seamlessly travels through all 5 worlds every 500 metres!
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className={`text-xs font-black px-2.5 py-1 rounded-xl ${theme === 'auto' ? 'bg-amber-400 text-slate-950' : 'bg-slate-700 text-slate-300'}`}>
+                                        {theme === 'auto' ? 'ACTIVE' : 'SELECT'}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-1">
+                                    Or Choose Starting Environment:
+                                  </span>
+
+                                  {/* List of 5 Worlds */}
+                                  <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                                    {THEMES.map((t, idx) => {
+                                      const isSelected = theme === t.id;
+                                      return (
+                                        <div
+                                          key={t.id}
+                                          onClick={() => {
+                                            onChangeTheme(t.id);
+                                            setShowWorldSelect(false);
+                                          }}
+                                          className={`p-3 rounded-2xl border cursor-pointer transition-all flex items-center justify-between ${
+                                            isSelected
+                                              ? 'bg-slate-800 border-2 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                                              : 'bg-slate-800/40 hover:bg-slate-800/80 border-slate-700/60'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-3">
+                                            <div
+                                              className="w-10 h-10 rounded-xl flex items-center justify-center text-xl border shadow"
+                                              style={{ backgroundColor: `${t.accent}25`, borderColor: t.accent }}
+                                            >
+                                              {t.icon}
+                                            </div>
+                                            <div className="text-left">
+                                              <div className="flex items-center gap-2">
+                                                <strong className="text-xs sm:text-sm font-black text-white">{t.name}</strong>
+                                                <span className="text-[10px] text-slate-400">{t.country}</span>
+                                              </div>
+                                              <p className="text-[10px] text-slate-400 truncate max-w-[180px] sm:max-w-xs">
+                                                {t.subtitle}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300">
+                                              {idx * 500}M
+                                            </span>
+                                            <span
+                                              className={`text-[10px] font-black px-2 py-1 rounded-xl ${
+                                                isSelected ? 'bg-cyan-400 text-slate-950 font-black' : 'bg-slate-700 text-slate-300'
+                                              }`}
+                                            >
+                                              {isSelected ? 'ACTIVE' : 'CHOOSE'}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+
+                                  <button
+                                    onClick={() => setShowWorldSelect(false)}
+                                    className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 font-bold text-xs text-white transition-all border border-slate-700"
+                                  >
+                                    Done
                                   </button>
                                 </div>
                               </div>

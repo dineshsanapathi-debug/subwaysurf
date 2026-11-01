@@ -18,7 +18,7 @@ export default function App() {
     return parseInt(localStorage.getItem('rail_rush_coins') || '0', 10);
   });
 
-  const [theme, setTheme] = useState('sunset'); // 'sunset' | 'night'
+  const [theme, setTheme] = useState('auto'); // 'auto' (World Tour auto 500m) or 'indian_railway', 'tokyo_city', etc.
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('rail_rush_user');

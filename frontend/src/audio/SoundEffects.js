@@ -126,6 +126,35 @@ class SoundEffectsEngine {
     } catch (e) {}
   }
 
+  playWorldChange() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      // Majestic 4-note ascending fanfare chime: C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const noteTime = now + idx * 0.09;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, noteTime);
+
+        gain.gain.setValueAtTime(this.sfxVolume * 0.45, noteTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(noteTime);
+        osc.stop(noteTime + 0.35);
+      });
+    } catch (e) {}
+  }
+
   playCoin() {
     if (this.isMuted) return;
     this.init();

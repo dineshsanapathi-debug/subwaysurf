@@ -110,7 +110,18 @@ function createGraffitiTexture(text, style = 'run') {
   return texture;
 }
 
-export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false }) {
+export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false, currentTheme = null }) {
+  // Extract theme parameters with sensible fallbacks
+  const groundColor = currentTheme?.ground || '#854d0e';
+  const sleeperColor = currentTheme?.sleeper || '#9a3412';
+  const railColor = currentTheme?.rail || '#cbd5e1';
+  const isNeon = currentTheme?.neonGlow || false;
+  const gantryColor = currentTheme?.gantryColor || '#eab308';
+  const wallTopColor = currentTheme?.wallTop || '#cbd5e1';
+  const sceneryType = currentTheme?.sceneryType || 'indian';
+  const bannerText = currentTheme?.bannerText || 'NEW DELHI JUNCTION';
+  const accentColor = currentTheme?.accent || '#f59e0b';
+
   // Generate procedural graffiti textures once
   const { leftWallTex, rightWallTex } = useMemo(() => {
     return {
@@ -128,7 +139,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
     return list;
   }, []);
 
-  // Green grass clumps along the walls
+  // Green grass / vegetation tufts along the walls
   const grassTufts = useMemo(() => {
     const list = [];
     for (let z = -CHUNK_LENGTH / 2; z < CHUNK_LENGTH / 2; z += 4.5) {
@@ -137,17 +148,11 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
     return list;
   }, []);
 
-  // Upper city buildings on left and right
+  // Side buildings styled to the current world theme
   const buildings = useMemo(() => {
     const list = [];
-    const colors = [
-      '#f97316', // Vibrant Orange
-      '#fbbf24', // Sunny Warm Yellow
-      '#ef4444', // Red-Coral
-      '#06b6d4', // Teal Blue
-      '#8b5cf6', // Soft Violet
-      '#ec4899', // Pinkish Coral
-      '#10b981'  // Mint Green
+    const colors = currentTheme?.buildingColors || [
+      '#f97316', '#fbbf24', '#ef4444', '#06b6d4', '#8b5cf6', '#ec4899', '#10b981'
     ];
 
     for (let i = 0; i < 9; i++) {
@@ -156,19 +161,19 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
       const heightR = 15 + (Math.abs(Math.cos(i * 1.4)) * 14);
       const colorL = colors[i % colors.length];
       const colorR = colors[(i + 3) % colors.length];
-      const bannerColor = i % 2 === 0 ? '#ef4444' : '#f59e0b';
+      const bannerColor = i % 2 === 0 ? accentColor : (colors[(i + 1) % colors.length]);
       list.push({ z, heightL, heightR, colorL, colorR, bannerColor });
     }
     return list;
-  }, []);
+  }, [currentTheme, accentColor]);
 
   return (
     <group position={position}>
-      {/* 1. Track Bed Ground (Warm Earthy Gravel / Ballast) */}
+      {/* 1. Track Bed Ground */}
       <mesh position={[0, -0.06, 0]} receiveShadow>
         <boxGeometry args={[TRACK_WIDTH, 0.12, CHUNK_LENGTH]} />
         <meshStandardMaterial
-          color="#854d0e"
+          color={groundColor}
           roughness={0.95}
           polygonOffset
           polygonOffsetFactor={1}
@@ -176,35 +181,47 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
         />
       </mesh>
 
-      {/* 2. Wooden Railway Ties / Sleepers (Rich Warm Wood) */}
+      {/* 2. Wooden Railway Ties / Sleepers */}
       {ties.map((z, idx) => (
         <group key={idx} position={[0, 0.02, z]}>
           {LANES_X.map((lx, lIdx) => (
             <mesh key={lIdx} position={[lx, 0, 0]} receiveShadow>
               <boxGeometry args={[2.2, 0.08, 0.44]} />
-              <meshStandardMaterial color="#9a3412" roughness={0.7} />
+              <meshStandardMaterial color={sleeperColor} roughness={0.7} />
             </mesh>
           ))}
         </group>
       ))}
 
-      {/* 3. Metallic Shiny Rails with Specular Highlights */}
+      {/* 3. Metallic Shiny Rails with Specular Highlights & Cyber Glow in Tokyo */}
       {LANES_X.map((lx, lIdx) => (
         <group key={lIdx}>
           {/* Left Rail */}
           <mesh position={[lx - 0.72, 0.09, 0]} receiveShadow>
             <boxGeometry args={[0.07, 0.14, CHUNK_LENGTH]} />
-            <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.15} />
+            <meshStandardMaterial
+              color={railColor}
+              metalness={isNeon ? 0.2 : 0.9}
+              roughness={isNeon ? 0.2 : 0.15}
+              emissive={isNeon ? railColor : '#000000'}
+              emissiveIntensity={isNeon ? 0.75 : 0}
+            />
           </mesh>
           {/* Right Rail */}
           <mesh position={[lx + 0.72, 0.09, 0]} receiveShadow>
             <boxGeometry args={[0.07, 0.14, CHUNK_LENGTH]} />
-            <meshStandardMaterial color="#cbd5e1" metalness={0.9} roughness={0.15} />
+            <meshStandardMaterial
+              color={railColor}
+              metalness={isNeon ? 0.2 : 0.9}
+              roughness={isNeon ? 0.2 : 0.15}
+              emissive={isNeon ? railColor : '#000000'}
+              emissiveIntensity={isNeon ? 0.75 : 0}
+            />
           </mesh>
         </group>
       ))}
 
-      {/* 4. Concrete Retaining Walls (Sunken Trench Canal) with Graffiti (hidden during skyway for open sky view) */}
+      {/* 4. Retaining Walls with Graffiti & Themed Tops */}
       {!isSkyway && (
         <>
           {/* Left Wall */}
@@ -216,7 +233,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             {/* Wall Top Ledge / Curb */}
             <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
-              <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
+              <meshStandardMaterial color={wallTopColor} roughness={0.6} />
             </mesh>
           </group>
 
@@ -229,7 +246,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             {/* Wall Top Ledge / Curb */}
             <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
-              <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
+              <meshStandardMaterial color={wallTopColor} roughness={0.6} />
             </mesh>
           </group>
 
@@ -309,41 +326,59 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
         </>
       )}
 
-      {/* 7. Overhead Steel Lattice Gantries & Catenary Wires (cleared during upper skyway flight) */}
+      {/* 7. Overhead Gantries & Themed Station Signage (cleared during upper skyway flight) */}
       {!isSkyway && [-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (
         <group key={gi} position={[0, 0, gantryZ]}>
-          {/* Yellow Lattice Crossbeam Arch */}
+          {/* Main Crossbeam Arch */}
           <mesh position={[0, 6.8, 0]} castShadow>
             <boxGeometry args={[TRACK_WIDTH + 1.2, 0.45, 0.45]} />
-            <meshStandardMaterial color="#eab308" metalness={0.5} roughness={0.4} />
+            <meshStandardMaterial
+              color={gantryColor}
+              metalness={0.5}
+              roughness={0.4}
+              emissive={isNeon ? gantryColor : '#000000'}
+              emissiveIntensity={isNeon ? 0.35 : 0}
+            />
           </mesh>
           {/* Support Legs */}
           <mesh position={[-TRACK_WIDTH / 2 - 0.2, 4.2, 0]} castShadow>
             <boxGeometry args={[0.35, 5.8, 0.35]} />
-            <meshStandardMaterial color="#eab308" metalness={0.5} />
+            <meshStandardMaterial color={gantryColor} metalness={0.5} />
           </mesh>
           <mesh position={[TRACK_WIDTH / 2 + 0.2, 4.2, 0]} castShadow>
             <boxGeometry args={[0.35, 5.8, 0.35]} />
-            <meshStandardMaterial color="#eab308" metalness={0.5} />
+            <meshStandardMaterial color={gantryColor} metalness={0.5} />
           </mesh>
 
-          {/* Yellow/Black Hazard Chevron Striping */}
-          <mesh position={[0, 6.4, 0.25]}>
-            <planeGeometry args={[2.8, 0.35]} />
-            <meshBasicMaterial color="#000000" />
+          {/* Themed Location Signboard */}
+          <mesh position={[0, 6.35, 0.25]}>
+            <boxGeometry args={[4.2, 0.55, 0.08]} />
+            <meshStandardMaterial
+              color={isNeon ? '#0f172a' : (sceneryType === 'egypt' ? '#78350f' : (sceneryType === 'newyork' ? '#15803d' : '#0f172a'))}
+              roughness={0.3}
+            />
+          </mesh>
+          {/* Inner Accent Line */}
+          <mesh position={[0, 6.35, 0.30]}>
+            <planeGeometry args={[4.0, 0.42]} />
+            <meshBasicMaterial color={accentColor} />
           </mesh>
 
-          {/* Overhead Power Catenary Wires hanging down */}
+          {/* Overhead Power Catenary Wires or Lanterns */}
           {LANES_X.map((lx, lIdx) => (
             <group key={lIdx} position={[lx, 6.0, 0]}>
               <mesh position={[0, -0.4, 0]}>
                 <cylinderGeometry args={[0.02, 0.02, 0.8, 6]} />
                 <meshStandardMaterial color="#334155" />
               </mesh>
-              {/* Electric Insulator */}
+              {/* Electric Insulator or Lantern */}
               <mesh position={[0, 0, 0]}>
                 <cylinderGeometry args={[0.08, 0.08, 0.22, 8]} />
-                <meshStandardMaterial color="#a855f7" />
+                <meshStandardMaterial
+                  color={isNeon ? '#00eaff' : (sceneryType === 'egypt' ? '#fbbf24' : '#a855f7')}
+                  emissive={isNeon ? '#00eaff' : '#000000'}
+                  emissiveIntensity={isNeon ? 0.6 : 0}
+                />
               </mesh>
             </group>
           ))}

@@ -10,6 +10,7 @@ import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceCharacter from '../components/PoliceCharacter';
 import RemoveDebugLines from '../components/RemoveDebugLines';
+import WorldThemes, { THEMES } from '../components/WorldThemes';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -64,10 +65,19 @@ function Scene({
   showIntro = false,
   onIntroComplete,
   policeChasing = false,
-  setPoliceChasing
+  setPoliceChasing,
+  onWorldChange
 }) {
+  const [currentWorldTheme, setCurrentWorldTheme] = useState(THEMES[0]);
   const [particles, setParticles] = useState([]);
   const playerGroupRef = useRef();
+
+  const handleWorldChange = (newTheme, themeIdx, distance) => {
+    setCurrentWorldTheme(newTheme);
+    if (onWorldChange) {
+      onWorldChange(newTheme, themeIdx, distance);
+    }
+  };
 
   useFrame((state, delta) => {
     if (!engine) return;
@@ -117,20 +127,25 @@ function Scene({
 
   return (
     <>
-      {/* Cartoon Sunny Skybox / Background Color */}
-      <color attach="background" args={['#38bdf8']} />
+      {/* Dynamic 500-Metre Multi-World Themes Engine */}
+      <WorldThemes
+        playerRef={playerGroupRef}
+        engine={engine}
+        themeOverride={theme}
+        onWorldChange={handleWorldChange}
+      />
 
-      {/* Atmospheric Fog */}
-      <fog attach="fog" args={['#60a5fa', 40, 110]} />
+      {/* Atmospheric Fog aligned with current world */}
+      <fog attach="fog" args={[currentWorldTheme.fog, currentWorldTheme.fogNear, currentWorldTheme.fogFar]} />
 
-      {/* Ambient Light for bright cartoon illumination */}
-      <ambientLight intensity={0.95} color="#e0f2fe" />
+      {/* Ambient Light with themed tint */}
+      <ambientLight intensity={currentWorldTheme.ambientIntensity} color={currentWorldTheme.ambientLight} />
 
-      {/* Warm Sunny Directional Sunlight casting crisp shadows */}
+      {/* Themed Directional Sunlight casting crisp shadows */}
       <directionalLight
         position={[14, 24, 16]}
-        intensity={1.6}
-        color="#fffbeb"
+        intensity={currentWorldTheme.sunIntensity}
+        color={currentWorldTheme.sunLight}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -142,8 +157,8 @@ function Scene({
         shadow-camera-bottom={-18}
       />
 
-      {/* Skylight Fill */}
-      <directionalLight position={[-12, 18, -10]} intensity={0.5} color="#7dd3fc" />
+      {/* Themed Skylight Fill */}
+      <directionalLight position={[-12, 18, -10]} intensity={0.4} color={currentWorldTheme.ambientLight} />
 
       {/* Camera Follow (active after intro) */}
       {!showIntro && (
@@ -167,9 +182,15 @@ function Scene({
         </React.Suspense>
       )}
 
-      {/* Track Chunks (Gantries & wires cleared while on skyway) */}
+      {/* Track Chunks with dynamic world theme colors, rails & scenery */}
       {engine?.chunks.map((chunk) => (
-        <Track key={chunk.id} position={[0, 0, chunk.z]} theme={theme} isSkyway={isSkyway} />
+        <Track
+          key={chunk.id}
+          position={[0, 0, chunk.z]}
+          theme={theme}
+          isSkyway={isSkyway}
+          currentTheme={currentWorldTheme}
+        />
       ))}
 
       {/* Obstacles & Trains */}
@@ -239,13 +260,30 @@ export default function Game({
   adaptiveSettings = {},
   onGameOver,
   onUpdateStats,
-  theme = 'sunset',
+  theme = 'auto',
   isPaused = false
 }) {
   const [engine, setEngine] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   const [policeChasing, setPoliceChasing] = useState(false);
+  const [worldAnnouncement, setWorldAnnouncement] = useState(null);
+  const announcementTimerRef = useRef(null);
   const engineRef = useRef(null);
+
+  const handleWorldChange = (newTheme, themeIdx, distance) => {
+    soundEffects.playWorldChange();
+    if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+    setWorldAnnouncement({ theme: newTheme, distance: Math.floor(distance) });
+    announcementTimerRef.current = setTimeout(() => {
+      setWorldAnnouncement(null);
+    }, 4500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (policeChasing && !showIntro) {
@@ -343,9 +381,53 @@ export default function Game({
             onIntroComplete={() => setShowIntro(false)}
             policeChasing={policeChasing}
             setPoliceChasing={setPoliceChasing}
+            onWorldChange={handleWorldChange}
           />
         )}
       </Canvas>
+
+      {/* World Tour Location Announcement Floating Card */}
+      {worldAnnouncement && !showIntro && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-40 pointer-events-none transition-all duration-500 animate-in fade-in slide-in-from-top-4">
+          <div
+            className="backdrop-blur-md rounded-2xl px-5 py-2.5 shadow-2xl flex items-center gap-3.5 border-2 text-center"
+            style={{
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              borderColor: worldAnnouncement.theme.accent || '#f59e0b',
+              boxShadow: `0 8px 30px ${worldAnnouncement.theme.accent}66`
+            }}
+          >
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl shadow border"
+              style={{
+                backgroundColor: `${worldAnnouncement.theme.accent}33`,
+                borderColor: worldAnnouncement.theme.accent
+              }}
+            >
+              {worldAnnouncement.theme.icon}
+            </div>
+            <div className="text-left">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-black tracking-widest text-white/80">
+                  {worldAnnouncement.theme.country}
+                </span>
+                <span
+                  className="text-[9px] font-black px-1.5 py-0.5 rounded-full text-slate-950 shadow"
+                  style={{ backgroundColor: worldAnnouncement.theme.accent }}
+                >
+                  {worldAnnouncement.distance > 0 ? `${worldAnnouncement.distance}M MILESTONE` : 'LOCATION'}
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-black text-white tracking-wide leading-tight">
+                {worldAnnouncement.theme.name}
+              </h3>
+              <p className="text-[10px] text-cyan-300 font-bold leading-tight">
+                {worldAnnouncement.theme.subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HUD Mango Counter */}
       {!showIntro && (
