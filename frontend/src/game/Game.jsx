@@ -84,6 +84,7 @@ function Scene({
   const [particles, setParticles] = useState([]);
   const playerGroupRef = useRef();
   const lastWarningKey = useRef('none');
+  const lastStatsTick = useRef(0);
 
   const handleWorldChange = (newTheme, themeIdx, distance) => {
     setCurrentWorldTheme(newTheme);
@@ -100,24 +101,32 @@ function Scene({
       engine.update(Math.min(delta, 0.1));
     }
 
-    onEngineTick({
-      score: engine.score,
-      distance: Math.floor(engine.distance),
-      coins: engine.coins,
-      speed: Math.floor(engine.speed),
-      multiplier: engine.multiplier,
-      powerups: { ...engine.powerups },
-      elevatedRoute: engine?.elevatedRoute ? { ...engine.elevatedRoute } : null,
-      lane: engine.lane,
-      posY: engine.posY,
-      isJumping: engine.isJumping,
-      isSliding: engine.isSliding,
-      isOnTrain: engine.isOnTrain,
-      isGameOver: engine.isGameOver,
-      isPaused: engine.isPaused,
-      isIntro: showIntro,
-      warningState: engine.warningState
-    });
+    // Performance Optimization: Throttle React HUD updates to 10Hz (every 100ms) or on game-over/pause
+    // Eliminates 60fps root React re-render bottleneck and micro-stutters
+    const now = state.clock.getElapsedTime();
+    if (now - lastStatsTick.current >= 0.1 || engine.isGameOver || engine.isPaused) {
+      lastStatsTick.current = now;
+      if (onEngineTick) {
+        onEngineTick({
+          score: engine.score,
+          distance: Math.floor(engine.distance),
+          coins: engine.coins,
+          speed: Math.floor(engine.speed),
+          multiplier: engine.multiplier,
+          powerups: { ...engine.powerups },
+          elevatedRoute: engine?.elevatedRoute ? { ...engine.elevatedRoute } : null,
+          lane: engine.lane,
+          posY: engine.posY,
+          isJumping: engine.isJumping,
+          isSliding: engine.isSliding,
+          isOnTrain: engine.isOnTrain,
+          isGameOver: engine.isGameOver,
+          isPaused: engine.isPaused,
+          isIntro: showIntro,
+          warningState: engine.warningState
+        });
+      }
+    }
 
     // Notify warning state updates to React HUD
     const currentWarn = engine.warningState || null;
@@ -127,8 +136,8 @@ function Scene({
       if (onWarningChange) onWarningChange(currentWarn);
     }
 
-    if (!showIntro) {
-      // Particle update
+    if (!showIntro && particles.length > 0) {
+      // Particle update only when active particles exist
       setParticles((prev) =>
         prev
           .map((p) => ({
@@ -446,6 +455,7 @@ export default function Game({
 
       <Canvas
         shadows
+        dpr={[1, 1.5]}
         camera={{ position: [0, 4.8, 7.0], fov: 62 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >

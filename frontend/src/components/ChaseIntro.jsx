@@ -3,15 +3,22 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 // Subway Surfers Police Inspector Cutout Sprite
-function StylizedPoliceInspector({ runTime = 0 }) {
+function StylizedPoliceInspector() {
+  const meshRef = useRef();
   const texture = useMemo(() => {
     const tex = new THREE.TextureLoader().load('/images/police.png');
     tex.colorSpace = THREE.SRGBColorSpace;
     return tex;
   }, []);
 
-  const bobY = Math.abs(Math.sin(runTime * 16)) * 0.14;
-  const swayZ = Math.sin(runTime * 8) * 0.05;
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const runTime = state.clock.getElapsedTime();
+    const bobY = Math.abs(Math.sin(runTime * 16)) * 0.14;
+    const swayZ = Math.sin(runTime * 8) * 0.05;
+    meshRef.current.position.y = 1.6 + bobY;
+    meshRef.current.rotation.z = swayZ;
+  });
 
   return (
     <group position={[0, 0, 0]}>
@@ -21,7 +28,7 @@ function StylizedPoliceInspector({ runTime = 0 }) {
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
       {/* Indian Police Officer Cutout Sprite - Facing opposite to screen (running down the track in hot pursuit) */}
-      <mesh position={[0, 1.6 + bobY, 0]} rotation={[-0.14, Math.PI, swayZ]}>
+      <mesh ref={meshRef} position={[0, 1.6, 0]} rotation={[-0.14, Math.PI, 0]}>
         <planeGeometry args={[2.06, 3.2]} />
         <meshBasicMaterial
           map={texture}
@@ -36,14 +43,15 @@ function StylizedPoliceInspector({ runTime = 0 }) {
 }
 
 // Procedural 3D Subway Surfers Police Dog
-function StylizedPoliceDog({ runTime = 0 }) {
+function StylizedPoliceDog() {
   const frontLeftLeg = useRef();
   const frontRightLeg = useRef();
   const backLeftLeg = useRef();
   const backRightLeg = useRef();
   const tailRef = useRef();
 
-  useFrame(() => {
+  useFrame((state) => {
+    const runTime = state.clock.getElapsedTime();
     const angle = Math.sin(runTime * 18) * 0.65;
     if (frontLeftLeg.current) frontLeftLeg.current.rotation.x = angle;
     if (frontRightLeg.current) frontRightLeg.current.rotation.x = -angle;
@@ -174,9 +182,9 @@ export default function ChaseIntro({
 }) {
   const policeRef = useRef();
   const dogRef = useRef();
+  const wallRef = useRef();
   const elapsed = useRef(0);
   const completed = useRef(false);
-  const [currentTime, setCurrentTime] = useState(0);
 
   useEffect(() => {
     elapsed.current = 0;
@@ -193,7 +201,11 @@ export default function ChaseIntro({
     if (completed.current) return;
     elapsed.current += delta;
     const t = elapsed.current;
-    setCurrentTime(t);
+
+    // Toggle wall visibility without triggering React re-renders
+    if (wallRef.current) {
+      wallRef.current.visible = (t < 2.0);
+    }
 
     // Dynamic Hero running movement during the chase sequence
     if (playerRef?.current) {
@@ -292,17 +304,19 @@ export default function ChaseIntro({
 
   return (
     <group>
-      {/* Graffiti Subway Wall during opening */}
-      {currentTime < 2.0 && <GraffitiWall />}
+      {/* Graffiti Subway Wall during opening (toggled via ref without state updates) */}
+      <group ref={wallRef}>
+        <GraffitiWall />
+      </group>
 
       {/* Police Inspector */}
       <group ref={policeRef} position={[0, 0, 3.8]}>
-        <StylizedPoliceInspector runTime={currentTime} />
+        <StylizedPoliceInspector />
       </group>
 
       {/* Police Dog */}
       <group ref={dogRef} position={[0.95, 0, 4.6]}>
-        <StylizedPoliceDog runTime={currentTime} />
+        <StylizedPoliceDog />
       </group>
     </group>
   );
