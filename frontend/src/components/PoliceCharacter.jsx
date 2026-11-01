@@ -108,9 +108,9 @@ export default function PoliceCharacter({
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
 
-      {/* Police Officer 2D Billboard Sprite (Aspect Ratio 0.587) */}
+      {/* Indian Police Officer 2D Billboard Sprite (Aspect Ratio 0.464) */}
       <mesh ref={spriteMeshRef} position={[0, 1.75, 0]}>
-        <planeGeometry args={[2.05, 3.5]} />
+        <planeGeometry args={[1.65, 3.5]} />
         <meshBasicMaterial
           map={texture}
           transparent={true}
