@@ -91,3 +91,28 @@ body {
   }
 }
 
+.police-warning {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ff2222;
+  font-size: clamp(20px, 4vw, 32px);
+  font-weight: 900;
+  text-shadow: 2px 2px 8px black, 0 0 16px rgba(239, 68, 68, 0.8);
+  z-index: 100;
+  white-space: nowrap;
+  animation: warning 0.5s infinite alternate;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 6px 18px;
+  border-radius: 9999px;
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  letter-spacing: 2px;
+}
+
+@keyframes warning {
+  from { opacity: 0.6; transform: translateX(-50%) scale(0.96); }
+  to { opacity: 1; transform: translateX(-50%) scale(1.04); }
+}
+

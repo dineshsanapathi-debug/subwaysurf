@@ -9,6 +9,8 @@ import ChaseIntro from '../components/ChaseIntro';
 import UpperFloor from '../components/UpperFloor';
 import Jetpack from '../components/Jetpack';
 import JetpackCoins from '../components/JetpackCoins';
+import CollisionChaseManager from '../components/CollisionChaseManager';
+import PoliceChase from '../components/PoliceChase';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -67,7 +69,9 @@ function Scene({
   selectedCharacter,
   theme,
   showIntro = false,
-  onIntroComplete
+  onIntroComplete,
+  policeChasing = false,
+  setPoliceChasing
 }) {
   const [particles, setParticles] = useState([]);
   const playerGroupRef = useRef();
@@ -215,6 +219,21 @@ function Scene({
         </React.Suspense>
       </group>
 
+      {/* Police Officer & Dog in hot pursuit when a side collision occurs */}
+      {!showIntro && (
+        <PoliceChase
+          active={policeChasing}
+          playerRef={playerGroupRef}
+        />
+      )}
+
+      {/* Collision Chase Manager (5s chase timer with retriggering on collisions) */}
+      <CollisionChaseManager
+        playerRef={playerGroupRef}
+        engine={engine}
+        onChaseChange={setPoliceChasing}
+      />
+
       {/* Particle System */}
       <ParticleSystem particles={particles} />
     </>
@@ -231,7 +250,14 @@ export default function Game({
 }) {
   const [engine, setEngine] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
+  const [policeChasing, setPoliceChasing] = useState(false);
   const engineRef = useRef(null);
+
+  useEffect(() => {
+    if (policeChasing && !showIntro) {
+      soundEffects.playWhistle();
+    }
+  }, [policeChasing, showIntro]);
 
   useEffect(() => {
     window.isIntroRunning = showIntro;
@@ -314,9 +340,18 @@ export default function Game({
             theme={theme}
             showIntro={showIntro}
             onIntroComplete={() => setShowIntro(false)}
+            policeChasing={policeChasing}
+            setPoliceChasing={setPoliceChasing}
           />
         )}
       </Canvas>
+
+      {/* Dynamic Police Chase Warning after Side/Obstacle Collision */}
+      {policeChasing && !showIntro && (
+        <div className="police-warning">
+          POLICE ARE CHASING YOU!
+        </div>
+      )}
 
       {/* Part A: Police Chase Opening Overlay */}
       {showIntro && (

@@ -81,10 +81,51 @@ export class GameEngine {
     }
   }
 
+  checkSideCollision(targetLane) {
+    if (this.powerups.jetpack > 0 || this.posY > 4.5) return null;
+    const targetX = targetLane * LANE_WIDTH;
+
+    for (const obs of this.obstacles) {
+      if (Math.abs(obs.x - targetX) > 0.8) continue;
+
+      if (obs.type === 'train') {
+        const halfL = (obs.length || 18) / 2;
+        const frontZ = obs.z + halfL;
+        const rearZ = obs.z - halfL;
+
+        // Player is running alongside this train if player z (0) is between rearZ and frontZ
+        if (rearZ <= 0.8 && frontZ >= -0.8) {
+          if (this.posY < this.trainRoofY - 0.2) {
+            return obs;
+          }
+        }
+      } else if (obs.type === 'roadblock' || obs.type === 'low_barrier' || obs.type === 'high_barrier') {
+        if (obs.z >= -1.0 && obs.z <= 1.0) {
+          return obs;
+        }
+      }
+    }
+    return null;
+  }
+
+  triggerSideCollision(obs) {
+    if (this.invulnerableTimer > 0) return;
+    this.invulnerableTimer = 0.5; // Short cooldown between bumps
+    if (this.onSideCollision) {
+      this.onSideCollision(obs);
+    }
+  }
+
   moveLeft() {
     if (this.isGameOver || this.isPaused) return false;
     if (this.lane > -1) {
-      this.lane -= 1;
+      const targetLane = this.lane - 1;
+      const hit = this.checkSideCollision(targetLane);
+      if (hit) {
+        this.triggerSideCollision(hit);
+        return false; // Cannot pass through train or obstacle flank
+      }
+      this.lane = targetLane;
       return true;
     }
     return false;
@@ -93,7 +134,13 @@ export class GameEngine {
   moveRight() {
     if (this.isGameOver || this.isPaused) return false;
     if (this.lane < 1) {
-      this.lane += 1;
+      const targetLane = this.lane + 1;
+      const hit = this.checkSideCollision(targetLane);
+      if (hit) {
+        this.triggerSideCollision(hit);
+        return false; // Cannot pass through train or obstacle flank
+      }
+      this.lane = targetLane;
       return true;
     }
     return false;
@@ -494,10 +541,10 @@ export class GameEngine {
             return;
           }
         }
-        // Body of train collision if jumping in middle
+        // Body of train collision (side impact)
         else if (0 >= rearZ && 0 <= frontZ) {
           if (this.posY < this.trainRoofY - 0.3) {
-            this.handleCollision('train');
+            this.triggerSideCollision(obs);
             return;
           }
         }
