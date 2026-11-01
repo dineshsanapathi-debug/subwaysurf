@@ -461,9 +461,9 @@ export default function GameUI({
                                   </button>
                                 </div>
 
-                                {/* 5 Subway Surfers Characters including Dinesh */}
+                                {/* 5 Subway Surfers Characters including Bhargav */}
                                 <div className="w-full max-w-6xl grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 my-auto py-2">
-                                  {['Dinesh', 'Jake', 'Tricky', 'Fresh', 'Yutani'].map((charKey) => {
+                                  {['Bhargav', 'Jake', 'Tricky', 'Fresh', 'Yutani'].map((charKey) => {
                                     const c = CHARACTERS[charKey];
                                     if (!c) return null;
                                     const isSelected = selectedCharacter === c.name || (selectedCharacter === 'Dash' && c.name === 'Jake');

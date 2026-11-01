@@ -1,6 +1,6 @@
 export const CHARACTERS = {
-  Dinesh: {
-    name: 'Dinesh',
+  Bhargav: {
+    name: 'Bhargav',
     title: 'Camo Rail Surfer',
     color: '#d4a373', // Camo Tan
     hoodieColor: '#e9d5a1', // Beige hood
@@ -82,6 +82,8 @@ export const CHARACTERS = {
 };
 
 // Aliases for backwards compatibility
+CHARACTERS.Dinesh = CHARACTERS.Bhargav;
 CHARACTERS.Dash = CHARACTERS.Jake;
 CHARACTERS.Luna = CHARACTERS.Tricky;
 CHARACTERS.Bolt = CHARACTERS.Yutani;
+

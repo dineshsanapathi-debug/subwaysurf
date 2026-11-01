@@ -165,7 +165,7 @@ function GraffitiWall() {
   );
 }
 
-export default function ChaseIntro({ onComplete, onSkip, characterName = 'Dinesh' }) {
+export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bhargav' }) {
   const policeRef = useRef();
   const dogRef = useRef();
   const elapsed = useRef(0);

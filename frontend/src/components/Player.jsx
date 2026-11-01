@@ -4,8 +4,6 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { CHARACTERS } from '../game/characters';
 
-export { CHARACTERS };
-
 // Preload 4K transparent character sprite
 useTexture.preload('/player-character.png');
 
@@ -18,7 +16,7 @@ export default function Player({
   isElevated = false,
   isLanding = false,
   isCrashing = false,
-  characterName = 'Dinesh',
+  characterName = 'Bhargav',
   powerups = {},
   isMenuPreview = false,
   position = [0, 0, 0],
@@ -44,12 +42,13 @@ export default function Player({
     characterTexture.colorSpace = THREE.SRGBColorSpace;
   }
 
-  const char = CHARACTERS[characterName] || CHARACTERS.Dinesh || CHARACTERS.Jake;
-  const isDinesh = characterName === 'Dinesh';
-  const isYutani = !isDinesh && (char.isAlienSuit || characterName === 'Yutani');
-  const isTricky = !isDinesh && (characterName === 'Tricky' || characterName === 'Luna');
-  const isFresh = !isDinesh && (characterName === 'Fresh');
-  const isJake = !isDinesh && !isYutani && !isTricky && !isFresh;
+  const char = CHARACTERS[characterName] || CHARACTERS.Bhargav || CHARACTERS.Jake;
+  const isBhargav = characterName === 'Bhargav' || characterName === 'Dinesh';
+  const isDinesh = isBhargav;
+  const isYutani = !isBhargav && (char.isAlienSuit || characterName === 'Yutani');
+  const isTricky = !isBhargav && (characterName === 'Tricky' || characterName === 'Luna');
+  const isFresh = !isBhargav && (characterName === 'Fresh');
+  const isJake = !isBhargav && !isYutani && !isTricky && !isFresh;
 
   // Initialize group position on mount
   React.useEffect(() => {
@@ -216,7 +215,7 @@ export default function Player({
         rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 14);
       }
     } else if (isDinesh) {
-      // ===== DINESH UPRIGHT RUNNING GLIDE STANCE (POST-SLIDE RECOVERY) =====
+      // ===== BHARGAV UPRIGHT RUNNING GLIDE STANCE (POST-SLIDE RECOVERY) =====
       const surfBob = Math.sin(time * 16) * 0.07;
       const surfSway = Math.sin(time * 8) * 0.04;
 
@@ -341,7 +340,7 @@ export default function Player({
 
       {/* Main Character Body Mesh Hierarchy */}
       <group ref={bodyRef}>
-        {/* ================= 0. DINESH (CUSTOM 4K CAMERA-FACING SPRITE) ================= */}
+        {/* ================= 0. BHARGAV (CUSTOM 4K CAMERA-FACING SPRITE) ================= */}
         {isDinesh && (
           <group>
             {/* Camera-Facing 4K Character Sprite (Direct, Stable Cutout) */}
@@ -356,7 +355,7 @@ export default function Player({
               />
             </mesh>
 
-            {/* Dinesh's Custom Graffiti Skateboard */}
+            {/* Bhargav's Custom Graffiti Skateboard */}
             {!powerups.hoverboard && (
               <group position={[0, 0.08, 0]}>
                 <mesh castShadow receiveShadow>
