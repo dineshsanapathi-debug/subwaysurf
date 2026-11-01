@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import Player from '../components/Player';
 import Track from '../components/Track';
 import Obstacles from '../components/Obstacles';
-import Coins from '../components/Coins';
+import MangoCollection from '../components/MangoCollection';
 import ChaseIntro from '../components/ChaseIntro';
 import UpperFloor from '../components/UpperFloor';
 import Jetpack from '../components/Jetpack';
@@ -185,8 +185,12 @@ function Scene({
       {/* Obstacles & Trains */}
       <Obstacles obstacles={engine?.obstacles || []} />
 
-      {/* Coins & Powerups */}
-      <Coins coins={engine?.coinsList || []} powerups={engine?.powerupsList || []} />
+      {/* 3D Mango Collectibles across all three lanes */}
+      <MangoCollection
+        mangoes={engine?.coinsList || []}
+        powerups={engine?.powerupsList || []}
+        playerPosition={[playerX, engine?.posY || 0, 0]}
+      />
 
       {/* 500-Metre Continuous Elevated Running Route */}
       <ElevatedFloor
@@ -366,6 +370,13 @@ export default function Game({
           />
         )}
       </Canvas>
+
+      {/* HUD Mango Counter */}
+      {!showIntro && (
+        <div className="mango-counter">
+          🥭 Mangoes: {engine?.coins || 0}
+        </div>
+      )}
 
       {/* 500-Metre Upper Route Distance HUD */}
       {engine?.elevatedRoute?.active && (

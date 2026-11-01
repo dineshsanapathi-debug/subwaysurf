@@ -522,9 +522,12 @@ export class GameEngine {
 
       if (dx < 1.0 && dy < 1.3 && dz < 1.4) {
         this.coins++;
+        this.mangoes = this.coins;
         this.runStats.coins++;
+        this.runStats.mangoes = (this.runStats.mangoes || 0) + 1;
         this.score += 10 * this.multiplier;
         this.coinsList.splice(i, 1);
+        if (this.onMangoCollect) this.onMangoCollect(c);
         if (this.onCoinCollect) this.onCoinCollect();
       }
     }
