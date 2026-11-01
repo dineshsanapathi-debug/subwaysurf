@@ -1,35 +1,9 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import MangoItem from './Mango';
 
-export function CoinItem({ position = [0, 1, 0] }) {
-  const meshRef = useRef();
-
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 4;
-    }
-  });
-
-  return (
-    <group position={position}>
-      <mesh ref={meshRef} castShadow>
-        <cylinderGeometry args={[0.38, 0.38, 0.1, 16]} />
-        <meshStandardMaterial
-          color="#facc15"
-          emissive="#eab308"
-          emissiveIntensity={0.4}
-          metalness={0.9}
-          roughness={0.2}
-        />
-      </mesh>
-      {/* Coin inner ring accent */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.18, 0.28, 16]} />
-        <meshBasicMaterial color="#ca8a04" />
-      </mesh>
-    </group>
-  );
-}
+// Re-export MangoItem as CoinItem for seamless backward compatibility
+export { MangoItem as CoinItem };
 
 export function PowerupItem({ type = 'magnet', position = [0, 1.2, 0] }) {
   const groupRef = useRef();

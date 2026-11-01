@@ -1,45 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
-// Single Vertical Upright Rotating Coin
-function VerticalSkyCoin({ position = [0, 6.2, 0] }) {
-  const spinRef = useRef();
-
-  useFrame((state, delta) => {
-    if (spinRef.current) {
-      spinRef.current.rotation.y += delta * 3.5;
-    }
-  });
-
-  return (
-    <group position={position}>
-      {/* Outer spinning group rotating around vertical Y axis */}
-      <group ref={spinRef}>
-        {/* Cylinder rotated so its circular faces are standing upright/vertical */}
-        <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <cylinderGeometry args={[0.38, 0.38, 0.08, 32]} />
-          <meshStandardMaterial
-            color="#FFD700"
-            metalness={0.9}
-            roughness={0.15}
-            emissive="#ffb700"
-            emissiveIntensity={0.35}
-          />
-        </mesh>
-        {/* Star emblem embossed on both faces */}
-        <mesh position={[0, 0, 0.045]}>
-          <circleGeometry args={[0.18, 5]} />
-          <meshBasicMaterial color="#d97706" side={THREE.DoubleSide} />
-        </mesh>
-        <mesh position={[0, 0, -0.045]}>
-          <circleGeometry args={[0.18, 5]} />
-          <meshBasicMaterial color="#d97706" side={THREE.DoubleSide} />
-        </mesh>
-      </group>
-    </group>
-  );
-}
+import MangoItem from './Mango';
 
 export default function JetpackCoins({
   active = false,
@@ -149,8 +111,9 @@ export default function JetpackCoins({
   return (
     <group>
       {coins.map((c) => (
-        <VerticalSkyCoin key={c.id} position={[c.x, c.y, c.z]} />
+        <MangoItem key={c.id} position={[c.x, c.y, c.z]} />
       ))}
     </group>
   );
 }
+

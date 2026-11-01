@@ -130,10 +130,10 @@ export default function GameUI({
                 </div>
               </button>
 
-              {/* Coin Counter Pill */}
-              <div className="bg-[#102447]/90 border border-cyan-500/40 rounded-full pl-1.5 pr-4 py-1.5 flex items-center gap-2 shadow-lg">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-200 border border-yellow-200 flex items-center justify-center shadow-inner">
-                  <span className="text-sm font-black text-amber-950">★</span>
+              {/* Mango Counter Pill */}
+              <div className="bg-[#102447]/90 border border-amber-500/40 rounded-full pl-1.5 pr-4 py-1.5 flex items-center gap-2 shadow-lg">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-orange-400 to-yellow-300 border border-yellow-200 flex items-center justify-center shadow-inner text-base">
+                  🥭
                 </div>
                 <span className="text-xl sm:text-2xl font-black text-white tracking-wide tabular-nums">
                   {stats.coins || 0}
@@ -559,8 +559,10 @@ export default function GameUI({
                                       <p className="text-2xl font-black text-white">{stats.distance || 0}m</p>
                                     </div>
                                     <div>
-                                      <span className="text-xs text-slate-400 uppercase font-bold">COINS</span>
-                                      <p className="text-2xl font-black text-yellow-400">{stats.coins || 0}</p>
+                                      <span className="text-xs text-slate-400 uppercase font-bold">MANGOES</span>
+                                      <p className="text-2xl font-black text-amber-400 flex items-center justify-center gap-1">
+                                        <span>🥭</span> {stats.coins || 0}
+                                      </p>
                                     </div>
                                   </div>
 
@@ -596,8 +598,8 @@ export default function GameUI({
                                           <div className="bg-pink-950/40 border border-pink-800/40 rounded-xl p-2.5">
                                             <p className="text-pink-300 font-bold mb-0.5">🎯 Next Run Challenge:</p>
                                             <p className="text-slate-300">{aiFeedback.challenge}</p>
-                                            <span className="text-[10px] text-yellow-400 font-bold">
-                                              Reward: +{aiFeedback.rewardCoins || 50} bonus coins
+                                            <span className="text-[10px] text-amber-400 font-bold">
+                                              Reward: +{aiFeedback.rewardCoins || 50} bonus mangoes 🥭
                                             </span>
                                           </div>
                                         )}
@@ -675,7 +677,7 @@ export default function GameUI({
                                             <p className="text-base font-black text-amber-300 tabular-nums">
                                               {item.score?.toLocaleString()}
                                             </p>
-                                            <span className="text-[10px] text-yellow-400 font-semibold">{item.coins || 0} coins</span>
+                                            <span className="text-[10px] text-amber-400 font-semibold">{item.coins || 0} mangoes 🥭</span>
                                           </div>
                                         </div>
                                       ))

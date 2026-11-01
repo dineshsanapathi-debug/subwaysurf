@@ -829,6 +829,60 @@
         "causeOfDeath": "train",
         "timePlayed": 13.2547000002265
       }
+    },
+    {
+      "id": "sc_1793523068031",
+      "username": "Guest Runner",
+      "score": 40,
+      "distance": 34,
+      "coins": 2,
+      "characterUsed": "Dinesh",
+      "date": "2026-11-01T08:51:08.031Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 2,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 2.0215999998152254
+      }
+    },
+    {
+      "id": "sc_1793523078832",
+      "username": "Guest Runner",
+      "score": 114,
+      "distance": 70,
+      "coins": 9,
+      "characterUsed": "Dinesh",
+      "date": "2026-11-01T08:51:18.832Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 9,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 4.127699999690054
+      }
+    },
+    {
+      "id": "sc_1793523100807",
+      "username": "Guest Runner",
+      "score": 433,
+      "distance": 223,
+      "coins": 33,
+      "characterUsed": "Dinesh",
+      "date": "2026-11-01T08:51:40.807Z",
+      "runStats": {
+        "jumps": 6,
+        "slides": 0,
+        "coins": 33,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 12.950599999785428
+      }
     }
   ],
   "analytics": [
@@ -1905,6 +1959,81 @@
         "difficultyRecommendation": "Easy"
       },
       "timestamp": "2026-11-01T08:45:01.499Z"
+    },
+    {
+      "id": "an_1793523068038",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 40,
+        "distance": 34,
+        "coins": 2,
+        "characterUsed": "Dinesh",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T08:51:08.038Z"
+    },
+    {
+      "id": "an_1793523078840",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 114,
+        "distance": 70,
+        "coins": 9,
+        "characterUsed": "Dinesh",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 70m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T08:51:18.840Z"
+    },
+    {
+      "id": "an_1793523100811",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 433,
+        "distance": 223,
+        "coins": 33,
+        "characterUsed": "Dinesh",
+        "jumps": 6,
+        "slides": 0,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 223m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T08:51:40.811Z"
     }
   ]
 }
