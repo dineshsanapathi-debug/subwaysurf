@@ -5,6 +5,10 @@ import Player from '../components/Player';
 import Track from '../components/Track';
 import Obstacles from '../components/Obstacles';
 import Coins from '../components/Coins';
+import ChaseIntro from '../components/ChaseIntro';
+import UpperFloor from '../components/UpperFloor';
+import Jetpack from '../components/Jetpack';
+import JetpackCoins from '../components/JetpackCoins';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -57,13 +61,25 @@ function ParticleSystem({ particles = [] }) {
   );
 }
 
-function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
+function Scene({
+  engine,
+  onEngineTick,
+  selectedCharacter,
+  theme,
+  showIntro = false,
+  onIntroComplete
+}) {
   const [particles, setParticles] = useState([]);
+  const playerGroupRef = useRef();
 
   useFrame((state, delta) => {
     if (!engine) return;
 
-    engine.update(Math.min(delta, 0.1));
+    // During intro, game physics update is paused
+    if (!showIntro) {
+      engine.update(Math.min(delta, 0.1));
+    }
+
     onEngineTick({
       score: engine.score,
       distance: Math.floor(engine.distance),
@@ -77,21 +93,24 @@ function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
       isSliding: engine.isSliding,
       isOnTrain: engine.isOnTrain,
       isGameOver: engine.isGameOver,
-      isPaused: engine.isPaused
+      isPaused: engine.isPaused,
+      isIntro: showIntro
     });
 
-    // Particle update
-    setParticles((prev) =>
-      prev
-        .map((p) => ({
-          ...p,
-          x: p.x + (p.vx || 0) * delta,
-          y: p.y + (p.vy || 0) * delta,
-          z: p.z + (p.vz || 0) * delta + engine.speed * delta * 0.5,
-          opacity: p.opacity - delta * 2
-        }))
-        .filter((p) => p.opacity > 0)
-    );
+    if (!showIntro) {
+      // Particle update
+      setParticles((prev) =>
+        prev
+          .map((p) => ({
+            ...p,
+            x: p.x + (p.vx || 0) * delta,
+            y: p.y + (p.vy || 0) * delta,
+            z: p.z + (p.vz || 0) * delta + engine.speed * delta * 0.5,
+            opacity: p.opacity - delta * 2
+          }))
+          .filter((p) => p.opacity > 0)
+      );
+    }
   });
 
   const playerX = engine ? engine.lane * 3.2 : 0;
@@ -127,14 +146,26 @@ function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
       {/* Skylight Fill */}
       <directionalLight position={[-12, 18, -10]} intensity={0.5} color="#7dd3fc" />
 
-      {/* Camera Follow */}
-      <CameraFollow
-        playerX={playerX}
-        posY={engine?.posY || 0}
-        isJetpack={isJetpack}
-        isSliding={engine?.isSliding}
-        isOnTrain={engine?.isOnTrain}
-      />
+      {/* Camera Follow (active after intro) */}
+      {!showIntro && (
+        <CameraFollow
+          playerX={playerX}
+          posY={engine?.posY || 0}
+          isJetpack={isJetpack}
+          isSliding={engine?.isSliding}
+          isOnTrain={engine?.isOnTrain}
+        />
+      )}
+
+      {/* Part A: Police Chase Cinematic Opening (5 seconds) */}
+      {showIntro && (
+        <React.Suspense fallback={null}>
+          <ChaseIntro
+            onComplete={onIntroComplete}
+            characterName={selectedCharacter}
+          />
+        </React.Suspense>
+      )}
 
       {/* Track Chunks */}
       {engine?.chunks.map((chunk) => (
@@ -147,19 +178,42 @@ function Scene({ engine, onEngineTick, selectedCharacter, theme }) {
       {/* Coins & Powerups */}
       <Coins coins={engine?.coinsList || []} powerups={engine?.powerupsList || []} />
 
+      {/* Part B: Jetpack System - Elevated Upper Floor Flying Path */}
+      <UpperFloor active={isJetpack} speed={engine?.speed || 20} />
+
+      {/* Part B: Jetpack Height Controller */}
+      <Jetpack active={isJetpack} playerRef={playerGroupRef} height={6.2} />
+
+      {/* Part B: Vertical Standing Sky Coins Formation */}
+      <JetpackCoins
+        active={isJetpack}
+        speed={engine?.speed || 20}
+        playerX={playerX}
+        playerY={engine?.posY || 6.2}
+        onCollect={(coin) => {
+          if (engine) {
+            engine.score += 10 * (engine.multiplier || 1);
+            engine.coins += 1;
+            if (engine.onCoinCollect) engine.onCoinCollect();
+          }
+        }}
+      />
+
       {/* Player Character */}
-      <React.Suspense fallback={null}>
-        <Player
-          lane={engine?.lane || 0}
-          posY={engine?.posY || 0}
-          isJumping={engine?.isJumping}
-          isSliding={engine?.isSliding}
-          isOnTrain={engine?.isOnTrain}
-          isCrashing={engine?.isGameOver}
-          characterName={selectedCharacter}
-          powerups={engine?.powerups || {}}
-        />
-      </React.Suspense>
+      <group ref={playerGroupRef}>
+        <React.Suspense fallback={null}>
+          <Player
+            lane={engine?.lane || 0}
+            posY={engine?.posY || 0}
+            isJumping={engine?.isJumping}
+            isSliding={engine?.isSliding}
+            isOnTrain={engine?.isOnTrain}
+            isCrashing={engine?.isGameOver}
+            characterName={selectedCharacter}
+            powerups={engine?.powerups || {}}
+          />
+        </React.Suspense>
+      </group>
 
       {/* Particle System */}
       <ParticleSystem particles={particles} />
@@ -176,7 +230,12 @@ export default function Game({
   isPaused = false
 }) {
   const [engine, setEngine] = useState(null);
+  const [showIntro, setShowIntro] = useState(true);
   const engineRef = useRef(null);
+
+  useEffect(() => {
+    window.isIntroRunning = showIntro;
+  }, [showIntro]);
 
   useEffect(() => {
     const newEngine = new GameEngine({
@@ -212,24 +271,33 @@ export default function Game({
 
   useEffect(() => {
     window.gameActions = {
-      moveLeft: () => engineRef.current?.moveLeft(),
-      moveRight: () => engineRef.current?.moveRight(),
+      moveLeft: () => !showIntro && engineRef.current?.moveLeft(),
+      moveRight: () => !showIntro && engineRef.current?.moveRight(),
       jump: () => {
+        if (showIntro) {
+          setShowIntro(false);
+          return;
+        }
         if (engineRef.current?.jump()) soundEffects.playJump();
       },
       slide: () => {
-        if (engineRef.current?.slide()) soundEffects.playSlide();
+        if (!showIntro && engineRef.current?.slide()) soundEffects.playSlide();
       },
       hoverboard: () => {
         engineRef.current?.activateHoverboard();
         soundEffects.playHoverboard();
-      }
+      },
+      jetpack: () => {
+        engineRef.current?.activateJetpack();
+        soundEffects.playPowerup();
+      },
+      skipIntro: () => setShowIntro(false)
     };
 
     return () => {
       delete window.gameActions;
     };
-  }, []);
+  }, [showIntro]);
 
   return (
     <div className="w-full h-full relative">
@@ -244,9 +312,25 @@ export default function Game({
             onEngineTick={onUpdateStats}
             selectedCharacter={selectedCharacter}
             theme={theme}
+            showIntro={showIntro}
+            onIntroComplete={() => setShowIntro(false)}
           />
         )}
       </Canvas>
+
+      {/* Part A: Police Chase Opening Overlay */}
+      {showIntro && (
+        <div className="chase-overlay">
+          <h1>RUN!</h1>
+          <p>THE POLICE ARE CHASING YOU!</p>
+          <button
+            onClick={() => setShowIntro(false)}
+            className="mt-6 pointer-events-auto px-6 py-2.5 rounded-full bg-slate-950/85 hover:bg-slate-900 border-2 border-yellow-400 text-yellow-300 font-black text-sm shadow-[0_0_20px_rgba(250,204,21,0.5)] uppercase tracking-wider active:scale-95 transition-all backdrop-blur-md"
+          >
+            SKIP INTRO (SPACE) ⏩
+          </button>
+        </div>
+      )}
     </div>
   );
 }

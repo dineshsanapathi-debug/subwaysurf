@@ -3,7 +3,7 @@ export const LANES = [-1, 0, 1]; // Left, Center, Right
 
 export const POWERUP_DURATIONS = {
   magnet: 12,
-  jetpack: 9,
+  jetpack: 11,
   hoverboard: 15,
   multiplier: 14
 };
@@ -132,6 +132,12 @@ export class GameEngine {
   activateHoverboard() {
     if (this.isGameOver || this.isPaused) return;
     this.powerups.hoverboard = POWERUP_DURATIONS.hoverboard;
+  }
+
+  activateJetpack(duration = 11) {
+    if (this.isGameOver || this.isPaused) return;
+    this.powerups.jetpack = duration;
+    if (this.onPowerupCollect) this.onPowerupCollect('jetpack');
   }
 
   spawnSegment(z) {
@@ -437,6 +443,9 @@ export class GameEngine {
   }
 
   checkObstacleCollisions() {
+    // Flying high in jetpack mode bypasses all ground/train obstacle collisions
+    if (this.powerups.jetpack > 0 || this.posY > 4.5) return;
+
     const playerX = this.lane * LANE_WIDTH;
 
     for (const obs of this.obstacles) {

@@ -45,12 +45,21 @@ export default function Controls({
           break;
         case ' ':
           e.preventDefault();
-          if (onTogglePause) onTogglePause();
+          if (window.isIntroRunning && window.gameActions?.skipIntro) {
+            window.gameActions.skipIntro();
+          } else if (onTogglePause) {
+            onTogglePause();
+          }
           break;
         case 'h':
         case 'H':
           e.preventDefault();
           if (onHoverboard) onHoverboard();
+          break;
+        case 'j':
+        case 'J':
+          e.preventDefault();
+          if (window.gameActions?.jetpack) window.gameActions.jetpack();
           break;
         default:
           break;

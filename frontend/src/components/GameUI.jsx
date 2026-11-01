@@ -187,14 +187,33 @@ export default function GameUI({
               </span>
             </div>
 
-            {/* Power-up Rocket / Jetpack Badge */}
+            {/* Hoverboard Power-up Button */}
             <button
               onClick={onActivateHoverboard}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-blue-600 via-cyan-600 to-blue-800 border-2 border-cyan-300/80 p-1 shadow-[0_4px_16px_rgba(6,182,212,0.4)] flex flex-col items-center justify-center active:scale-95 transition-all relative"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-b from-cyan-600 to-blue-800 border-2 border-cyan-300/80 p-1 shadow-[0_4px_16px_rgba(6,182,212,0.4)] flex flex-col items-center justify-center active:scale-95 transition-all relative"
+              title="Activate Hoverboard (H key)"
             >
-              <span className="text-2xl">🚀</span>
+              <span className="text-2xl">🛹</span>
               <span className="absolute -bottom-1 -right-1 bg-amber-400 text-slate-950 font-black text-[11px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow">
                 {stats.powerups?.hoverboard > 0 ? Math.ceil(stats.powerups.hoverboard) : '3'}
+              </span>
+            </button>
+
+            {/* Jetpack Power-up Button */}
+            <button
+              onClick={() => {
+                if (window.gameActions?.jetpack) window.gameActions.jetpack();
+              }}
+              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 p-1 shadow-[0_4px_16px_rgba(249,115,22,0.4)] flex flex-col items-center justify-center active:scale-95 transition-all relative ${
+                stats.powerups?.jetpack > 0
+                  ? 'bg-gradient-to-b from-amber-400 via-orange-500 to-rose-600 border-amber-300 animate-pulse'
+                  : 'bg-gradient-to-b from-orange-600 via-amber-600 to-orange-800 border-orange-300/80'
+              }`}
+              title="Activate Jetpack (J Key)"
+            >
+              <span className="text-2xl">🚀</span>
+              <span className="absolute -bottom-1 -right-1 bg-yellow-400 text-slate-950 font-black text-[11px] w-5 h-5 rounded-full flex items-center justify-center border border-white shadow">
+                {stats.powerups?.jetpack > 0 ? Math.ceil(stats.powerups.jetpack) : 'FLY'}
               </span>
             </button>
           </div>
