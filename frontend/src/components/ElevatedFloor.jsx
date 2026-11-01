@@ -50,8 +50,8 @@ export default function ElevatedFloor({
   if (!active) return null;
 
   // Calculate centered Z position so 500m platform streams under player at Z=0
-  // Starts ahead at Z = -250 and streams through to Z = +250
-  const dist = Math.min(500, Math.max(0, distanceTraveled || currentOffsetZ.current));
+  // Starts ahead at Z = -250 and streams through to Z = +250, continuing smoothly as player leaps off
+  const dist = Math.max(0, distanceTraveled || currentOffsetZ.current);
   const zCenter = -250 + dist;
 
   return (

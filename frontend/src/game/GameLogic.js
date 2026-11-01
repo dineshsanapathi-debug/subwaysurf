@@ -210,8 +210,14 @@ export class GameEngine {
   }
 
   completeElevatedRoute() {
-    if (!this.elevatedRoute.active) return;
+    if (!this.elevatedRoute.active || this.elevatedRoute.isLanding) return;
     this.elevatedRoute.isLanding = true;
+    // Hero leaps forward off the upper floor edge down to the ground!
+    this.velocityY = 4.2;
+    this.isJumping = true;
+    this.isSliding = false;
+    this.slideTimer = 0;
+    if (this.onElevatedLeap) this.onElevatedLeap();
   }
 
   spawnSegment(z) {
@@ -447,30 +453,18 @@ export class GameEngine {
 
     // 500-Metre Elevated Route progression
     if (this.elevatedRoute?.active) {
-      this.elevatedRoute.distance = Math.min(500, Math.floor(this.distance - this.elevatedRoute.startDistance));
+      this.elevatedRoute.distance = Math.floor(this.distance - this.elevatedRoute.startDistance);
 
       if (!this.elevatedRoute.isLanding) {
         // Smoothly rise to upper floor (4.75m)
         if (this.posY < 4.75 && !this.isJumping) {
           this.posY = Math.min(4.75, this.posY + delta * 7.5);
         }
-      } else {
-        // Smooth landing transition back to ground/train roof
-        const targetLandingY = this.isOnTrain ? this.trainRoofY : 0;
-        if (this.posY > targetLandingY && !this.isJumping) {
-          this.posY = Math.max(targetLandingY, this.posY - delta * 7.5);
-          if (this.posY <= targetLandingY + 0.08) {
-            this.posY = targetLandingY;
-            this.elevatedRoute.active = false;
-            this.elevatedRoute.isLanding = false;
-            if (this.onElevatedRouteComplete) this.onElevatedRouteComplete();
-          }
-        }
-      }
 
-      // Check 500m endpoint
-      if (this.elevatedRoute.distance >= 500 && !this.elevatedRoute.isLanding) {
-        this.completeElevatedRoute();
+        // Endpoint reached (500m): hero runs off the upper floor edge and leaps down to ground!
+        if (this.elevatedRoute.distance >= 500) {
+          this.completeElevatedRoute();
+        }
       }
     }
 
@@ -494,6 +488,14 @@ export class GameEngine {
         this.posY = currentBaseY;
         this.velocityY = 0;
         this.isJumping = false;
+
+        // If hero was leaping down from the elevated route, touchdown on ground completed!
+        if (this.elevatedRoute?.isLanding) {
+          this.elevatedRoute.active = false;
+          this.elevatedRoute.isLanding = false;
+          if (this.onElevatedLanding) this.onElevatedLanding();
+          if (this.onElevatedRouteComplete) this.onElevatedRouteComplete();
+        }
       }
     }
 

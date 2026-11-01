@@ -101,6 +101,31 @@ class SoundEffectsEngine {
     } catch (e) {}
   }
 
+  playLand() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.16);
+
+      gain.gain.setValueAtTime(this.sfxVolume * 0.55, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.18);
+    } catch (e) {}
+  }
+
   playCoin() {
     if (this.isMuted) return;
     this.init();

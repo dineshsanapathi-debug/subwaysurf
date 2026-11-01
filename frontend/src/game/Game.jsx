@@ -15,7 +15,7 @@ import PoliceChase from '../components/PoliceChase';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
-function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevated }) {
+function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevated, isLanding }) {
   const { camera } = useThree();
   const currentLookY = useRef(2.0);
 
@@ -25,19 +25,19 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevat
     const targetLookX = playerX * 0.75;
 
     // Smooth continuous vertical camera target (no discrete threshold jerks!)
-    const baseGroundY = isOnTrain ? 3.2 : (isElevated ? 4.75 : 0);
+    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 4.75 : 0);
     let targetCamY = 4.8;
     if (isJetpack) {
       targetCamY = 9.8;
-    } else if (isElevated) {
+    } else if (isElevated && !isLanding) {
       targetCamY = 4.75 + 4.8; // 9.55m elevation
     } else {
-      // Gentle, continuous elevation following without threshold snaps
-      targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.25;
+      // Gentle, continuous elevation following tracking during jump off floor to ground
+      targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.35;
       if (isSliding) targetCamY -= 0.4;
     }
 
-    const targetCamZ = isJetpack ? 9.8 : (isElevated ? 8.2 : 7.0);
+    const targetCamZ = isJetpack ? 9.8 : (isElevated && !isLanding ? 8.2 : 7.0);
 
     // Smooth lerp tracking
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
@@ -45,7 +45,7 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevat
     camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, Math.min(1, delta * 6));
 
     // Continuous smooth lookAt without snapping
-    const targetLookY = baseGroundY + 1.8 + Math.max(0, posY - baseGroundY) * 0.15;
+    const targetLookY = baseGroundY + 1.8 + Math.max(0, posY - baseGroundY) * 0.2;
     currentLookY.current = THREE.MathUtils.lerp(currentLookY.current, targetLookY, Math.min(1, delta * 6));
     camera.lookAt(targetLookX, currentLookY.current, -14);
   });
@@ -125,6 +125,7 @@ function Scene({
   const playerX = engine ? engine.lane * 3.2 : 0;
   const isJetpack = engine?.powerups.jetpack > 0;
   const isElevated = engine?.elevatedRoute?.active;
+  const isLanding = engine?.elevatedRoute?.isLanding;
 
   return (
     <>
@@ -163,6 +164,7 @@ function Scene({
           posY={engine?.posY || 0}
           isJetpack={isJetpack}
           isElevated={isElevated}
+          isLanding={isLanding}
           isSliding={engine?.isSliding}
           isOnTrain={engine?.isOnTrain}
         />
@@ -235,6 +237,7 @@ function Scene({
             isSliding={engine?.isSliding}
             isOnTrain={engine?.isOnTrain}
             isElevated={isElevated}
+            isLanding={isLanding}
             isCrashing={engine?.isGameOver}
             characterName={selectedCharacter}
             powerups={engine?.powerups || {}}
@@ -299,6 +302,8 @@ export default function Game({
     newEngine.onCoinCollect = () => soundEffects.playCoin();
     newEngine.onPowerupCollect = () => soundEffects.playPowerup();
     newEngine.onHoverboardBreak = () => soundEffects.playCrash();
+    newEngine.onElevatedLeap = () => soundEffects.playJump();
+    newEngine.onElevatedLanding = () => soundEffects.playLand();
     newEngine.onGameOver = (finalData) => {
       soundEffects.playCrash();
       if (onGameOver) onGameOver(finalData);
