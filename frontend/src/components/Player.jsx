@@ -18,6 +18,7 @@ export default function Player({
   isCrashing = false,
   characterName = 'Bhargav',
   powerups = {},
+  shieldActive = false,
   isMenuPreview = false,
   position = [0, 0, 0],
   scale = 1,
@@ -334,6 +335,35 @@ export default function Player({
           <mesh position={[0.24, -0.36, 0]}>
             <coneGeometry args={[0.09, 0.35, 8]} />
             <meshBasicMaterial color="#fde047" />
+          </mesh>
+        </group>
+      )}
+
+      {/* Glowing Blue Protective Mango Shield */}
+      {(shieldActive || engine?.shieldActive) && (
+        <group position={[0, 1.15, 0]}>
+          <mesh>
+            <sphereGeometry args={[1.4, 32, 32]} />
+            <meshBasicMaterial
+              color="#00dfff"
+              transparent
+              opacity={0.18}
+              wireframe
+            />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[1.34, 24, 24]} />
+            <meshBasicMaterial
+              color="#38bdf8"
+              transparent
+              opacity={0.12}
+              side={THREE.DoubleSide}
+              depthWrite={false}
+            />
+          </mesh>
+          <mesh rotation={[Math.PI / 4, 0, 0]}>
+            <torusGeometry args={[1.42, 0.035, 12, 48]} />
+            <meshBasicMaterial color="#67e8f9" transparent opacity={0.7} />
           </mesh>
         </group>
       )}

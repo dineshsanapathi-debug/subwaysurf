@@ -11,6 +11,8 @@ import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceCharacter from '../components/PoliceCharacter';
 import RemoveDebugLines from '../components/RemoveDebugLines';
 import WorldThemes, { THEMES } from '../components/WorldThemes';
+import MangoShieldBar from '../components/MangoShieldBar';
+import useMangoShield from '../hooks/useMangoShield';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -73,7 +75,8 @@ function Scene({
   onIntroComplete,
   policeChasing = false,
   setPoliceChasing,
-  onWorldChange
+  onWorldChange,
+  shieldActive = false
 }) {
   const [currentWorldTheme, setCurrentWorldTheme] = useState(THEMES[0]);
   const [particles, setParticles] = useState([]);
@@ -235,6 +238,7 @@ function Scene({
           isElevated={isSkyway}
           isLanding={isLanding}
           isCrashing={engine?.isGameOver}
+          shieldActive={shieldActive}
           characterName={selectedCharacter}
           powerups={engine?.powerups || {}}
         />
@@ -278,6 +282,32 @@ export default function Game({
   const announcementTimerRef = useRef(null);
   const engineRef = useRef(null);
 
+  // Mango Challenge & Protective Shield System
+  const {
+    mangoProgress,
+    shieldActive,
+    shieldTime,
+    collectMango,
+    absorbHit
+  } = useMangoShield();
+
+  const collectMangoRef = useRef(collectMango);
+  collectMangoRef.current = collectMango;
+  const absorbHitRef = useRef(absorbHit);
+  absorbHitRef.current = absorbHit;
+
+  // Audio trigger on shield activation
+  const prevShieldRef = useRef(false);
+  useEffect(() => {
+    if (shieldActive && !prevShieldRef.current) {
+      soundEffects.playShieldActivate();
+    }
+    prevShieldRef.current = shieldActive;
+    if (engineRef.current) {
+      engineRef.current.shieldActive = shieldActive;
+    }
+  }, [shieldActive]);
+
   const handleWorldChange = (newTheme, themeIdx, distance) => {
     soundEffects.playWorldChange();
     if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
@@ -314,6 +344,16 @@ export default function Game({
     });
 
     newEngine.onCoinCollect = () => soundEffects.playCoin();
+    newEngine.onMangoCollect = () => {
+      collectMangoRef.current?.();
+    };
+    newEngine.onShieldHit = (obstacleType) => {
+      const absorbed = absorbHitRef.current ? absorbHitRef.current() : false;
+      if (absorbed) {
+        soundEffects.playShieldAbsorb();
+      }
+      return absorbed;
+    };
     newEngine.onPowerupCollect = () => soundEffects.playPowerup();
     newEngine.onHoverboardBreak = () => soundEffects.playCrash();
     newEngine.onElevatedLeap = () => soundEffects.playJump();
@@ -373,6 +413,15 @@ export default function Game({
 
   return (
     <div className="w-full h-full relative">
+      {/* Mango Shield Challenge Progress Bar */}
+      {!showIntro && (
+        <MangoShieldBar
+          mangoProgress={mangoProgress}
+          shieldActive={shieldActive}
+          shieldTime={shieldTime}
+        />
+      )}
+
       <Canvas
         shadows
         camera={{ position: [0, 4.8, 7.0], fov: 62 }}
@@ -390,6 +439,7 @@ export default function Game({
             policeChasing={policeChasing}
             setPoliceChasing={setPoliceChasing}
             onWorldChange={handleWorldChange}
+            shieldActive={shieldActive}
           />
         )}
       </Canvas>

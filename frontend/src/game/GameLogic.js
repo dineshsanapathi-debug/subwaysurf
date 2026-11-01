@@ -715,6 +715,13 @@ export class GameEngine {
   }
 
   handleCollision(obstacleType) {
+    // 1. Mango Shield Protection (Absorbs one collision and protects player)
+    if (this.onShieldHit && this.onShieldHit(obstacleType)) {
+      this.invulnerableTimer = 1.5; // Grace window to safely pass the obstacle
+      if (this.onShieldAbsorb) this.onShieldAbsorb(obstacleType);
+      return;
+    }
+
     if (this.powerups.hoverboard > 0) {
       // Hoverboard saves player!
       this.powerups.hoverboard = 0;
