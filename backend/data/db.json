@@ -505,6 +505,114 @@
         "causeOfDeath": "low_barrier",
         "timePlayed": 2.024900000065566
       }
+    },
+    {
+      "id": "sc_1793517063226",
+      "username": "Guest Runner",
+      "score": 3250,
+      "distance": 1432,
+      "coins": 151,
+      "characterUsed": "Jake",
+      "date": "2026-11-01T07:11:03.226Z",
+      "runStats": {
+        "jumps": 9,
+        "slides": 0,
+        "coins": 151,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 77.24730000048936
+      }
+    },
+    {
+      "id": "sc_1793517129466",
+      "username": "Guest Runner",
+      "score": 1445,
+      "distance": 651,
+      "coins": 107,
+      "characterUsed": "Yutani",
+      "date": "2026-11-01T07:12:09.466Z",
+      "runStats": {
+        "jumps": 4,
+        "slides": 4,
+        "coins": 107,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 36.7339000001847
+      }
+    },
+    {
+      "id": "sc_1793517878940",
+      "username": "Guest Runner",
+      "score": 16,
+      "distance": 34,
+      "coins": 0,
+      "characterUsed": "Yutani",
+      "date": "2026-11-01T07:24:38.940Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 0,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "roadblock",
+        "timePlayed": 2.004599999964237
+      }
+    },
+    {
+      "id": "sc_1793517911734",
+      "username": "Guest Runner",
+      "score": 642,
+      "distance": 535,
+      "coins": 35,
+      "characterUsed": "Yutani",
+      "date": "2026-11-01T07:25:11.734Z",
+      "runStats": {
+        "jumps": 11,
+        "slides": 0,
+        "coins": 35,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 30.409999999940176
+      }
+    },
+    {
+      "id": "sc_1793517996662",
+      "username": "Guest Runner",
+      "score": 5741,
+      "distance": 1545,
+      "coins": 250,
+      "characterUsed": "Yutani",
+      "date": "2026-11-01T07:26:36.662Z",
+      "runStats": {
+        "jumps": 16,
+        "slides": 18,
+        "coins": 250,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 82.86050000026867
+      }
+    },
+    {
+      "id": "sc_1793518050687",
+      "username": "Guest Runner",
+      "score": 3669,
+      "distance": 928,
+      "coins": 92,
+      "characterUsed": "Yutani",
+      "date": "2026-11-01T07:27:30.688Z",
+      "runStats": {
+        "jumps": 8,
+        "slides": 0,
+        "coins": 92,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 51.48229999998263
+      }
     }
   ],
   "analytics": [
@@ -1131,6 +1239,156 @@
         "difficultyRecommendation": "Easy"
       },
       "timestamp": "2026-11-01T05:16:40.710Z"
+    },
+    {
+      "id": "an_1793517063252",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 3250,
+        "distance": 1432,
+        "coins": 151,
+        "characterUsed": "Jake",
+        "jumps": 9,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 1432m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T07:11:03.252Z"
+    },
+    {
+      "id": "an_1793517129474",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 1445,
+        "distance": 651,
+        "coins": 107,
+        "characterUsed": "Yutani",
+        "jumps": 4,
+        "slides": 4,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 651m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T07:12:09.474Z"
+    },
+    {
+      "id": "an_1793517878949",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 16,
+        "distance": 34,
+        "coins": 0,
+        "characterUsed": "Yutani",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "roadblock"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T07:24:38.949Z"
+    },
+    {
+      "id": "an_1793517911745",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 642,
+        "distance": 535,
+        "coins": 35,
+        "characterUsed": "Yutani",
+        "jumps": 11,
+        "slides": 0,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 535m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T07:25:11.745Z"
+    },
+    {
+      "id": "an_1793517996674",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 5741,
+        "distance": 1545,
+        "coins": 250,
+        "characterUsed": "Yutani",
+        "jumps": 16,
+        "slides": 18,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "B",
+        "headline": "🛹 Getting in the Groove!",
+        "feedback": "Good run! You cleared 1545m, but that train caught you off guard.",
+        "proTip": "Pick up the Coin Magnet to gather coins while keeping your eyes locked ahead.",
+        "challenge": "Collect at least 40 coins in your next run with Yutani.",
+        "rewardCoins": 60,
+        "difficultyRecommendation": "Medium"
+      },
+      "timestamp": "2026-11-01T07:26:36.674Z"
+    },
+    {
+      "id": "an_1793518050694",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 3669,
+        "distance": 928,
+        "coins": 92,
+        "characterUsed": "Yutani",
+        "jumps": 8,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 928m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T07:27:30.694Z"
     }
   ]
 }

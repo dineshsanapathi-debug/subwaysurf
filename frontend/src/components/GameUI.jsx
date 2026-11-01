@@ -168,12 +168,20 @@ export default function GameUI({
           <div className="absolute right-4 top-24 flex flex-col gap-3 pointer-events-auto">
             {/* Character Badge */}
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#0f2854]/90 border-2 border-cyan-400/60 p-1 shadow-xl flex items-center justify-center relative overflow-hidden group">
-              <div
-                className="w-full h-full rounded-xl flex items-center justify-center text-3xl font-black shadow-inner"
-                style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
-              >
-                {CHARACTERS[selectedCharacter]?.icon || '🧢'}
-              </div>
+              {CHARACTERS[selectedCharacter]?.avatar ? (
+                <img
+                  src={CHARACTERS[selectedCharacter].avatar}
+                  alt={selectedCharacter}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              ) : (
+                <div
+                  className="w-full h-full rounded-xl flex items-center justify-center text-3xl font-black shadow-inner"
+                  style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
+                >
+                  {CHARACTERS[selectedCharacter]?.icon || '🧢'}
+                </div>
+              )}
               <span className="absolute bottom-0 text-[9px] font-black uppercase tracking-tight text-white bg-blue-700/80 px-1 rounded">
                 {selectedCharacter}
               </span>
@@ -305,21 +313,29 @@ export default function GameUI({
                                 onClick={() => onSelectCharacter('next')}
                                 className="cursor-pointer bg-slate-950/80 hover:bg-slate-900/90 backdrop-blur-md border border-cyan-400/50 rounded-full px-4 py-1.5 flex items-center gap-2.5 shadow-2xl active:scale-95 transition-all"
                               >
-                                <div
-                                  className="w-7 h-7 rounded-full flex items-center justify-center text-base shadow"
-                                  style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
-                                >
-                                  {CHARACTERS[selectedCharacter]?.icon || '🧢'}
-                                </div>
-                                  <div className="text-left text-xs">
-                                    <span className="text-slate-400 text-[10px] block leading-tight font-semibold">Runner:</span>
-                                    <strong className="text-white font-black">{selectedCharacter}</strong>
-                                    <span className="text-cyan-400 text-[10px] ml-1.5 font-bold">({CHARACTERS[selectedCharacter]?.title})</span>
+                                {CHARACTERS[selectedCharacter]?.avatar ? (
+                                  <img
+                                    src={CHARACTERS[selectedCharacter].avatar}
+                                    alt={selectedCharacter}
+                                    className="w-7 h-7 rounded-full object-cover border border-amber-400 shadow"
+                                  />
+                                ) : (
+                                  <div
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-base shadow"
+                                    style={{ backgroundColor: CHARACTERS[selectedCharacter]?.color || '#2563eb' }}
+                                  >
+                                    {CHARACTERS[selectedCharacter]?.icon || '🧢'}
                                   </div>
-                                  <span className="text-[10px] font-bold text-amber-400 uppercase bg-amber-400/20 px-2 py-0.5 rounded-full ml-2">
-                                    Switch
-                                  </span>
+                                )}
+                                <div className="text-left text-xs">
+                                  <span className="text-slate-400 text-[10px] block leading-tight font-semibold">Runner:</span>
+                                  <strong className="text-white font-black">{selectedCharacter}</strong>
+                                  <span className="text-cyan-400 text-[10px] ml-1.5 font-bold">({CHARACTERS[selectedCharacter]?.title})</span>
                                 </div>
+                                <span className="text-[10px] font-bold text-amber-400 uppercase bg-amber-400/20 px-2 py-0.5 rounded-full ml-2">
+                                  Switch
+                                </span>
+                              </div>
 
                                 {/* Giant Arcade Play Button */}
                                 <button
@@ -377,9 +393,9 @@ export default function GameUI({
                                   </button>
                                 </div>
 
-                                {/* 4 Iconic Character Cards (Jake, Tricky, Fresh, Yutani) */}
-                                <div className="w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 my-auto py-2">
-                                  {['Jake', 'Tricky', 'Fresh', 'Yutani'].map((charKey) => {
+                                {/* 5 Subway Surfers Characters including Dinesh */}
+                                <div className="w-full max-w-6xl grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 my-auto py-2">
+                                  {['Dinesh', 'Jake', 'Tricky', 'Fresh', 'Yutani'].map((charKey) => {
                                     const c = CHARACTERS[charKey];
                                     if (!c) return null;
                                     const isSelected = selectedCharacter === c.name || (selectedCharacter === 'Dash' && c.name === 'Jake');
@@ -388,20 +404,32 @@ export default function GameUI({
                                       <div
                                         key={c.name}
                                         onClick={() => onSelectCharacter(c.name)}
-                                        className={`cursor-pointer rounded-3xl p-4 sm:p-5 border-2 transition-all flex flex-col justify-between ${isSelected
+                                        className={`cursor-pointer rounded-3xl p-3.5 sm:p-4 border-2 transition-all flex flex-col justify-between ${isSelected
                                             ? 'border-pink-500 bg-slate-900/95 shadow-[0_0_25px_rgba(244,63,94,0.4)] scale-105'
                                             : 'border-slate-800/90 bg-slate-900/60 hover:border-slate-700 hover:scale-[1.02]'
                                           }`}
                                       >
                                         <div>
-                                          {/* Character Avatar Icon */}
-                                          <div
-                                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg mb-3"
-                                            style={{ backgroundColor: c.color }}
-                                          >
-                                            {c.name === 'Yutani' ? '👽' : c.name === 'Fresh' ? '📻' : c.name === 'Tricky' ? '👓' : '🧢'}
+                                          {/* Character Avatar Icon / Photo */}
+                                          {c.avatar ? (
+                                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shadow-lg mb-3 border-2 border-amber-400 relative">
+                                              <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
+                                              <span className="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-rose-500 text-slate-950 text-[8px] font-black px-1.5 py-0.5 rounded-bl shadow">
+                                                CUSTOM
+                                              </span>
+                                            </div>
+                                          ) : (
+                                            <div
+                                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center text-3xl font-black shadow-lg mb-3"
+                                              style={{ backgroundColor: c.color }}
+                                            >
+                                              {c.name === 'Yutani' ? '👽' : c.name === 'Fresh' ? '📻' : c.name === 'Tricky' ? '👓' : '🧢'}
+                                            </div>
+                                          )}
+                                          <div className="flex items-center gap-1.5">
+                                            <h3 className="text-lg sm:text-xl font-black text-white">{c.name}</h3>
+                                            {c.avatar && <span className="text-xs">⭐</span>}
                                           </div>
-                                          <h3 className="text-lg sm:text-xl font-black text-white">{c.name}</h3>
                                           <p className="text-[11px] font-bold text-cyan-400 uppercase tracking-wide">{c.title}</p>
                                           <p className="text-xs text-slate-300 mt-2 line-clamp-2">{c.description}</p>
 

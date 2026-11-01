@@ -3,6 +3,25 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 export const CHARACTERS = {
+  Dinesh: {
+    name: 'Dinesh',
+    title: 'Camo Rail Surfer',
+    color: '#d4a373', // Camo Tan
+    hoodieColor: '#e9d5a1', // Beige hood
+    camoGreen: '#526046', // Olive camo patch
+    camoBrown: '#6b4a2d', // Earth camo patch
+    shirtColor: '#0f172a', // Black inner tee
+    pantsColor: '#1e293b', // Dark charcoal jeans
+    shoesColor: '#ef4444', // Retro red & white skate shoes
+    skinColor: '#c68642', // Warm tan tone
+    hairColor: '#171717', // Curly dark hair
+    hasSkateboard: true,
+    avatar: '/dinesh-avatar.jpg',
+    icon: '🛹',
+    description: 'Curly dark hair, trimmed beard, camo zip-up hoodie over black tee, dark jeans, retro red kicks, and a custom graffiti railboard.',
+    stats: { speed: 99, jump: 95, magnet: 92 },
+    ability: 'Speed Spark Rail Glide'
+  },
   Jake: {
     name: 'Jake',
     title: 'The Mascot Runner',
@@ -91,11 +110,12 @@ export default function Player({
   const hoverboardRef = useRef();
   const footSparkRef = useRef();
 
-  const char = CHARACTERS[characterName] || CHARACTERS.Jake;
-  const isYutani = char.isAlienSuit || characterName === 'Yutani';
-  const isTricky = characterName === 'Tricky' || characterName === 'Luna';
-  const isFresh = characterName === 'Fresh';
-  const isJake = !isYutani && !isTricky && !isFresh;
+  const char = CHARACTERS[characterName] || CHARACTERS.Dinesh || CHARACTERS.Jake;
+  const isDinesh = characterName === 'Dinesh';
+  const isYutani = !isDinesh && (char.isAlienSuit || characterName === 'Yutani');
+  const isTricky = !isDinesh && (characterName === 'Tricky' || characterName === 'Luna');
+  const isFresh = !isDinesh && (characterName === 'Fresh');
+  const isJake = !isDinesh && !isYutani && !isTricky && !isFresh;
 
   const targetX = lane * 3.2;
 
@@ -175,23 +195,23 @@ export default function Player({
       }
     } else if (isSliding) {
       if (bodyRef.current) {
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, -0.4, delta * 14);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.75, delta * 14);
-        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, isDinesh ? -0.52 : -0.4, delta * 14);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, isDinesh ? 0.85 : 0.75, delta * 14);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, isDinesh ? 0.28 : 0, delta * 14);
       }
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 1.3, delta * 14);
         rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 1.3, delta * 14);
       }
       if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -0.8, delta * 14);
-        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, -0.8, delta * 14);
+        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, isDinesh ? -1.1 : -0.8, delta * 14);
+        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, isDinesh ? 1.3 : -0.8, delta * 14);
       }
     } else if (isAirborne) {
       if (bodyRef.current) {
         bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0.05, delta * 12);
         bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.22, delta * 12);
-        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 12);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, isDinesh ? 0.2 : 0, delta * 12);
       }
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, -0.6, delta * 12);
@@ -200,6 +220,24 @@ export default function Player({
       if (leftArmRef.current && rightArmRef.current) {
         leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 1.1, delta * 12);
         rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 12);
+      }
+    } else if (isDinesh) {
+      // Dinesh's Signature Dynamic Rail-Surfer Glide Stance
+      if (bodyRef.current) {
+        const bounce = Math.abs(Math.sin(time * 16)) * 0.08;
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, bounce, delta * 16);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.15, delta * 14);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0.24, delta * 14);
+      }
+      if (leftLegRef.current && rightLegRef.current) {
+        leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, -0.22 + Math.sin(time * 16) * 0.12, delta * 16);
+        rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 0.24 - Math.sin(time * 16) * 0.12, delta * 16);
+      }
+      if (leftArmRef.current && rightArmRef.current) {
+        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 0.45 + Math.sin(time * 8) * 0.1, delta * 16);
+        rightArmRef.current.rotation.z = THREE.MathUtils.lerp(rightArmRef.current.rotation.z, 0.25, delta * 16);
+        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -0.42 - Math.sin(time * 8) * 0.1, delta * 16);
+        leftArmRef.current.rotation.z = THREE.MathUtils.lerp(leftArmRef.current.rotation.z, -0.25, delta * 16);
       }
     } else {
       if (bodyRef.current) {
@@ -236,7 +274,7 @@ export default function Player({
       )}
 
       {/* Hoverboard Equipment */}
-      {powerups.hoverboard && (
+      {powerups.hoverboard && !isDinesh && (
         <group ref={hoverboardRef} position={[0, 0.15, 0]}>
           <mesh castShadow receiveShadow>
             <boxGeometry args={[0.7, 0.08, 1.8]} />
@@ -277,6 +315,291 @@ export default function Player({
 
       {/* Main Character Body Mesh Hierarchy */}
       <group ref={bodyRef}>
+        {/* ================= 0. DINESH (CAMO RAIL SURFER) ================= */}
+        {isDinesh && (
+          <group>
+            {/* Dinesh's Custom Graffiti Skateboard Deck under feet */}
+            <group position={[0, 0.08, 0]}>
+              {/* Board Deck */}
+              <mesh castShadow receiveShadow position={[0, 0, 0]}>
+                <boxGeometry args={[0.62, 0.05, 1.45]} />
+                <meshStandardMaterial color="#f59e0b" roughness={0.3} />
+              </mesh>
+              {/* Curved Nose & Tail */}
+              <mesh position={[0, 0.03, -0.74]} rotation={[-0.2, 0, 0]}>
+                <boxGeometry args={[0.56, 0.04, 0.18]} />
+                <meshStandardMaterial color="#ef4444" />
+              </mesh>
+              <mesh position={[0, 0.03, 0.74]} rotation={[0.2, 0, 0]}>
+                <boxGeometry args={[0.56, 0.04, 0.18]} />
+                <meshStandardMaterial color="#3b82f6" />
+              </mesh>
+              {/* Colorful Graffiti Grip Tape / Decal Top */}
+              <mesh position={[0, 0.028, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+                <planeGeometry args={[0.54, 1.35]} />
+                <meshBasicMaterial color="#ec4899" />
+              </mesh>
+              <mesh position={[0, 0.03, -0.1]} rotation={[-Math.PI / 2, 0, 0]}>
+                <circleGeometry args={[0.18, 5]} />
+                <meshBasicMaterial color="#facc15" side={THREE.DoubleSide} />
+              </mesh>
+              <mesh position={[0, 0.031, 0.25]} rotation={[-Math.PI / 2, 0, 0]}>
+                <ringGeometry args={[0.08, 0.16, 6]} />
+                <meshBasicMaterial color="#06b6d4" side={THREE.DoubleSide} />
+              </mesh>
+
+              {/* Skateboard Trucks & Wheels */}
+              <group position={[0, -0.04, -0.45]}>
+                <mesh>
+                  <boxGeometry args={[0.48, 0.03, 0.04]} />
+                  <meshStandardMaterial color="#94a3b8" metalness={0.8} />
+                </mesh>
+                <mesh position={[-0.26, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.055, 0.055, 0.06, 12]} />
+                  <meshStandardMaterial color="#ef4444" roughness={0.4} />
+                </mesh>
+                <mesh position={[0.26, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.055, 0.055, 0.06, 12]} />
+                  <meshStandardMaterial color="#ef4444" roughness={0.4} />
+                </mesh>
+              </group>
+              <group position={[0, -0.04, 0.45]}>
+                <mesh>
+                  <boxGeometry args={[0.48, 0.03, 0.04]} />
+                  <meshStandardMaterial color="#94a3b8" metalness={0.8} />
+                </mesh>
+                <mesh position={[-0.26, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.055, 0.055, 0.06, 12]} />
+                  <meshStandardMaterial color="#facc15" roughness={0.4} />
+                </mesh>
+                <mesh position={[0.26, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.055, 0.055, 0.06, 12]} />
+                  <meshStandardMaterial color="#facc15" roughness={0.4} />
+                </mesh>
+              </group>
+
+              {/* Trailing speed sparks along board */}
+              <group position={[0, -0.02, 0.7]}>
+                <mesh rotation={[-Math.PI / 2, 0, 0]}>
+                  <coneGeometry args={[0.22, 0.5, 6]} />
+                  <meshBasicMaterial color="#fbbf24" transparent opacity={0.7} />
+                </mesh>
+              </group>
+
+              {/* Supercharged Neon Glow when Hoverboard Powerup is Active */}
+              {powerups.hoverboard && (
+                <mesh position={[0, -0.05, 0]}>
+                  <boxGeometry args={[0.7, 0.12, 1.6]} />
+                  <meshBasicMaterial color="#06b6d4" transparent opacity={0.6} />
+                </mesh>
+              )}
+            </group>
+
+            {/* Torso: Camouflage Tan Hoodie over Black T-Shirt */}
+            <group position={[0, 1.25, 0]}>
+              {/* Inner Black T-Shirt */}
+              <mesh position={[0, 0, 0.02]} castShadow>
+                <boxGeometry args={[0.56, 0.7, 0.4]} />
+                <meshStandardMaterial color="#0f172a" roughness={0.6} />
+              </mesh>
+              {/* Inner Chest neckline skin / collar */}
+              <mesh position={[0, 0.3, 0.2]}>
+                <boxGeometry args={[0.24, 0.1, 0.05]} />
+                <meshStandardMaterial color="#1e293b" />
+              </mesh>
+
+              {/* Tan Camo Outer Hoodie (Left Half) */}
+              <mesh position={[-0.16, 0, 0.02]} castShadow>
+                <boxGeometry args={[0.3, 0.72, 0.42]} />
+                <meshStandardMaterial color="#d4a373" roughness={0.7} />
+              </mesh>
+              {/* Tan Camo Outer Hoodie (Right Half) */}
+              <mesh position={[0.16, 0, 0.02]} castShadow>
+                <boxGeometry args={[0.3, 0.72, 0.42]} />
+                <meshStandardMaterial color="#d4a373" roughness={0.7} />
+              </mesh>
+              {/* Back of Hoodie */}
+              <mesh position={[0, 0, -0.05]} castShadow>
+                <boxGeometry args={[0.62, 0.72, 0.35]} />
+                <meshStandardMaterial color="#d4a373" roughness={0.7} />
+              </mesh>
+
+              {/* Camo Patches on Hoodie (Olive green and dark earth brown spots) */}
+              <mesh position={[-0.18, 0.14, 0.23]}>
+                <planeGeometry args={[0.14, 0.12]} />
+                <meshStandardMaterial color="#526046" />
+              </mesh>
+              <mesh position={[-0.12, -0.16, 0.23]}>
+                <planeGeometry args={[0.12, 0.14]} />
+                <meshStandardMaterial color="#6b4a2d" />
+              </mesh>
+              <mesh position={[0.18, 0.12, 0.23]}>
+                <planeGeometry args={[0.13, 0.13]} />
+                <meshStandardMaterial color="#6b4a2d" />
+              </mesh>
+              <mesh position={[0.15, -0.15, 0.23]}>
+                <planeGeometry args={[0.15, 0.11]} />
+                <meshStandardMaterial color="#526046" />
+              </mesh>
+              <mesh position={[-0.2, 0.02, -0.23]} rotation={[0, Math.PI, 0]}>
+                <planeGeometry args={[0.18, 0.16]} />
+                <meshStandardMaterial color="#526046" />
+              </mesh>
+              <mesh position={[0.16, -0.1, -0.23]} rotation={[0, Math.PI, 0]}>
+                <planeGeometry args={[0.2, 0.14]} />
+                <meshStandardMaterial color="#6b4a2d" />
+              </mesh>
+
+              {/* Silver Front Zipper running down the center */}
+              <mesh position={[0, -0.02, 0.22]}>
+                <boxGeometry args={[0.025, 0.68, 0.02]} />
+                <meshStandardMaterial color="#cbd5e1" metalness={0.8} roughness={0.2} />
+              </mesh>
+              {/* Zipper Pull Tab */}
+              <mesh position={[0, 0.18, 0.24]}>
+                <boxGeometry args={[0.04, 0.07, 0.02]} />
+                <meshStandardMaterial color="#94a3b8" metalness={0.9} />
+              </mesh>
+
+              {/* Folded Tan Hood draped behind neck */}
+              <group position={[0, 0.32, -0.12]}>
+                <mesh castShadow>
+                  <torusGeometry args={[0.26, 0.08, 10, 18, Math.PI * 1.2]} rotation={[Math.PI / 2, 0, -Math.PI * 0.1]} />
+                  <meshStandardMaterial color="#e9d5a1" roughness={0.7} />
+                </mesh>
+                {/* Drawstrings */}
+                <mesh position={[-0.1, -0.12, 0.32]}>
+                  <cylinderGeometry args={[0.012, 0.012, 0.22, 6]} />
+                  <meshStandardMaterial color="#ffffff" />
+                </mesh>
+                <mesh position={[0.1, -0.12, 0.32]}>
+                  <cylinderGeometry args={[0.012, 0.012, 0.22, 6]} />
+                  <meshStandardMaterial color="#ffffff" />
+                </mesh>
+              </group>
+            </group>
+
+            {/* Head with Curly Dark Hair, Facial Features, Mustache & Goatee Beard */}
+            <group position={[0, 1.85, 0]}>
+              {/* Face & Head Base */}
+              <mesh castShadow>
+                <sphereGeometry args={[0.28, 16, 16]} />
+                <meshStandardMaterial color="#c68642" roughness={0.6} />
+              </mesh>
+              {/* Jawline & Chin Definition */}
+              <mesh position={[0, -0.1, 0.1]} castShadow>
+                <boxGeometry args={[0.26, 0.18, 0.24]} />
+                <meshStandardMaterial color="#c68642" roughness={0.6} />
+              </mesh>
+
+              {/* Eyes */}
+              <mesh position={[0.09, 0.02, 0.26]}>
+                <sphereGeometry args={[0.045, 10, 10]} />
+                <meshBasicMaterial color="#0f172a" />
+              </mesh>
+              <mesh position={[-0.09, 0.02, 0.26]}>
+                <sphereGeometry args={[0.045, 10, 10]} />
+                <meshBasicMaterial color="#0f172a" />
+              </mesh>
+              {/* White Eye Sparkles */}
+              <mesh position={[0.075, 0.035, 0.29]}>
+                <sphereGeometry args={[0.014, 6, 6]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+              <mesh position={[-0.075, 0.035, 0.29]}>
+                <sphereGeometry args={[0.014, 6, 6]} />
+                <meshBasicMaterial color="#ffffff" />
+              </mesh>
+
+              {/* Dark Eyebrows */}
+              <mesh position={[0.095, 0.075, 0.26]} rotation={[0, 0, -0.1]}>
+                <boxGeometry args={[0.09, 0.025, 0.04]} />
+                <meshBasicMaterial color="#171717" />
+              </mesh>
+              <mesh position={[-0.095, 0.075, 0.26]} rotation={[0, 0, 0.1]}>
+                <boxGeometry args={[0.09, 0.025, 0.04]} />
+                <meshBasicMaterial color="#171717" />
+              </mesh>
+
+              {/* Nose */}
+              <mesh position={[0, -0.01, 0.29]}>
+                <coneGeometry args={[0.04, 0.08, 6]} rotation={[Math.PI / 2, 0, 0]} />
+                <meshStandardMaterial color="#b47535" />
+              </mesh>
+
+              {/* Trimmed Mustache */}
+              <mesh position={[0, -0.065, 0.27]}>
+                <boxGeometry args={[0.16, 0.03, 0.04]} />
+                <meshStandardMaterial color="#171717" roughness={0.9} />
+              </mesh>
+
+              {/* Trimmed Goatee Beard & Jaw Beard Stubble */}
+              <mesh position={[0, -0.14, 0.23]}>
+                <boxGeometry args={[0.14, 0.09, 0.08]} />
+                <meshStandardMaterial color="#171717" roughness={0.9} />
+              </mesh>
+              <mesh position={[-0.11, -0.11, 0.18]} rotation={[0, 0.4, 0]}>
+                <boxGeometry args={[0.1, 0.07, 0.08]} />
+                <meshStandardMaterial color="#171717" roughness={0.9} />
+              </mesh>
+              <mesh position={[0.11, -0.11, 0.18]} rotation={[0, -0.4, 0]}>
+                <boxGeometry args={[0.1, 0.07, 0.08]} />
+                <meshStandardMaterial color="#171717" roughness={0.9} />
+              </mesh>
+
+              {/* Voluminous Curly Dark Hair Clusters (Signature Dinesh hairstyle!) */}
+              <group position={[0, 0.15, -0.02]}>
+                {/* Main Hair Volume Core */}
+                <mesh castShadow>
+                  <sphereGeometry args={[0.3, 16, 16]} />
+                  <meshStandardMaterial color="#171717" roughness={0.95} />
+                </mesh>
+                {/* Curly clusters - Front, Top, and Sides */}
+                <mesh position={[0, 0.16, 0.12]} castShadow>
+                  <sphereGeometry args={[0.14, 10, 10]} />
+                  <meshStandardMaterial color="#1f1f1f" roughness={0.95} />
+                </mesh>
+                <mesh position={[-0.12, 0.15, 0.08]} castShadow>
+                  <sphereGeometry args={[0.13, 10, 10]} />
+                  <meshStandardMaterial color="#171717" roughness={0.95} />
+                </mesh>
+                <mesh position={[0.12, 0.15, 0.08]} castShadow>
+                  <sphereGeometry args={[0.13, 10, 10]} />
+                  <meshStandardMaterial color="#171717" roughness={0.95} />
+                </mesh>
+                <mesh position={[0, 0.2, -0.05]} castShadow>
+                  <sphereGeometry args={[0.15, 10, 10]} />
+                  <meshStandardMaterial color="#1c1917" roughness={0.95} />
+                </mesh>
+                <mesh position={[-0.18, 0.08, -0.02]} castShadow>
+                  <sphereGeometry args={[0.13, 10, 10]} />
+                  <meshStandardMaterial color="#171717" roughness={0.95} />
+                </mesh>
+                <mesh position={[0.18, 0.08, -0.02]} castShadow>
+                  <sphereGeometry args={[0.13, 10, 10]} />
+                  <meshStandardMaterial color="#171717" roughness={0.95} />
+                </mesh>
+                <mesh position={[-0.14, -0.02, -0.1]} castShadow>
+                  <sphereGeometry args={[0.12, 10, 10]} />
+                  <meshStandardMaterial color="#1c1917" roughness={0.95} />
+                </mesh>
+                <mesh position={[0.14, -0.02, -0.1]} castShadow>
+                  <sphereGeometry args={[0.12, 10, 10]} />
+                  <meshStandardMaterial color="#1c1917" roughness={0.95} />
+                </mesh>
+              </group>
+            </group>
+
+            {/* Black Sports Watch on Left Wrist */}
+            <group position={[-0.42, 0.95, 0]}>
+              <mesh>
+                <torusGeometry args={[0.09, 0.025, 8, 16]} rotation={[Math.PI / 2, 0, 0]} />
+                <meshStandardMaterial color="#0f172a" metalness={0.5} roughness={0.3} />
+              </mesh>
+            </group>
+          </group>
+        )}
+
         {/* ================= 1. JAKE ================= */}
         {isJake && (
           <group>
@@ -634,8 +957,14 @@ export default function Player({
         <group ref={leftArmRef} position={[-0.42, 1.48, 0]}>
           <mesh position={[0, -0.28, 0]} castShadow>
             <boxGeometry args={[0.18, 0.6, 0.2]} />
-            <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
+            <meshStandardMaterial color={isDinesh ? '#d4a373' : isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
           </mesh>
+          {isDinesh && (
+            <mesh position={[0, -0.22, 0.11]}>
+              <planeGeometry args={[0.14, 0.22]} />
+              <meshStandardMaterial color="#526046" />
+            </mesh>
+          )}
           <mesh position={[0, -0.62, 0]}>
             <sphereGeometry args={[0.1, 10, 10]} />
             <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor} />
@@ -646,8 +975,14 @@ export default function Player({
         <group ref={rightArmRef} position={[0.42, 1.48, 0]}>
           <mesh position={[0, -0.28, 0]} castShadow>
             <boxGeometry args={[0.18, 0.6, 0.2]} />
-            <meshStandardMaterial color={isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
+            <meshStandardMaterial color={isDinesh ? '#d4a373' : isYutani ? '#84cc16' : isFresh ? char.skinColor : '#ffffff'} />
           </mesh>
+          {isDinesh && (
+            <mesh position={[0, -0.22, 0.11]}>
+              <planeGeometry args={[0.14, 0.22]} />
+              <meshStandardMaterial color="#6b4a2d" />
+            </mesh>
+          )}
           <mesh position={[0, -0.62, 0]}>
             <sphereGeometry args={[0.1, 10, 10]} />
             <meshStandardMaterial color={isYutani ? '#65a30d' : char.skinColor} />
@@ -657,7 +992,33 @@ export default function Player({
         {/* ================= LEGS ================= */}
         {/* Left Leg */}
         <group ref={leftLegRef} position={[-0.18, 0.85, 0]}>
-          {isFresh ? (
+          {isDinesh ? (
+            <group>
+              <mesh position={[0, -0.32, 0]} castShadow>
+                <boxGeometry args={[0.22, 0.68, 0.24]} />
+                <meshStandardMaterial color="#1e293b" roughness={0.7} />
+              </mesh>
+              {/* Retro Red and White Skate Sneakers */}
+              <group position={[0, -0.72, 0.08]}>
+                <mesh castShadow>
+                  <boxGeometry args={[0.24, 0.18, 0.44]} />
+                  <meshStandardMaterial color="#ef4444" roughness={0.4} />
+                </mesh>
+                <mesh position={[0, -0.02, 0.16]} castShadow>
+                  <boxGeometry args={[0.22, 0.14, 0.16]} />
+                  <meshStandardMaterial color="#ffffff" roughness={0.3} />
+                </mesh>
+                <mesh position={[0, 0.02, 0.02]}>
+                  <boxGeometry args={[0.25, 0.06, 0.08]} />
+                  <meshBasicMaterial color="#0f172a" />
+                </mesh>
+                <mesh position={[0, -0.09, 0]}>
+                  <boxGeometry args={[0.25, 0.06, 0.46]} />
+                  <meshStandardMaterial color="#ffffff" roughness={0.2} />
+                </mesh>
+              </group>
+            </group>
+          ) : isFresh ? (
             <group>
               <mesh position={[0, -0.15, 0]} castShadow>
                 <boxGeometry args={[0.22, 0.32, 0.24]} />
@@ -698,23 +1059,51 @@ export default function Player({
           )}
 
           {/* Sneakers / Creature Feet */}
-          <group position={[0, -0.72, 0.1]}>
-            <mesh castShadow>
-              <boxGeometry args={[0.24, 0.18, 0.44]} />
-              <meshStandardMaterial color={isYutani ? '#65a30d' : char.shoesColor || '#dc2626'} roughness={0.4} />
-            </mesh>
-            {!isYutani && (
-              <mesh position={[0, -0.09, 0]}>
-                <boxGeometry args={[0.25, 0.06, 0.46]} />
-                <meshStandardMaterial color="#ffffff" />
+          {!isDinesh && (
+            <group position={[0, -0.72, 0.1]}>
+              <mesh castShadow>
+                <boxGeometry args={[0.24, 0.18, 0.44]} />
+                <meshStandardMaterial color={isYutani ? '#65a30d' : char.shoesColor || '#dc2626'} roughness={0.4} />
               </mesh>
-            )}
-          </group>
+              {!isYutani && (
+                <mesh position={[0, -0.09, 0]}>
+                  <boxGeometry args={[0.25, 0.06, 0.46]} />
+                  <meshStandardMaterial color="#ffffff" />
+                </mesh>
+              )}
+            </group>
+          )}
         </group>
 
         {/* Right Leg */}
         <group ref={rightLegRef} position={[0.18, 0.85, 0]}>
-          {isFresh ? (
+          {isDinesh ? (
+            <group>
+              <mesh position={[0, -0.32, 0]} castShadow>
+                <boxGeometry args={[0.22, 0.68, 0.24]} />
+                <meshStandardMaterial color="#1e293b" roughness={0.7} />
+              </mesh>
+              {/* Retro Red and White Skate Sneakers */}
+              <group position={[0, -0.72, 0.08]}>
+                <mesh castShadow>
+                  <boxGeometry args={[0.24, 0.18, 0.44]} />
+                  <meshStandardMaterial color="#ef4444" roughness={0.4} />
+                </mesh>
+                <mesh position={[0, -0.02, 0.16]} castShadow>
+                  <boxGeometry args={[0.22, 0.14, 0.16]} />
+                  <meshStandardMaterial color="#ffffff" roughness={0.3} />
+                </mesh>
+                <mesh position={[0, 0.02, 0.02]}>
+                  <boxGeometry args={[0.25, 0.06, 0.08]} />
+                  <meshBasicMaterial color="#0f172a" />
+                </mesh>
+                <mesh position={[0, -0.09, 0]}>
+                  <boxGeometry args={[0.25, 0.06, 0.46]} />
+                  <meshStandardMaterial color="#ffffff" roughness={0.2} />
+                </mesh>
+              </group>
+            </group>
+          ) : isFresh ? (
             <group>
               <mesh position={[0, -0.15, 0]} castShadow>
                 <boxGeometry args={[0.22, 0.32, 0.24]} />
@@ -753,18 +1142,20 @@ export default function Player({
           )}
 
           {/* Sneakers / Creature Feet */}
-          <group position={[0, -0.72, 0.1]}>
-            <mesh castShadow>
-              <boxGeometry args={[0.24, 0.18, 0.44]} />
-              <meshStandardMaterial color={isYutani ? '#65a30d' : char.shoesColor || '#dc2626'} roughness={0.4} />
-            </mesh>
-            {!isYutani && (
-              <mesh position={[0, -0.09, 0]}>
-                <boxGeometry args={[0.25, 0.06, 0.46]} />
-                <meshStandardMaterial color="#ffffff" />
+          {!isDinesh && (
+            <group position={[0, -0.72, 0.1]}>
+              <mesh castShadow>
+                <boxGeometry args={[0.24, 0.18, 0.44]} />
+                <meshStandardMaterial color={isYutani ? '#65a30d' : char.shoesColor || '#dc2626'} roughness={0.4} />
               </mesh>
-            )}
-          </group>
+              {!isYutani && (
+                <mesh position={[0, -0.09, 0]}>
+                  <boxGeometry args={[0.25, 0.06, 0.46]} />
+                  <meshStandardMaterial color="#ffffff" />
+                </mesh>
+              )}
+            </group>
+          )}
         </group>
       </group>
     </group>

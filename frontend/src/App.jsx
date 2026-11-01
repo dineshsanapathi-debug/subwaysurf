@@ -10,7 +10,7 @@ import Player from './components/Player';
 
 export default function App() {
   const [screen, setScreen] = useState('menu'); // 'menu' | 'characters' | 'playing' | 'pause' | 'gameover'
-  const [selectedCharacter, setSelectedCharacter] = useState('Jake');
+  const [selectedCharacter, setSelectedCharacter] = useState('Dinesh');
   const [highScore, setHighScore] = useState(() => {
     return parseInt(localStorage.getItem('rail_rush_highscore') || '0', 10);
   });
