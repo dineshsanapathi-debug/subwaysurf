@@ -17,9 +17,9 @@ export class GameEngine {
     this.acceleration = 0.4; // m/s per 10 seconds
 
     // Difficulty tuning
-    this.trainSpawnRate = options.trainSpawnRate || 0.3;
+    this.trainSpawnRate = options.trainSpawnRate || 0.32;
     this.powerupFrequency = options.powerupFrequency || 0.12;
-    this.obstacleGap = options.obstacleGap || 32;
+    this.obstacleGap = options.obstacleGap || 36;
 
     // Player state
     this.lane = 0; // -1, 0, 1
@@ -225,7 +225,7 @@ export class GameEngine {
       occupiedLanes.add(trainLane);
       const isMoving = Math.random() < 0.45;
       const hasRamp = Math.random() < 0.65;
-      const length = 18;
+      const length = 28; // Indian WAP-4 Locomotive + 3 Blue Passenger Coaches (28m rake)
 
       this.obstacles.push({
         id: 'train_' + Math.random(),
@@ -238,11 +238,11 @@ export class GameEngine {
         hasRamp,
         isMoving,
         moveSpeed: isMoving ? 8 : 0,
-        color: ['#dc2626', '#2563eb', '#16a34a'][Math.floor(Math.random() * 3)]
+        color: '#d71932'
       });
 
-      // Spawn coins along train roof!
-      for (let cz = z - length + 2; cz < z; cz += 2.5) {
+      // Spawn vertical mango collectibles along the train roof
+      for (let cz = z - length + 2; cz < z; cz += 2.8) {
         this.coinsList.push({
           id: 'c_' + Math.random(),
           x: trainLane * LANE_WIDTH,

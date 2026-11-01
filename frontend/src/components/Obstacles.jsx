@@ -1,5 +1,5 @@
 import React from 'react';
-import Train from './Train';
+import IndianTrain from './IndianTrain';
 
 export function LowBarrier({ position = [0, 0, 0] }) {
   // Exact match to the red-and-white striped hurdle in the screenshot
@@ -107,13 +107,11 @@ export default function Obstacles({ obstacles = [] }) {
       {obstacles.map((obs) => {
         if (obs.type === 'train') {
           return (
-            <Train
+            <IndianTrain
               key={obs.id}
               position={[obs.x, obs.y, obs.z]}
-              length={obs.length || 18}
-              color={obs.color || '#2563eb'}
+              length={obs.length || 28}
               hasRamp={obs.hasRamp}
-              isCargo={obs.isCargo || obs.color === '#dc2626'}
               isMoving={obs.isMoving}
             />
           );
