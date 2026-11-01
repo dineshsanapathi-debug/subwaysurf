@@ -48,6 +48,15 @@ export class GameEngine {
       multiplier: 0
     };
 
+    // 500-Metre Elevated Running Route
+    this.elevatedRoute = {
+      active: false,
+      startDistance: 0,
+      distance: 0,
+      maxDistance: 500,
+      isLanding: false
+    };
+
     // Tracking for AI Coach
     this.runStats = {
       jumps: 0,
@@ -148,8 +157,10 @@ export class GameEngine {
 
   jump() {
     if (this.isGameOver || this.isPaused) return false;
-    // Can jump if on ground or on train roof (with generous 0.25m threshold)
-    const groundY = this.isOnTrain ? this.trainRoofY : 0;
+    let groundY = this.isOnTrain ? this.trainRoofY : 0;
+    if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
+      groundY = 4.75;
+    }
     if (this.posY <= groundY + 0.25 && !this.powerups.jetpack) {
       this.velocityY = 15.0;
       this.isJumping = true;
@@ -166,7 +177,8 @@ export class GameEngine {
     if (this.powerups.jetpack) return false;
 
     // Fast downward slam if currently in mid-air
-    if (this.isJumping || this.posY > 0.3) {
+    const groundY = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) ? 4.75 : 0.3;
+    if (this.isJumping || this.posY > groundY) {
       this.velocityY = -24;
     }
 
@@ -185,6 +197,20 @@ export class GameEngine {
     if (this.isGameOver || this.isPaused) return;
     this.powerups.jetpack = duration;
     if (this.onPowerupCollect) this.onPowerupCollect('jetpack');
+  }
+
+  activateElevatedRoute() {
+    if (this.isGameOver || this.isPaused || this.elevatedRoute.active) return;
+    this.elevatedRoute.active = true;
+    this.elevatedRoute.startDistance = this.distance;
+    this.elevatedRoute.distance = 0;
+    this.elevatedRoute.isLanding = false;
+    if (this.onElevatedRouteStart) this.onElevatedRouteStart();
+  }
+
+  completeElevatedRoute() {
+    if (!this.elevatedRoute.active) return;
+    this.elevatedRoute.isLanding = true;
   }
 
   spawnSegment(z) {
@@ -387,8 +413,41 @@ export class GameEngine {
     }
     this.isOnTrain = standingOnAnyTrain;
 
+    // 500-Metre Elevated Route progression
+    if (this.elevatedRoute?.active) {
+      this.elevatedRoute.distance = Math.min(500, Math.floor(this.distance - this.elevatedRoute.startDistance));
+
+      if (!this.elevatedRoute.isLanding) {
+        // Smoothly rise to upper floor (4.75m)
+        if (this.posY < 4.75 && !this.isJumping) {
+          this.posY = Math.min(4.75, this.posY + delta * 7.5);
+        }
+      } else {
+        // Smooth landing transition back to ground/train roof
+        const targetLandingY = this.isOnTrain ? this.trainRoofY : 0;
+        if (this.posY > targetLandingY && !this.isJumping) {
+          this.posY = Math.max(targetLandingY, this.posY - delta * 7.5);
+          if (this.posY <= targetLandingY + 0.08) {
+            this.posY = targetLandingY;
+            this.elevatedRoute.active = false;
+            this.elevatedRoute.isLanding = false;
+            if (this.onElevatedRouteComplete) this.onElevatedRouteComplete();
+          }
+        }
+      }
+
+      // Check 500m endpoint
+      if (this.elevatedRoute.distance >= 500 && !this.elevatedRoute.isLanding) {
+        this.completeElevatedRoute();
+      }
+    }
+
     // 4. Stable Vertical Physics & Gravity
-    const currentBaseY = this.isOnTrain ? this.trainRoofY : 0;
+    let currentBaseY = this.isOnTrain ? this.trainRoofY : 0;
+    if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
+      currentBaseY = 4.75;
+    }
+
     if (this.powerups.jetpack > 0) {
       this.posY = 6.2;
       this.velocityY = 0;

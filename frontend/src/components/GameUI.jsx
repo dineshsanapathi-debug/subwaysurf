@@ -216,6 +216,24 @@ export default function GameUI({
                 {stats.powerups?.jetpack > 0 ? Math.ceil(stats.powerups.jetpack) : 'FLY'}
               </span>
             </button>
+
+            {/* 500-Metre Upper Skyway Route Button */}
+            <button
+              onClick={() => {
+                if (window.gameActions?.elevatedRoute) window.gameActions.elevatedRoute();
+              }}
+              className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border-2 p-1 shadow-[0_4px_16px_rgba(6,182,212,0.4)] flex flex-col items-center justify-center active:scale-95 transition-all relative ${
+                stats.elevatedRoute?.active
+                  ? 'bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 border-cyan-200 animate-pulse'
+                  : 'bg-gradient-to-b from-sky-700 via-cyan-800 to-slate-900 border-cyan-400/80'
+              }`}
+              title="Activate 500-Metre Upper Skyway (E Key)"
+            >
+              <span className="text-2xl">⚡</span>
+              <span className="absolute -bottom-1 -right-1 bg-cyan-400 text-slate-950 font-black text-[10px] px-1 py-0.5 rounded-full flex items-center justify-center border border-white shadow">
+                {stats.elevatedRoute?.active ? `${Math.floor(stats.elevatedRoute.distance)}m` : '500M'}
+              </span>
+            </button>
           </div>
 
           {/* Bottom On-Screen Arcade Arrow Controls (Exact Match to Screenshot!) */}
@@ -806,8 +824,10 @@ export default function GameUI({
                                       <li><strong className="text-white">← / → :</strong> Switch Railway Lanes</li>
                                       <li><strong className="text-white">↑ (Up) :</strong> Jump over low hurdles & climb train ramps</li>
                                       <li><strong className="text-white">↓ (Down) :</strong> Slide under high barriers</li>
-                                      <li><strong className="text-white">H key / Rocket icon :</strong> Activate Hoverboard shield</li>
-                                      <li><strong className="text-white">Space / Yellow Button :</strong> Pause game</li>
+                                      <li><strong className="text-white">H key / 🛹 icon :</strong> Activate Hoverboard shield</li>
+                                      <li><strong className="text-white">J key / 🚀 icon :</strong> Jetpack Skyway flight</li>
+                                      <li><strong className="text-white">E key / ⚡ icon :</strong> 500-Metre Elevated Skyway Route</li>
+                                      <li><strong className="text-white">Space / Yellow Button :</strong> Pause game / Skip intro</li>
                                     </ul>
                                   </div>
 

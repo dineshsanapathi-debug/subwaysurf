@@ -61,6 +61,11 @@ export default function Controls({
           e.preventDefault();
           if (window.gameActions?.jetpack) window.gameActions.jetpack();
           break;
+        case 'e':
+        case 'E':
+          e.preventDefault();
+          if (window.gameActions?.elevatedRoute) window.gameActions.elevatedRoute();
+          break;
         default:
           break;
       }

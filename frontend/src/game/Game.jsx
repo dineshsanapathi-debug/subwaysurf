@@ -9,12 +9,13 @@ import ChaseIntro from '../components/ChaseIntro';
 import UpperFloor from '../components/UpperFloor';
 import Jetpack from '../components/Jetpack';
 import JetpackCoins from '../components/JetpackCoins';
+import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceChase from '../components/PoliceChase';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
-function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain }) {
+function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevated }) {
   const { camera } = useThree();
   const currentLookY = useRef(2.0);
 
@@ -23,17 +24,19 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain }) {
     const targetCamX = playerX * 0.42;
 
     // Smooth continuous vertical camera target (no discrete threshold jerks!)
-    const baseGroundY = isOnTrain ? 3.2 : 0;
+    const baseGroundY = isOnTrain ? 3.2 : (isElevated ? 4.75 : 0);
     let targetCamY = 4.8;
     if (isJetpack) {
       targetCamY = 9.8;
+    } else if (isElevated) {
+      targetCamY = 4.75 + 4.8; // 9.55m elevation
     } else {
       // Gentle, continuous elevation following without threshold snaps
       targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.25;
       if (isSliding) targetCamY -= 0.4;
     }
 
-    const targetCamZ = isJetpack ? 9.8 : 7.0;
+    const targetCamZ = isJetpack ? 9.8 : (isElevated ? 8.2 : 7.0);
 
     // Smooth lerp tracking
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
@@ -91,6 +94,7 @@ function Scene({
       speed: Math.floor(engine.speed),
       multiplier: engine.multiplier,
       powerups: { ...engine.powerups },
+      elevatedRoute: engine?.elevatedRoute ? { ...engine.elevatedRoute } : null,
       lane: engine.lane,
       posY: engine.posY,
       isJumping: engine.isJumping,
@@ -119,6 +123,7 @@ function Scene({
 
   const playerX = engine ? engine.lane * 3.2 : 0;
   const isJetpack = engine?.powerups.jetpack > 0;
+  const isElevated = engine?.elevatedRoute?.active;
 
   return (
     <>
@@ -156,6 +161,7 @@ function Scene({
           playerX={playerX}
           posY={engine?.posY || 0}
           isJetpack={isJetpack}
+          isElevated={isElevated}
           isSliding={engine?.isSliding}
           isOnTrain={engine?.isOnTrain}
         />
@@ -181,6 +187,17 @@ function Scene({
 
       {/* Coins & Powerups */}
       <Coins coins={engine?.coinsList || []} powerups={engine?.powerupsList || []} />
+
+      {/* 500-Metre Continuous Elevated Running Route */}
+      <ElevatedFloor
+        active={isElevated}
+        playerRef={playerGroupRef}
+        speed={engine?.speed || 20}
+        distanceTraveled={engine?.elevatedRoute?.distance || 0}
+        onComplete={() => {
+          if (engine) engine.completeElevatedRoute();
+        }}
+      />
 
       {/* Part B: Jetpack System - Elevated Upper Floor Flying Path */}
       <UpperFloor active={isJetpack} speed={engine?.speed || 20} />
@@ -317,6 +334,10 @@ export default function Game({
         engineRef.current?.activateJetpack();
         soundEffects.playPowerup();
       },
+      elevatedRoute: () => {
+        engineRef.current?.activateElevatedRoute();
+        soundEffects.playPowerup();
+      },
       skipIntro: () => setShowIntro(false)
     };
 
@@ -345,6 +366,26 @@ export default function Game({
           />
         )}
       </Canvas>
+
+      {/* 500-Metre Upper Route Distance HUD */}
+      {engine?.elevatedRoute?.active && (
+        <div className="elevated-route-hud">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-cyan-400 font-black text-xs uppercase tracking-wider animate-pulse flex items-center gap-1">
+              <span>⚡</span> 500M UPPER SKYWAY
+            </span>
+            <span className="text-white font-black text-sm tabular-nums">
+              {Math.min(500, Math.floor(engine.elevatedRoute.distance))} / 500 M
+            </span>
+          </div>
+          <div className="w-full bg-slate-900/85 rounded-full h-2 mt-1.5 border border-cyan-500/40 overflow-hidden shadow-inner">
+            <div
+              className="bg-gradient-to-r from-cyan-500 via-sky-400 to-emerald-400 h-full rounded-full transition-all duration-75 shadow-[0_0_12px_#06b6d4]"
+              style={{ width: `${(Math.min(500, engine.elevatedRoute.distance) / 500) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Dynamic Police Chase Warning after Side/Obstacle Collision */}
       {policeChasing && !showIntro && (
