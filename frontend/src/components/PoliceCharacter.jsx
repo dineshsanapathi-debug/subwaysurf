@@ -68,13 +68,19 @@ export default function PoliceCharacter({
         pz = playerPos.z;
       }
 
-      // Target position: right behind the player in Z
-      const target = new THREE.Vector3(px, py, pz + distanceBehind);
+      // Target position: right behind the player in Z, clamped to track surface
+      const surfaceY = py >= 7.0 ? 8.65 : py >= 2.5 ? 3.2 : 0;
+      const target = new THREE.Vector3(px, surfaceY, pz + distanceBehind);
 
       // Smooth follow pursuit lerp
       currentPos.current.lerp(target, Math.min(1, followSpeed * delta));
       policeRef.current.position.copy(currentPos.current);
       policeRef.current.visible = true;
+
+      // Dynamic heading: calculate angle directly towards the hero
+      const dx = px - currentPos.current.x;
+      const dz = pz - currentPos.current.z;
+      const turnAngle = Math.atan2(-dx, -dz);
 
       // Energetic forward sprint running bobbing and forward lean
       const bobY = Math.abs(Math.sin(time * 16)) * 0.14;
@@ -82,8 +88,8 @@ export default function PoliceCharacter({
 
       if (spriteMeshRef.current) {
         spriteMeshRef.current.position.y = 1.6 + bobY;
-        // Officer faces opposite to screen (facing down the tracks towards -Z chasing the player)
-        spriteMeshRef.current.rotation.set(-0.14, Math.PI, swayZ);
+        // Officer leans into forward sprint (-0.16) and faces directly towards the hero (Math.PI + turnAngle)
+        spriteMeshRef.current.rotation.set(-0.16, Math.PI + turnAngle, swayZ);
       }
 
       // Ground shadow tracking
