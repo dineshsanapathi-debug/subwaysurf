@@ -54,6 +54,27 @@ export default function GameUI({
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState('');
+  const [liveFps, setLiveFps] = useState(60);
+
+  // Smooth real-time FPS monitoring updated every 500ms
+  useEffect(() => {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let rafId;
+
+    const countFrame = () => {
+      frameCount++;
+      const now = performance.now();
+      if (now - lastTime >= 500) {
+        setLiveFps(Math.round((frameCount * 1000) / (now - lastTime)));
+        frameCount = 0;
+        lastTime = now;
+      }
+      rafId = requestAnimationFrame(countFrame);
+    };
+    rafId = requestAnimationFrame(countFrame);
+    return () => cancelAnimationFrame(rafId);
+  }, []);
 
   // AI chat state
   const [coachQuestion, setCoachQuestion] = useState('');
@@ -156,12 +177,24 @@ export default function GameUI({
               </span>
             </div>
 
-            {/* Top Right: Best High Score Pill */}
-            <div className="flex items-center gap-2 bg-[#102447]/90 border border-amber-500/40 rounded-full pl-2 pr-4 py-1.5 shadow-lg">
-              <span className="text-lg">🏆</span>
-              <div className="flex items-baseline gap-1 text-xs sm:text-sm font-black">
-                <span className="text-amber-400">Best:</span>
-                <span className="text-white tabular-nums">{highScore.toLocaleString()}</span>
+            {/* Top Right: Best High Score & Live Performance FPS Badges */}
+            <div className="flex items-center gap-2">
+              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full shadow-md tracking-wider backdrop-blur-sm ${
+                liveFps >= 50
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                  : liveFps >= 30
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
+                  : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'
+              }`}>
+                ⚡ {liveFps} FPS
+              </span>
+
+              <div className="flex items-center gap-2 bg-[#102447]/90 border border-amber-500/40 rounded-full pl-2 pr-4 py-1.5 shadow-lg">
+                <span className="text-lg">🏆</span>
+                <div className="flex items-baseline gap-1 text-xs sm:text-sm font-black">
+                  <span className="text-amber-400">Best:</span>
+                  <span className="text-white tabular-nums">{highScore.toLocaleString()}</span>
+                </div>
               </div>
             </div>
           </div>

@@ -2,6 +2,16 @@ import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
+// Pre-allocated shared geometries & materials for zero-GC train rendering
+const coachWindowGeo = new THREE.BoxGeometry(0.035, 0.75, 0.75);
+const coachWindowMat = new THREE.MeshStandardMaterial({ color: '#172b42', metalness: 0.35, roughness: 0.3 });
+const coachGrilleGeo = new THREE.BoxGeometry(0.02, 0.04, 0.7);
+const coachGrilleMat = new THREE.MeshBasicMaterial({ color: '#facc15' });
+const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.2, 10);
+const wheelMat = new THREE.MeshStandardMaterial({ color: '#252525', metalness: 0.65, roughness: 0.4 });
+const bogieFrameGeo = new THREE.BoxGeometry(2.4, 0.15, 1.8);
+const bogieFrameMat = new THREE.MeshStandardMaterial({ color: '#1e293b', metalness: 0.7 });
+
 /**
  * Blue Passenger Coach (ICF / Utkrisht Livery)
  * Built with full 3D geometry: blue body, light blue stripe, curved silver roof,
@@ -34,32 +44,20 @@ export function Coach({ z = 0, coachIndex = 0 }) {
         <meshStandardMaterial color="#64748b" roughness={0.8} />
       </mesh>
 
-      {/* 4. Windows on Both Flanks (5 windows per side) */}
+      {/* 4. Windows on Both Flanks (5 windows per side with shared geometries) */}
       {Array.from({ length: 5 }, (_, i) => {
         const windowZ = -2.4 + i * 1.2;
         return (
           <React.Fragment key={i}>
             {/* Left flank window */}
-            <mesh position={[-1.41, 1.95, windowZ]}>
-              <boxGeometry args={[0.035, 0.75, 0.75]} />
-              <meshStandardMaterial color="#172b42" metalness={0.35} roughness={0.3} />
-            </mesh>
+            <mesh position={[-1.41, 1.95, windowZ]} geometry={coachWindowGeo} material={coachWindowMat} />
             {/* Window safety grille / bar */}
-            <mesh position={[-1.42, 1.95, windowZ]}>
-              <boxGeometry args={[0.02, 0.04, 0.7]} />
-              <meshBasicMaterial color="#facc15" />
-            </mesh>
+            <mesh position={[-1.42, 1.95, windowZ]} geometry={coachGrilleGeo} material={coachGrilleMat} />
 
             {/* Right flank window */}
-            <mesh position={[1.41, 1.95, windowZ]}>
-              <boxGeometry args={[0.035, 0.75, 0.75]} />
-              <meshStandardMaterial color="#172b42" metalness={0.35} roughness={0.3} />
-            </mesh>
+            <mesh position={[1.41, 1.95, windowZ]} geometry={coachWindowGeo} material={coachWindowMat} />
             {/* Window safety grille / bar */}
-            <mesh position={[1.42, 1.95, windowZ]}>
-              <boxGeometry args={[0.02, 0.04, 0.7]} />
-              <meshBasicMaterial color="#facc15" />
-            </mesh>
+            <mesh position={[1.42, 1.95, windowZ]} geometry={coachGrilleGeo} material={coachGrilleMat} />
           </React.Fragment>
         );
       })}
@@ -68,21 +66,17 @@ export function Coach({ z = 0, coachIndex = 0 }) {
       {[-2.2, 2.2].map((zPos, bIdx) => (
         <group key={bIdx} position={[0, 0, zPos]}>
           {/* Bogie Frame */}
-          <mesh position={[0, 0.48, 0]}>
-            <boxGeometry args={[2.4, 0.15, 1.8]} />
-            <meshStandardMaterial color="#1e293b" metalness={0.7} />
-          </mesh>
-          {/* Steel Wheels */}
+          <mesh position={[0, 0.48, 0]} geometry={bogieFrameGeo} material={bogieFrameMat} />
+          {/* Steel Wheels (Optimized 10-segment cylinders) */}
           {[-1.05, 1.05].map((xPos) =>
             [-0.5, 0.5].map((wZ, wIdx) => (
               <mesh
                 key={`${xPos}-${wIdx}`}
                 position={[xPos, 0.48, wZ]}
                 rotation={[0, 0, Math.PI / 2]}
-              >
-                <cylinderGeometry args={[0.42, 0.42, 0.2, 16]} />
-                <meshStandardMaterial color="#252525" metalness={0.65} roughness={0.4} />
-              </mesh>
+                geometry={wheelGeo}
+                material={wheelMat}
+              />
             ))
           )}
         </group>

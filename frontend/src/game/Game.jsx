@@ -459,7 +459,12 @@ function GameComponent({
         shadows
         dpr={[1, 1.25]}
         camera={{ position: [0, 4.8, 7.0], fov: 62 }}
-        gl={{ antialias: true, powerPreference: 'high-performance' }}
+        gl={{
+          antialias: false,
+          powerPreference: 'high-performance',
+          stencil: false,
+          depth: true
+        }}
       >
         <RemoveDebugLines />
         {engine && (

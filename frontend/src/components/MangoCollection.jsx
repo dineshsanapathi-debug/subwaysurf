@@ -1,7 +1,94 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import Mango from './Mango';
+// Pre-allocated shared geometries and materials for zero-overhead instancing
+const mangoBodyGeo = new THREE.SphereGeometry(0.42, 12, 12);
+const mangoLeafGeo = new THREE.SphereGeometry(0.17, 8, 6);
+const mangoBodyMat = new THREE.MeshStandardMaterial({
+  color: '#ff9f1c',
+  roughness: 0.38,
+  metalness: 0.05,
+  emissive: '#f59e0b',
+  emissiveIntensity: 0.28
+});
+const mangoLeafMat = new THREE.MeshStandardMaterial({
+  color: '#22c55e',
+  roughness: 0.6,
+  emissive: '#15803d',
+  emissiveIntensity: 0.2
+});
+
+const MAX_MANGO_INSTANCES = 150;
+
+/**
+ * InstancedMangoes
+ * Renders up to 150 3D Mango collectibles in exactly 2 GPU draw calls.
+ */
+function InstancedMangoes({ items, collectedIds }) {
+  const bodyRef = useRef();
+  const leafRef = useRef();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const spinAngle = useRef(0);
+
+  useFrame((state, delta) => {
+    if (!bodyRef.current) return;
+    spinAngle.current += delta * 2.2;
+    const spin = spinAngle.current;
+    const count = Math.min(items.length, MAX_MANGO_INSTANCES);
+
+    for (let i = 0; i < count; i++) {
+      const item = items[i];
+      if (collectedIds.has(item.id)) {
+        dummy.position.set(0, -999, 0);
+        dummy.scale.set(0, 0, 0);
+      } else {
+        dummy.position.set(item.x, item.y, item.z);
+        dummy.rotation.set(0, spin + (i % 8) * 0.4, -0.15);
+        dummy.scale.set(0.74, 1.05, 0.64);
+      }
+      dummy.updateMatrix();
+      bodyRef.current.setMatrixAt(i, dummy.matrix);
+
+      if (leafRef.current) {
+        if (collectedIds.has(item.id)) {
+          dummy.position.set(0, -999, 0);
+          dummy.scale.set(0, 0, 0);
+        } else {
+          dummy.position.set(item.x + 0.1, item.y + 0.44, item.z);
+          dummy.rotation.set(0, spin + (i % 8) * 0.4, 0.45);
+          dummy.scale.set(0.18, 0.08, 0.14);
+        }
+        dummy.updateMatrix();
+        leafRef.current.setMatrixAt(i, dummy.matrix);
+      }
+    }
+
+    // Hide remaining unused slots
+    for (let i = count; i < MAX_MANGO_INSTANCES; i++) {
+      dummy.position.set(0, -999, 0);
+      dummy.scale.set(0, 0, 0);
+      dummy.updateMatrix();
+      bodyRef.current.setMatrixAt(i, dummy.matrix);
+      if (leafRef.current) leafRef.current.setMatrixAt(i, dummy.matrix);
+    }
+
+    bodyRef.current.instanceMatrix.needsUpdate = true;
+    if (leafRef.current) leafRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <group>
+      <instancedMesh
+        ref={bodyRef}
+        args={[mangoBodyGeo, mangoBodyMat, MAX_MANGO_INSTANCES]}
+      />
+      <instancedMesh
+        ref={leafRef}
+        args={[mangoLeafGeo, mangoLeafMat, MAX_MANGO_INSTANCES]}
+      />
+    </group>
+  );
+}
 
 // Game uses standard 3-lane X coordinates: -3.2 (Left), 0 (Center), +3.2 (Right)
 const LANES = [-3.2, 0, 3.2];
@@ -120,16 +207,8 @@ export default function MangoCollection({
 
   return (
     <group>
-      {activeItems.map((item) => {
-        if (collectedIds.has(item.id)) return null;
-        return (
-          <Mango
-            key={item.id}
-            position={[item.x, item.y, item.z]}
-            scale={0.95}
-          />
-        );
-      })}
+      {/* High-Performance Instanced Mangoes (Replaces 60+ individual meshes with 2 draw calls) */}
+      <InstancedMangoes items={activeItems} collectedIds={collectedIds} />
 
       {/* Render powerup items (featuring full 3D Rocket for jetpack) */}
       {powerups.map((p) => {

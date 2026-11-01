@@ -148,6 +148,50 @@ function InstancedSleepers({ ties, sleeperColor }) {
   );
 }
 
+// Pre-allocated grass cone geometry & material for zero-overhead scenery instancing
+const grassConeGeo = new THREE.ConeGeometry(0.2, 0.45, 5);
+const grassMat = new THREE.MeshStandardMaterial({ color: '#22c55e', roughness: 0.6 });
+
+// High-performance Instanced Grass Tufts (Replaces 88 individual meshes with 1 draw call per chunk)
+function InstancedGrass({ grassTufts }) {
+  const meshRef = React.useRef();
+  const count = grassTufts.length * 2; // Left side + right side
+
+  React.useLayoutEffect(() => {
+    if (!meshRef.current) return;
+    const dummy = new THREE.Object3D();
+    let idx = 0;
+    for (const g of grassTufts) {
+      // Left side
+      dummy.position.set(-5.3, 0.2, g.z);
+      dummy.rotation.set(0, 0, 0.3);
+      dummy.scale.set(g.scale, g.scale, g.scale);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(idx++, dummy.matrix);
+
+      // Right side
+      dummy.position.set(5.3, 0.2, g.z);
+      dummy.rotation.set(0, 0, -0.3);
+      dummy.scale.set(g.scale, g.scale, g.scale);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(idx++, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  }, [grassTufts]);
+
+  return <instancedMesh ref={meshRef} args={[grassConeGeo, grassMat, count]} />;
+}
+
+// Pre-allocated building window and banner geometries/materials to eliminate GC allocations
+const windowPlaneGeo = new THREE.PlaneGeometry(1.2, 1.6);
+const windowMat = new THREE.MeshStandardMaterial({
+  color: '#fef08a',
+  roughness: 0.2,
+  emissive: '#fef08a',
+  emissiveIntensity: 0.2
+});
+const bannerGeo = new THREE.PlaneGeometry(1.2, 2.4);
+
 export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false, currentTheme = null }) {
   // Extract theme parameters with sensible fallbacks
   const groundColor = currentTheme?.ground || '#854d0e';
@@ -274,34 +318,8 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             </mesh>
           </group>
 
-          {/* 5. Green Cartoon Grass Tufts along the bottom of the walls */}
-          {grassTufts.map((g, i) => (
-            <React.Fragment key={i}>
-              {/* Left Wall Grass */}
-              <group position={[-5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
-                <mesh position={[0, 0.2, 0]} rotation={[0, 0, 0.3]}>
-                  <coneGeometry args={[0.22, 0.5, 5]} />
-                  <meshStandardMaterial color="#22c55e" roughness={0.5} />
-                </mesh>
-                <mesh position={[-0.1, 0.15, 0.1]} rotation={[0, 0, 0.5]}>
-                  <coneGeometry args={[0.18, 0.4, 5]} />
-                  <meshStandardMaterial color="#16a34a" roughness={0.5} />
-                </mesh>
-              </group>
-
-              {/* Right Wall Grass */}
-              <group position={[5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
-                <mesh position={[0, 0.2, 0]} rotation={[0, 0, -0.3]}>
-                  <coneGeometry args={[0.22, 0.5, 5]} />
-                  <meshStandardMaterial color="#22c55e" roughness={0.5} />
-                </mesh>
-                <mesh position={[0.1, 0.15, -0.1]} rotation={[0, 0, -0.5]}>
-                  <coneGeometry args={[0.18, 0.4, 5]} />
-                  <meshStandardMaterial color="#16a34a" roughness={0.5} />
-                </mesh>
-              </group>
-            </React.Fragment>
-          ))}
+          {/* 5. Green Cartoon Grass Tufts along the bottom of the walls (Instanced for 1 draw call per chunk) */}
+          <InstancedGrass grassTufts={grassTufts} />
 
           {/* 6. Upper Promenade & Colorful European Buildings */}
           {buildings.map((b, i) => (
@@ -314,14 +332,10 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
                 </mesh>
                 {/* White Windows Grid */}
                 {[-2.5, 0, 2.5].map((wx, wIdx) => (
-                  <mesh key={wIdx} position={[4.52, 1, wx]}>
-                    <planeGeometry args={[1.2, 1.6]} />
-                    <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
-                  </mesh>
+                  <mesh key={wIdx} position={[4.52, 1, wx]} geometry={windowPlaneGeo} material={windowMat} />
                 ))}
                 {/* Hanging Banner / Pennant */}
-                <mesh position={[4.6, -1.8, 1.5]} rotation={[0, Math.PI / 2, 0]}>
-                  <planeGeometry args={[1.2, 2.4]} />
+                <mesh position={[4.6, -1.8, 1.5]} rotation={[0, Math.PI / 2, 0]} geometry={bannerGeo}>
                   <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
                 </mesh>
               </group>
@@ -334,14 +348,10 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
                 </mesh>
                 {/* White Windows Grid */}
                 {[-2.5, 0, 2.5].map((wx, wIdx) => (
-                  <mesh key={wIdx} position={[-4.52, 1, wx]} rotation={[0, Math.PI, 0]}>
-                    <planeGeometry args={[1.2, 1.6]} />
-                    <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
-                  </mesh>
+                  <mesh key={wIdx} position={[-4.52, 1, wx]} rotation={[0, Math.PI, 0]} geometry={windowPlaneGeo} material={windowMat} />
                 ))}
                 {/* Hanging Banner / Pennant */}
-                <mesh position={[-4.6, -1.8, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
-                  <planeGeometry args={[1.2, 2.4]} />
+                <mesh position={[-4.6, -1.8, -1.5]} rotation={[0, -Math.PI / 2, 0]} geometry={bannerGeo}>
                   <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
                 </mesh>
               </group>
