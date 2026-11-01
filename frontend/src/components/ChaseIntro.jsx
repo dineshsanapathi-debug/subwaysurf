@@ -384,3 +384,4 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Dinesh
     </group>
   );
 }
+

@@ -189,8 +189,10 @@ export default function PoliceChase({ active = false, playerRef }) {
     const time = state.clock.getElapsedTime();
 
     if (active && playerRef?.current) {
-      // Player current position
-      const playerPos = playerRef.current.position;
+      // Player current world position across any lane and elevation
+      const playerPos = new THREE.Vector3();
+      const targetObj = playerRef.current.children?.[0] || playerRef.current;
+      targetObj.getWorldPosition(playerPos);
 
       // Chase target position right behind the hero (Z + 2.5)
       const targetPos = new THREE.Vector3(
@@ -224,3 +226,4 @@ export default function PoliceChase({ active = false, playerRef }) {
     </group>
   );
 }
+

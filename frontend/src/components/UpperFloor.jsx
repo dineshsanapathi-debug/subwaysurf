@@ -80,3 +80,4 @@ export default function UpperFloor({ active = true, speed = 20 }) {
     </group>
   );
 }
+

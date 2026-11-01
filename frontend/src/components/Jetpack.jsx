@@ -34,3 +34,4 @@ export default function Jetpack({ active = false, playerRef, height = 6.2 }) {
 
   return null;
 }
+

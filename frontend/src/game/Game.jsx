@@ -20,8 +20,9 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevat
   const currentLookY = useRef(2.0);
 
   useFrame((state, delta) => {
-    // Dynamic camera horizontal follow
-    const targetCamX = playerX * 0.42;
+    // Dynamic camera horizontal follow - centers neatly on active lane to avoid perspective skew
+    const targetCamX = playerX * 0.75;
+    const targetLookX = playerX * 0.75;
 
     // Smooth continuous vertical camera target (no discrete threshold jerks!)
     const baseGroundY = isOnTrain ? 3.2 : (isElevated ? 4.75 : 0);
@@ -46,7 +47,7 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevat
     // Continuous smooth lookAt without snapping
     const targetLookY = baseGroundY + 1.8 + Math.max(0, posY - baseGroundY) * 0.15;
     currentLookY.current = THREE.MathUtils.lerp(currentLookY.current, targetLookY, Math.min(1, delta * 6));
-    camera.lookAt(targetCamX * 0.6, currentLookY.current, -14);
+    camera.lookAt(targetLookX, currentLookY.current, -14);
   });
 
   return null;

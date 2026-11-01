@@ -133,6 +133,15 @@ export default function Player({
 
   const targetX = lane * 3.2;
 
+  // Initialize group position on mount
+  React.useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.position.x = targetX;
+      groupRef.current.position.y = posY || 0;
+      groupRef.current.position.z = position[2] || 0;
+    }
+  }, []);
+
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
@@ -154,15 +163,19 @@ export default function Player({
     groupRef.current.position.x = THREE.MathUtils.lerp(
       groupRef.current.position.x,
       targetX,
-      Math.min(1, delta * 15)
+      Math.min(1, delta * 18)
     );
 
-    // Dynamic bank tilt
+    const baseGroundY = isOnTrain ? 3.2 : 0;
+    const isAirborne = isJumping || (posY > baseGroundY + 0.18);
+
+    // Dynamic bank tilt: only tilt while steering on ground, stay stable upright in air
     const xDiff = targetX - groupRef.current.position.x;
+    const targetTilt = isAirborne ? 0 : -xDiff * 0.16;
     groupRef.current.rotation.z = THREE.MathUtils.lerp(
       groupRef.current.rotation.z,
-      -xDiff * 0.16,
-      Math.min(1, delta * 10)
+      targetTilt,
+      Math.min(1, delta * 12)
     );
 
     // Vertical Y position
@@ -192,9 +205,6 @@ export default function Player({
       groupRef.current.position.z = THREE.MathUtils.lerp(groupRef.current.position.z, -1.5, delta * 6);
       return;
     }
-
-    const baseGroundY = isOnTrain ? 3.2 : 0;
-    const isAirborne = isJumping || (posY > baseGroundY + 0.18);
 
     if (powerups.hoverboard) {
       if (bodyRef.current) {
@@ -290,7 +300,7 @@ export default function Player({
   });
 
   return (
-    <group ref={groupRef} position={[position[0], posY, position[2]]} scale={scale}>
+    <group ref={groupRef} scale={scale}>
       {/* Dynamic 3D Track Ground Shadow */}
       <mesh ref={shadowRef} position={[0, isOnTrain ? 3.22 : 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.3, 0.7]} />
@@ -357,7 +367,7 @@ export default function Player({
         {isDinesh && (
           <group>
             {/* Camera-Facing 4K Character Sprite Billboard */}
-            <Billboard follow={true}>
+            <Billboard follow={true} lockX={true} lockZ={true}>
               <mesh ref={spriteMeshRef} position={[0, 1.15, 0]} castShadow>
                 <planeGeometry args={[1.5, 2.28]} />
                 <meshBasicMaterial
