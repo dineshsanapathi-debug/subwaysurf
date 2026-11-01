@@ -77,10 +77,8 @@ export default function PoliceCharacter({
       policeRef.current.position.copy(currentPos.current);
       policeRef.current.visible = true;
 
-      // Dynamic heading: calculate angle directly towards the hero
-      const dx = px - currentPos.current.x;
-      const dz = pz - currentPos.current.z;
-      const turnAngle = Math.atan2(-dx, -dz);
+      // Direct orientation: Police continuously tracks and faces directly toward the hero
+      policeRef.current.lookAt(px, policeRef.current.position.y, pz);
 
       // Energetic forward sprint running bobbing and forward lean
       const bobY = Math.abs(Math.sin(time * 16)) * 0.14;
@@ -88,8 +86,8 @@ export default function PoliceCharacter({
 
       if (spriteMeshRef.current) {
         spriteMeshRef.current.position.y = 1.6 + bobY;
-        // Officer leans into forward sprint (-0.16) and faces directly towards the hero (Math.PI + turnAngle)
-        spriteMeshRef.current.rotation.set(-0.16, Math.PI + turnAngle, swayZ);
+        // Officer sprite faces directly toward hero in active sprint
+        spriteMeshRef.current.rotation.set(-0.14, 0, swayZ);
       }
 
       // Ground shadow tracking
@@ -115,8 +113,8 @@ export default function PoliceCharacter({
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
 
-      {/* Indian Police Officer 2D Billboard Sprite - Facing opposite to screen */}
-      <mesh ref={spriteMeshRef} position={[0, 1.6, 0]} rotation={[-0.14, Math.PI, 0]}>
+      {/* Indian Police Officer 2D Billboard Sprite - Facing directly toward hero */}
+      <mesh ref={spriteMeshRef} position={[0, 1.6, 0]} rotation={[-0.14, 0, 0]}>
         <planeGeometry args={[2.06, 3.2]} />
         <meshBasicMaterial
           map={texture}

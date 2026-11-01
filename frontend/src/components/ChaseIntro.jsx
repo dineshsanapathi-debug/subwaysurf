@@ -17,7 +17,7 @@ function StylizedPoliceInspector() {
     const bobY = Math.abs(Math.sin(runTime * 16)) * 0.14;
     const swayZ = Math.sin(runTime * 8) * 0.05;
     meshRef.current.position.y = 1.6 + bobY;
-    meshRef.current.rotation.z = swayZ;
+    meshRef.current.rotation.set(-0.14, 0, swayZ);
   });
 
   return (
@@ -27,8 +27,8 @@ function StylizedPoliceInspector() {
         <planeGeometry args={[1.6, 0.85]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
-      {/* Indian Police Officer Cutout Sprite - Facing opposite to screen (running down the track in hot pursuit) */}
-      <mesh ref={meshRef} position={[0, 1.6, 0]} rotation={[-0.14, Math.PI, 0]}>
+      {/* Indian Police Officer Cutout Sprite - Facing directly toward hero */}
+      <mesh ref={meshRef} position={[0, 1.6, 0]} rotation={[-0.14, 0, 0]}>
         <planeGeometry args={[2.06, 3.2]} />
         <meshBasicMaterial
           map={texture}
@@ -250,11 +250,8 @@ export default function ChaseIntro({
         policeRef.current.position.x = Math.sin(t * 3) * 0.2;
       }
 
-      // Calculate dynamic heading directly to the hero
-      const dx = heroTargetX - policeRef.current.position.x;
-      const dz = heroTargetZ - policeRef.current.position.z;
-      const heading = Math.atan2(-dx, -dz);
-      policeRef.current.rotation.y = THREE.MathUtils.lerp(policeRef.current.rotation.y, heading, delta * 14);
+      // Group directly looks at hero (aligns local +Z towards the hero)
+      policeRef.current.lookAt(heroTargetX, policeRef.current.position.y, heroTargetZ);
     }
 
     if (dogRef.current) {
@@ -269,7 +266,7 @@ export default function ChaseIntro({
       // Dog also tracks and faces directly towards the hero
       const ddx = heroTargetX - dogRef.current.position.x;
       const ddz = heroTargetZ - dogRef.current.position.z;
-      const dogHeading = Math.atan2(ddx, -ddz);
+      const dogHeading = Math.atan2(ddx, ddz) + Math.PI;
       dogRef.current.rotation.y = THREE.MathUtils.lerp(dogRef.current.rotation.y, dogHeading, delta * 14);
     }
 
