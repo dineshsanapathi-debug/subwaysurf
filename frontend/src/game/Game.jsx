@@ -9,6 +9,7 @@ import ChaseIntro from '../components/ChaseIntro';
 import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceCharacter from '../components/PoliceCharacter';
+import RemoveDebugLines from '../components/RemoveDebugLines';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -331,6 +332,7 @@ export default function Game({
         camera={{ position: [0, 4.8, 7.0], fov: 62 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
       >
+        <RemoveDebugLines />
         {engine && (
           <Scene
             engine={engine}

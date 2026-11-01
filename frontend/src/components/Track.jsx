@@ -20,16 +20,6 @@ function createGraffitiTexture(text, style = 'run') {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 1024, 512);
 
-  // Subtle concrete panel lines and grime
-  ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
-  ctx.lineWidth = 4;
-  for (let x = 0; x <= 1024; x += 256) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 512);
-    ctx.stroke();
-  }
-
   // Paint Splatters
   const splatters = [
     { x: 180, y: 220, r: 60, c: 'rgba(236, 72, 153, 0.4)' },
@@ -177,7 +167,13 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
       {/* 1. Track Bed Ground (Warm Earthy Gravel / Ballast) */}
       <mesh position={[0, -0.06, 0]} receiveShadow>
         <boxGeometry args={[TRACK_WIDTH, 0.12, CHUNK_LENGTH]} />
-        <meshStandardMaterial color="#854d0e" roughness={0.95} />
+        <meshStandardMaterial
+          color="#854d0e"
+          roughness={0.95}
+          polygonOffset
+          polygonOffsetFactor={1}
+          polygonOffsetUnits={1}
+        />
       </mesh>
 
       {/* 2. Wooden Railway Ties / Sleepers (Rich Warm Wood) */}
@@ -222,11 +218,6 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
               <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
             </mesh>
-            {/* Yellow Metal Handrail along top edge */}
-            <mesh position={[0.2, 3.4, 0]}>
-              <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
-              <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
-            </mesh>
           </group>
 
           {/* Right Wall */}
@@ -239,11 +230,6 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
               <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
               <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
-            </mesh>
-            {/* Yellow Metal Handrail along top edge */}
-            <mesh position={[-0.2, 3.4, 0]}>
-              <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
-              <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
             </mesh>
           </group>
 
@@ -362,14 +348,6 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
             </group>
           ))}
         </group>
-      ))}
-
-      {/* Continuous Overhead Wire Lines stretching through chunk */}
-      {!isSkyway && LANES_X.map((lx, lIdx) => (
-        <mesh key={lIdx} position={[lx, 5.6, 0]}>
-          <cylinderGeometry args={[0.015, 0.015, CHUNK_LENGTH, 4]} rotation={[Math.PI / 2, 0, 0]} />
-          <meshStandardMaterial color="#1e293b" />
-        </mesh>
       ))}
     </group>
   );
