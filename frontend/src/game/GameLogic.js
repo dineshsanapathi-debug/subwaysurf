@@ -94,8 +94,22 @@ export class GameEngine {
   }
 
   checkSideCollision(targetLane) {
-    if (this.powerups.jetpack > 0 || this.posY > 4.5) return null;
+    const isPlayerElevated = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) || this.posY >= 7.0;
     const targetX = targetLane * LANE_WIDTH;
+
+    // Aerial sky obstacle collision check (dodging drones on Upper Skyway)
+    if (isPlayerElevated) {
+      for (const obs of this.obstacles) {
+        if (obs.type === 'sky_drone') {
+          if (Math.abs(obs.x - targetX) < 1.4 && obs.z >= -1.6 && obs.z <= 1.6) {
+            return obs;
+          }
+        }
+      }
+      return null;
+    }
+
+    if (this.powerups.jetpack > 0 || this.posY > 4.5) return null;
 
     for (const obs of this.obstacles) {
       if (Math.abs(obs.x - targetX) > 0.8) continue;
@@ -669,7 +683,7 @@ export class GameEngine {
 
       // 1. SKY LASER GATE (Spans across skyway runway; duck/slide required)
       if (obs.type === 'sky_laser_gate') {
-        if (isPlayerElevated && dist > 5 && dist < 42) {
+        if (isPlayerElevated && dist >= -0.5 && dist < 45) {
           if (dist < minDistance) {
             minDistance = dist;
             closestHazard = {
@@ -683,7 +697,7 @@ export class GameEngine {
       }
       // 2. AERIAL SKY DRONE IN PLAYER'S LANE (Lane switch required)
       else if (obs.type === 'sky_drone') {
-        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.35 && dist > 5 && dist < 42) {
+        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.85 && dist >= -0.5 && dist < 45) {
           if (dist < minDistance) {
             minDistance = dist;
             closestHazard = {
@@ -697,7 +711,7 @@ export class GameEngine {
       }
       // 3. LOW OVERHEAD GIRDER (Over train tracks; slide/duck required)
       else if (obs.type === 'overhead_beam') {
-        if ((this.isOnTrain || this.posY >= 3.0) && dist > 5 && dist < 42) {
+        if (!isPlayerElevated && dist >= -0.5 && dist < 45) {
           if (dist < minDistance) {
             minDistance = dist;
             closestHazard = {
@@ -713,7 +727,7 @@ export class GameEngine {
       else if (obs.type === 'train' && !isPlayerElevated) {
         const halfL = (obs.length || 28) / 2;
         const frontDist = -(obs.z + halfL);
-        if (Math.abs(playerX - obs.x) < 1.35 && frontDist > 8 && frontDist < 42 && !obs.hasRamp && !this.isOnTrain) {
+        if (Math.abs(playerX - obs.x) < 1.35 && frontDist >= -0.5 && frontDist < 45 && !obs.hasRamp && !this.isOnTrain) {
           if (frontDist < minDistance) {
             minDistance = frontDist;
             closestHazard = {
@@ -727,7 +741,7 @@ export class GameEngine {
       }
       // 5. HIGH BARRIER ON GROUND TRACK (Slide required)
       else if (obs.type === 'high_barrier' && !isPlayerElevated) {
-        if (Math.abs(playerX - obs.x) < 1.35 && dist > 5 && dist < 35 && !this.isOnTrain) {
+        if (Math.abs(playerX - obs.x) < 1.35 && dist >= -0.5 && dist < 38 && !this.isOnTrain) {
           if (dist < minDistance) {
             minDistance = dist;
             closestHazard = {
@@ -778,7 +792,12 @@ export class GameEngine {
       const dz = Math.abs(p.z - 0);
 
       if (dx < 1.2 && dy < 1.5 && dz < 1.5) {
-        this.powerups[p.type] = POWERUP_DURATIONS[p.type] || 10;
+        if (p.type === 'jetpack') {
+          // Touchdown on Rocket launches hero onto the Upper Skyway!
+          this.activateJetpack(POWERUP_DURATIONS.jetpack || 14);
+        } else {
+          this.powerups[p.type] = POWERUP_DURATIONS[p.type] || 10;
+        }
         this.powerupsList.splice(i, 1);
         if (this.onPowerupCollect) this.onPowerupCollect(p.type);
       }
@@ -796,10 +815,10 @@ export class GameEngine {
       // 1. SKY LASER GATE (Upper Skyway runway)
       if (obs.type === 'sky_laser_gate') {
         if (isPlayerElevated) {
-          const swept = (curZ >= -1.6 && prevZ <= 1.6);
+          const swept = (curZ >= -1.8 && prevZ <= 1.8);
           if (swept) {
             // Player must be sliding (ducking under 1.35m laser) to clear!
-            if (!this.isSliding || this.posY > 8.9) {
+            if (!this.isSliding || this.posY > 8.85) {
               this.handleCollision('sky_laser_gate');
               return;
             }
@@ -810,11 +829,14 @@ export class GameEngine {
 
       // 2. SKY DRONE (Upper Skyway lane obstacle)
       if (obs.type === 'sky_drone') {
-        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.35) {
-          const swept = (curZ >= -1.5 && prevZ <= 1.5);
+        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.85) {
+          const swept = (curZ >= -1.8 && prevZ <= 1.8);
           if (swept) {
-            this.handleCollision('sky_drone');
-            return;
+            // Player must slide under or dodge lane to clear!
+            if (!this.isSliding || this.posY > 8.85) {
+              this.handleCollision('sky_drone');
+              return;
+            }
           }
         }
         continue;
@@ -822,15 +844,18 @@ export class GameEngine {
 
       // 3. OVERHEAD INDUSTRIAL GIRDER (Over train tracks)
       if (obs.type === 'overhead_beam') {
-        const swept = (curZ >= -1.5 && prevZ <= 1.5);
-        if (swept) {
-          // If player is on train or jumping high, must slide to duck under beam at Y=5.25m!
-          if (this.posY >= 4.6) {
-            this.handleCollision('overhead_beam');
-            return;
-          } else if (this.isOnTrain && (!this.isSliding || this.posY > 4.1)) {
-            this.handleCollision('overhead_beam');
-            return;
+        // High Upper Skyway flight (Y >= 7.0) is completely clear of ground train girders
+        if (!isPlayerElevated) {
+          const swept = (curZ >= -1.8 && prevZ <= 1.8);
+          if (swept) {
+            // If player is on train or jumping high, must slide to duck under beam at Y=5.25m!
+            if (this.isOnTrain && (!this.isSliding || this.posY > 4.1)) {
+              this.handleCollision('overhead_beam');
+              return;
+            } else if (this.posY >= 4.6 && !this.isSliding) {
+              this.handleCollision('overhead_beam');
+              return;
+            }
           }
         }
         continue;

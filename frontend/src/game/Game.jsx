@@ -128,12 +128,14 @@ function Scene({
       }
     }
 
-    // Notify warning state updates to React HUD
+    // Notify warning state updates to React HUD (throttled to 10Hz to prevent 60fps re-render lag)
     const currentWarn = engine.warningState || null;
-    const warnKey = currentWarn?.active ? `${currentWarn.message}_${currentWarn.distance}_${currentWarn.action}` : 'none';
+    const warnKey = currentWarn?.active
+      ? `${currentWarn.message}_${Math.floor(currentWarn.distance / 2) * 2}_${currentWarn.action}`
+      : 'none';
     if (warnKey !== lastWarningKey.current) {
       lastWarningKey.current = warnKey;
-      if (onWarningChange) onWarningChange(currentWarn);
+      if (onWarningChange) onWarningChange(currentWarn ? { ...currentWarn } : null);
     }
 
     if (!showIntro && particles.length > 0) {
