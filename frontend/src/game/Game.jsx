@@ -234,6 +234,7 @@ function Scene({
             isJumping={engine?.isJumping}
             isSliding={engine?.isSliding}
             isOnTrain={engine?.isOnTrain}
+            isElevated={isElevated}
             isCrashing={engine?.isGameOver}
             characterName={selectedCharacter}
             powerups={engine?.powerups || {}}

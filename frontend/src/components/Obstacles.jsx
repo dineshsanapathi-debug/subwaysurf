@@ -101,6 +101,58 @@ export function Roadblock({ position = [0, 0, 0] }) {
   );
 }
 
+export function ElevatedRamp({ position = [0, 0, 0] }) {
+  return (
+    <group position={position}>
+      {/* 3-Lane Wide Inclined Cyber Roadway Deck leading up to upper floor */}
+      <mesh position={[0, 2.3, 0]} rotation={[0.28, 0, 0]} receiveShadow castShadow>
+        <boxGeometry args={[11.8, 0.4, 16.5]} />
+        <meshStandardMaterial color="#1e293b" metalness={0.65} roughness={0.4} />
+      </mesh>
+
+      {/* Surface Grip Floor Panels for 3 Lanes */}
+      {[-3.2, 0, 3.2].map((lx) => (
+        <mesh key={lx} position={[lx, 2.48, 0]} rotation={[0.28, 0, 0]}>
+          <boxGeometry args={[2.8, 0.05, 16.2]} />
+          <meshStandardMaterial color="#334155" roughness={0.6} />
+        </mesh>
+      ))}
+
+      {/* Glowing Neon Cyan Boundary Rails */}
+      {[-5.8, 5.8].map((rx) => (
+        <mesh key={rx} position={[rx, 2.65, 0]} rotation={[0.28, 0, 0]}>
+          <boxGeometry args={[0.2, 0.45, 16.5]} />
+          <meshStandardMaterial color="#00ccff" emissive="#00ccff" emissiveIntensity={2.0} />
+        </mesh>
+      ))}
+
+      {/* Glowing Neon Green/Cyan Hazard Chevrons pointing UP */}
+      {[-6, -2, 2, 6].map((cz, ci) => (
+        <mesh key={ci} position={[0, 2.55, cz]} rotation={[-1.29, 0, 0]}>
+          <planeGeometry args={[9.5, 0.8]} />
+          <meshBasicMaterial color="#10b981" />
+        </mesh>
+      ))}
+
+      {/* Entrance Cyber Arch at Top of Ramp */}
+      <group position={[0, 4.6, -7.5]}>
+        <mesh position={[0, 1.8, 0]}>
+          <boxGeometry args={[12.2, 0.4, 0.5]} />
+          <meshStandardMaterial color="#00ccff" emissive="#00ccff" emissiveIntensity={2} />
+        </mesh>
+        <mesh position={[-5.9, 0, 0]}>
+          <boxGeometry args={[0.3, 3.6, 0.4]} />
+          <meshStandardMaterial color="#0284c7" />
+        </mesh>
+        <mesh position={[5.9, 0, 0]}>
+          <boxGeometry args={[0.3, 3.6, 0.4]} />
+          <meshStandardMaterial color="#0284c7" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 export default function Obstacles({ obstacles = [] }) {
   return (
     <group>
@@ -115,6 +167,9 @@ export default function Obstacles({ obstacles = [] }) {
               isMoving={obs.isMoving}
             />
           );
+        }
+        if (obs.type === 'elevated_ramp') {
+          return <ElevatedRamp key={obs.id} position={[obs.x, obs.y, obs.z]} />;
         }
         if (obs.type === 'low_barrier') {
           return <LowBarrier key={obs.id} position={[obs.x, obs.y, obs.z]} />;

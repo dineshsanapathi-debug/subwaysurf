@@ -169,20 +169,81 @@ export default function ElevatedFloor({
         );
       })}
 
-      {/* 8. 500-Metre Start & Finish Neon Checkpoints */}
-      <group position={[0, 2.0, -248]}>
-        {/* Start Gate */}
+      {/* 8. 500-Metre Start & Finish Neon Checkpoints & Ramps */}
+      {/* Entrance Ascent Ramp (+Z) */}
+      <group position={[0, -2.25, 258]}>
+        <mesh rotation={[-0.27, 0, 0]} receiveShadow castShadow>
+          <boxGeometry args={[12, 0.45, 17]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.65} roughness={0.4} />
+        </mesh>
+        {/* Entrance Chevrons pointing up to the floor */}
+        {[-5, -1, 3].map((cz, ci) => (
+          <mesh key={ci} position={[0, 0.26, cz]} rotation={[-1.3, 0, 0]}>
+            <planeGeometry args={[10, 0.8]} />
+            <meshBasicMaterial color="#10b981" />
+          </mesh>
+        ))}
+        {/* Ramp glowing side rails */}
+        {[-5.8, 5.8].map((rx) => (
+          <mesh key={rx} position={[rx, 0.35, 0]} rotation={[-0.27, 0, 0]}>
+            <boxGeometry args={[0.2, 0.4, 17]} />
+            <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Start Arch Gate */}
+      <group position={[0, 2.0, 248]}>
         <mesh position={[0, 2.0, 0]}>
-          <boxGeometry args={[12.2, 0.3, 0.4]} />
-          <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2} />
+          <boxGeometry args={[12.2, 0.4, 0.5]} />
+          <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2.2} />
+        </mesh>
+        <mesh position={[-5.8, 0, 0]}>
+          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <meshStandardMaterial color="#059669" />
+        </mesh>
+        <mesh position={[5.8, 0, 0]}>
+          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <meshStandardMaterial color="#059669" />
         </mesh>
       </group>
-      <group position={[0, 2.0, 248]}>
-        {/* Finish Gate */}
+
+      {/* Finish Arch Gate */}
+      <group position={[0, 2.0, -248]}>
         <mesh position={[0, 2.0, 0]}>
-          <boxGeometry args={[12.2, 0.3, 0.4]} />
-          <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2} />
+          <boxGeometry args={[12.2, 0.4, 0.5]} />
+          <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.2} />
         </mesh>
+        <mesh position={[-5.8, 0, 0]}>
+          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <meshStandardMaterial color="#d97706" />
+        </mesh>
+        <mesh position={[5.8, 0, 0]}>
+          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <meshStandardMaterial color="#d97706" />
+        </mesh>
+      </group>
+
+      {/* Exit Descent Ramp (-Z) */}
+      <group position={[0, -2.25, -258]}>
+        <mesh rotation={[0.27, 0, 0]} receiveShadow castShadow>
+          <boxGeometry args={[12, 0.45, 17]} />
+          <meshStandardMaterial color="#1e293b" metalness={0.65} roughness={0.4} />
+        </mesh>
+        {/* Exit Chevrons pointing down to ground rails */}
+        {[-3, 1, 5].map((cz, ci) => (
+          <mesh key={ci} position={[0, 0.26, cz]} rotation={[-1.84, 0, 0]}>
+            <planeGeometry args={[10, 0.8]} />
+            <meshBasicMaterial color="#f59e0b" />
+          </mesh>
+        ))}
+        {/* Ramp glowing side rails */}
+        {[-5.8, 5.8].map((rx) => (
+          <mesh key={rx} position={[rx, 0.35, 0]} rotation={[0.27, 0, 0]}>
+            <boxGeometry args={[0.2, 0.4, 17]} />
+            <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2} />
+          </mesh>
+        ))}
       </group>
     </group>
   );

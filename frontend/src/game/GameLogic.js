@@ -56,6 +56,7 @@ export class GameEngine {
       maxDistance: 500,
       isLanding: false
     };
+    this.lastElevatedDistance = -150;
 
     // Tracking for AI Coach
     this.runStats = {
@@ -216,6 +217,37 @@ export class GameEngine {
   spawnSegment(z) {
     const laneChoices = [-1, 0, 1];
     const occupiedLanes = new Set();
+
+    // Periodic Elevated Floor Entrance Ramp on track (every ~280m of running distance)
+    const canSpawnElevatedRamp =
+      !this.elevatedRoute.active &&
+      (this.distance - this.lastElevatedDistance > 280 || (this.distance < 100 && this.lastElevatedDistance < -100 && Math.abs(z) > 130 && Math.abs(z) < 180)) &&
+      this.powerups.jetpack <= 0;
+
+    if (canSpawnElevatedRamp && Math.random() < 0.4) {
+      this.lastElevatedDistance = this.distance;
+      this.obstacles.push({
+        id: 'elevated_ramp_' + Math.random(),
+        type: 'elevated_ramp',
+        lane: 0,
+        x: 0,
+        y: 0,
+        z,
+        length: 16
+      });
+
+      // Ascending trail of mango collectibles up the ramp
+      for (let rz = z - 6; rz <= z + 6; rz += 3) {
+        const progress = Math.max(0, Math.min(1, (rz - (z - 8)) / 16));
+        this.coinsList.push({
+          id: 'c_' + Math.random(),
+          x: 0,
+          y: 0.9 + progress * 3.8,
+          z: rz
+        });
+      }
+      return;
+    }
 
     // Decide if spawning a train or static obstacles
     const rollTrain = Math.random() < this.trainSpawnRate;
@@ -558,6 +590,16 @@ export class GameEngine {
     const playerX = this.lane * LANE_WIDTH;
 
     for (const obs of this.obstacles) {
+      // 1. Elevated Floor Ramp check (covers all 3 lanes)
+      if (obs.type === 'elevated_ramp') {
+        if (obs.z >= -5.0 && obs.z <= 5.0) {
+          if (!this.elevatedRoute?.active) {
+            this.activateElevatedRoute();
+          }
+        }
+        continue;
+      }
+
       // Must be roughly in same lane
       if (Math.abs(playerX - obs.x) > 1.0) continue;
 
@@ -587,18 +629,27 @@ export class GameEngine {
           }
         }
       } else if (obs.type === 'train') {
-        const halfL = (obs.length || 18) / 2;
+        const halfL = (obs.length || 28) / 2;
         const frontZ = obs.z + halfL;
         const rearZ = obs.z - halfL;
 
-        // Front bumper collision
-        if (frontZ >= -1.6 && frontZ <= 1.6) {
-          // If train has ramp and player is jumping or high enough, smoothly glide onto roof
-          if (obs.hasRamp && (this.isJumping || this.posY > 0.6)) {
+        // Front ramp approach: smoothly run up ramp onto train roof floor!
+        if (obs.hasRamp && frontZ >= -2.4 && frontZ <= 2.4) {
+          this.isOnTrain = true;
+          const rampProgress = Math.max(0, Math.min(1, (frontZ + 2.4) / 3.2));
+          this.posY = Math.max(this.posY, this.trainRoofY * rampProgress);
+          if (this.posY >= this.trainRoofY - 0.25) {
+            this.posY = this.trainRoofY;
+            this.velocityY = 0;
+            this.isJumping = false;
+          }
+        }
+        // Front bumper collision (no ramp or player below roof height)
+        else if (frontZ >= -1.6 && frontZ <= 1.6) {
+          if (this.posY >= this.trainRoofY - 0.35) {
             this.isOnTrain = true;
             this.posY = Math.max(this.posY, this.trainRoofY);
-            if (this.velocityY < 0) this.velocityY = 0;
-          } else if (this.posY < this.trainRoofY - 0.3) {
+          } else {
             this.handleCollision('train');
             return;
           }
