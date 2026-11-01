@@ -208,116 +208,120 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
         </group>
       ))}
 
-      {/* 4. Concrete Retaining Walls (Sunken Trench Canal) with Graffiti */}
-      {/* Left Wall */}
-      <group position={[-5.8, 2.6, 0]} rotation={[0, 0, -0.08]}>
-        <mesh receiveShadow castShadow>
-          <boxGeometry args={[0.6, 5.4, CHUNK_LENGTH]} />
-          <meshStandardMaterial map={leftWallTex} roughness={0.8} />
-        </mesh>
-        {/* Wall Top Ledge / Curb */}
-        <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
-          <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
-        </mesh>
-        {/* Yellow Metal Handrail along top edge */}
-        <mesh position={[0.2, 3.4, 0]}>
-          <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
-          <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
-        </mesh>
-      </group>
-
-      {/* Right Wall */}
-      <group position={[5.8, 2.6, 0]} rotation={[0, 0, 0.08]}>
-        <mesh receiveShadow castShadow>
-          <boxGeometry args={[0.6, 5.4, CHUNK_LENGTH]} />
-          <meshStandardMaterial map={rightWallTex} roughness={0.8} />
-        </mesh>
-        {/* Wall Top Ledge / Curb */}
-        <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
-          <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
-          <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
-        </mesh>
-        {/* Yellow Metal Handrail along top edge */}
-        <mesh position={[-0.2, 3.4, 0]}>
-          <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
-          <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
-        </mesh>
-      </group>
-
-      {/* 5. Green Cartoon Grass Tufts along the bottom of the walls */}
-      {grassTufts.map((g, i) => (
-        <React.Fragment key={i}>
-          {/* Left Wall Grass */}
-          <group position={[-5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
-            <mesh position={[0, 0.2, 0]} rotation={[0, 0, 0.3]}>
-              <coneGeometry args={[0.22, 0.5, 5]} />
-              <meshStandardMaterial color="#22c55e" roughness={0.5} />
+      {/* 4. Concrete Retaining Walls (Sunken Trench Canal) with Graffiti (hidden during skyway for open sky view) */}
+      {!isSkyway && (
+        <>
+          {/* Left Wall */}
+          <group position={[-5.8, 2.6, 0]} rotation={[0, 0, -0.08]}>
+            <mesh receiveShadow castShadow>
+              <boxGeometry args={[0.6, 5.4, CHUNK_LENGTH]} />
+              <meshStandardMaterial map={leftWallTex} roughness={0.8} />
             </mesh>
-            <mesh position={[-0.1, 0.15, 0.1]} rotation={[0, 0, 0.5]}>
-              <coneGeometry args={[0.18, 0.4, 5]} />
-              <meshStandardMaterial color="#16a34a" roughness={0.5} />
+            {/* Wall Top Ledge / Curb */}
+            <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
+              <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
+              <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
+            </mesh>
+            {/* Yellow Metal Handrail along top edge */}
+            <mesh position={[0.2, 3.4, 0]}>
+              <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
+              <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
             </mesh>
           </group>
 
-          {/* Right Wall Grass */}
-          <group position={[5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
-            <mesh position={[0, 0.2, 0]} rotation={[0, 0, -0.3]}>
-              <coneGeometry args={[0.22, 0.5, 5]} />
-              <meshStandardMaterial color="#22c55e" roughness={0.5} />
+          {/* Right Wall */}
+          <group position={[5.8, 2.6, 0]} rotation={[0, 0, 0.08]}>
+            <mesh receiveShadow castShadow>
+              <boxGeometry args={[0.6, 5.4, CHUNK_LENGTH]} />
+              <meshStandardMaterial map={rightWallTex} roughness={0.8} />
             </mesh>
-            <mesh position={[0.1, 0.15, -0.1]} rotation={[0, 0, -0.5]}>
-              <coneGeometry args={[0.18, 0.4, 5]} />
-              <meshStandardMaterial color="#16a34a" roughness={0.5} />
+            {/* Wall Top Ledge / Curb */}
+            <mesh position={[0, 2.8, 0]} castShadow receiveShadow>
+              <boxGeometry args={[1.1, 0.35, CHUNK_LENGTH]} />
+              <meshStandardMaterial color="#cbd5e1" roughness={0.6} />
             </mesh>
-          </group>
-        </React.Fragment>
-      ))}
-
-      {/* 6. Upper Promenade & Colorful European Buildings */}
-      {buildings.map((b, i) => (
-        <React.Fragment key={i}>
-          {/* Left Skyscraper / City House */}
-          <group position={[-11.5, b.heightL / 2 + 5.2, b.z]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[9, b.heightL, 9.5]} />
-              <meshStandardMaterial color={b.colorL} roughness={0.5} />
-            </mesh>
-            {/* White Windows Grid */}
-            {[-2.5, 0, 2.5].map((wx, wIdx) => (
-              <mesh key={wIdx} position={[4.52, 1, wx]}>
-                <planeGeometry args={[1.2, 1.6]} />
-                <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
-              </mesh>
-            ))}
-            {/* Hanging Banner / Pennant */}
-            <mesh position={[4.6, -1.8, 1.5]} rotation={[0, Math.PI / 2, 0]}>
-              <planeGeometry args={[1.2, 2.4]} />
-              <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
+            {/* Yellow Metal Handrail along top edge */}
+            <mesh position={[-0.2, 3.4, 0]}>
+              <boxGeometry args={[0.08, 0.8, CHUNK_LENGTH]} />
+              <meshStandardMaterial color="#f59e0b" metalness={0.6} roughness={0.3} />
             </mesh>
           </group>
 
-          {/* Right Skyscraper / City House */}
-          <group position={[11.5, b.heightR / 2 + 5.2, b.z]}>
-            <mesh castShadow receiveShadow>
-              <boxGeometry args={[9, b.heightR, 9.5]} />
-              <meshStandardMaterial color={b.colorR} roughness={0.5} />
-            </mesh>
-            {/* White Windows Grid */}
-            {[-2.5, 0, 2.5].map((wx, wIdx) => (
-              <mesh key={wIdx} position={[-4.52, 1, wx]} rotation={[0, Math.PI, 0]}>
-                <planeGeometry args={[1.2, 1.6]} />
-                <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
-              </mesh>
-            ))}
-            {/* Hanging Banner / Pennant */}
-            <mesh position={[-4.6, -1.8, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
-              <planeGeometry args={[1.2, 2.4]} />
-              <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
-            </mesh>
-          </group>
-        </React.Fragment>
-      ))}
+          {/* 5. Green Cartoon Grass Tufts along the bottom of the walls */}
+          {grassTufts.map((g, i) => (
+            <React.Fragment key={i}>
+              {/* Left Wall Grass */}
+              <group position={[-5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
+                <mesh position={[0, 0.2, 0]} rotation={[0, 0, 0.3]}>
+                  <coneGeometry args={[0.22, 0.5, 5]} />
+                  <meshStandardMaterial color="#22c55e" roughness={0.5} />
+                </mesh>
+                <mesh position={[-0.1, 0.15, 0.1]} rotation={[0, 0, 0.5]}>
+                  <coneGeometry args={[0.18, 0.4, 5]} />
+                  <meshStandardMaterial color="#16a34a" roughness={0.5} />
+                </mesh>
+              </group>
+
+              {/* Right Wall Grass */}
+              <group position={[5.3, 0.1, g.z]} scale={[g.scale, g.scale, g.scale]}>
+                <mesh position={[0, 0.2, 0]} rotation={[0, 0, -0.3]}>
+                  <coneGeometry args={[0.22, 0.5, 5]} />
+                  <meshStandardMaterial color="#22c55e" roughness={0.5} />
+                </mesh>
+                <mesh position={[0.1, 0.15, -0.1]} rotation={[0, 0, -0.5]}>
+                  <coneGeometry args={[0.18, 0.4, 5]} />
+                  <meshStandardMaterial color="#16a34a" roughness={0.5} />
+                </mesh>
+              </group>
+            </React.Fragment>
+          ))}
+
+          {/* 6. Upper Promenade & Colorful European Buildings */}
+          {buildings.map((b, i) => (
+            <React.Fragment key={i}>
+              {/* Left Skyscraper / City House */}
+              <group position={[-11.5, b.heightL / 2 + 5.2, b.z]}>
+                <mesh castShadow receiveShadow>
+                  <boxGeometry args={[9, b.heightL, 9.5]} />
+                  <meshStandardMaterial color={b.colorL} roughness={0.5} />
+                </mesh>
+                {/* White Windows Grid */}
+                {[-2.5, 0, 2.5].map((wx, wIdx) => (
+                  <mesh key={wIdx} position={[4.52, 1, wx]}>
+                    <planeGeometry args={[1.2, 1.6]} />
+                    <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
+                  </mesh>
+                ))}
+                {/* Hanging Banner / Pennant */}
+                <mesh position={[4.6, -1.8, 1.5]} rotation={[0, Math.PI / 2, 0]}>
+                  <planeGeometry args={[1.2, 2.4]} />
+                  <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
+                </mesh>
+              </group>
+
+              {/* Right Skyscraper / City House */}
+              <group position={[11.5, b.heightR / 2 + 5.2, b.z]}>
+                <mesh castShadow receiveShadow>
+                  <boxGeometry args={[9, b.heightR, 9.5]} />
+                  <meshStandardMaterial color={b.colorR} roughness={0.5} />
+                </mesh>
+                {/* White Windows Grid */}
+                {[-2.5, 0, 2.5].map((wx, wIdx) => (
+                  <mesh key={wIdx} position={[-4.52, 1, wx]} rotation={[0, Math.PI, 0]}>
+                    <planeGeometry args={[1.2, 1.6]} />
+                    <meshStandardMaterial color="#fef08a" roughness={0.2} emissive="#fef08a" emissiveIntensity={0.2} />
+                  </mesh>
+                ))}
+                {/* Hanging Banner / Pennant */}
+                <mesh position={[-4.6, -1.8, -1.5]} rotation={[0, -Math.PI / 2, 0]}>
+                  <planeGeometry args={[1.2, 2.4]} />
+                  <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
+                </mesh>
+              </group>
+            </React.Fragment>
+          ))}
+        </>
+      )}
 
       {/* 7. Overhead Steel Lattice Gantries & Catenary Wires (cleared during upper skyway flight) */}
       {!isSkyway && [-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (

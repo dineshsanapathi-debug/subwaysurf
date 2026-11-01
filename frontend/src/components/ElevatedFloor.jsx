@@ -1,15 +1,44 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import MangoItem from './Mango';
 
 /**
- * Upper Skyway Route (Activated EXCLUSIVELY by the Rocket)
- * High-altitude, 100% pristine and clear 3-lane neon skyway:
- * - Elevated at Y = 8.5m (well above all ground walls, trains, and obstacles)
- * - Zero pillars from below or arches blocking the running lanes
- * - 3 clear running lanes with glowing cyan boundary rails
- * - Rows of vertical 3D mango collectibles
+ * Procedural 3D Fluffy White Cartoon Cloud
+ */
+function FluffyCloud({ position = [0, 0, 0], scale = 1.0 }) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0, 0]}>
+        <sphereGeometry args={[1.8, 12, 12]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[-1.3, -0.3, 0]}>
+        <sphereGeometry args={[1.3, 10, 10]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[1.3, -0.2, 0.2]}>
+        <sphereGeometry args={[1.4, 10, 10]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[0.6, 0.6, -0.2]}>
+        <sphereGeometry args={[1.2, 10, 10]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[-0.7, 0.5, 0.3]}>
+        <sphereGeometry args={[1.1, 10, 10]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Upper Skyway Route (Activated EXCLUSIVELY by touching the Rocket)
+ * High-altitude, 100% open, clear 3-lane cosmic highway:
+ * - Elevated high in the sky (Y = 8.5m)
+ * - Zero buildings, zero walls, zero arches, zero obstacles
+ * - Fluffy white 3D cartoon clouds drifting in the open sky
+ * - Glowing cyan boundary rails and lane dividers
  * - Smooth jump-off ledge at the exit where hero dives back to ground tracks
  */
 export default function ElevatedFloor({
@@ -50,6 +79,20 @@ export default function ElevatedFloor({
       onComplete?.();
     }
   });
+
+  // Procedural clouds along the skyway
+  const clouds = useMemo(() => {
+    const list = [];
+    for (let i = 0; i < 24; i++) {
+      const z = -240 + i * 20;
+      const side = i % 2 === 0 ? -1 : 1;
+      const x = side * (9.5 + (i % 3) * 3.5);
+      const y = -1.2 + Math.sin(i * 1.5) * 1.8;
+      const scale = 0.8 + (i % 4) * 0.35;
+      list.push({ id: i, x, y, z, scale });
+    }
+    return list;
+  }, []);
 
   if (!active) return null;
 
@@ -115,57 +158,27 @@ export default function ElevatedFloor({
         </mesh>
       ))}
 
-      {/* 5. Clear Vertical Standing Mango Collectibles (Unobstructed across 3 lanes) */}
-      {Array.from({ length: 48 }, (_, mi) => {
-        const mz = -230 + mi * 10.0;
-        const mx = ((mi % 3) - 1) * 3.2; // Cleanly placed in lanes -3.2, 0, 3.2
-        return (
-          <group key={mi} position={[mx, 0.9, mz]}>
-            <MangoItem position={[0, 0, 0]} scale={0.92} />
-          </group>
-        );
-      })}
+      {/* 5. Fluffy 3D Cartoon Clouds floating in the open sky beside the runway */}
+      {clouds.map((c) => (
+        <FluffyCloud
+          key={c.id}
+          position={[c.x, c.y, c.z]}
+          scale={c.scale}
+        />
+      ))}
 
-      {/* 6. Glowing Start & Exit Checkpoint Ledges */}
-      {/* Start Entrance Gate (+Z) */}
-      <group position={[0, 1.5, 248]}>
-        <mesh position={[0, 1.8, 0]}>
-          <boxGeometry args={[12.2, 0.3, 0.4]} />
-          <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2.2} />
-        </mesh>
-        <mesh position={[-5.8, 0, 0]}>
-          <boxGeometry args={[0.25, 3.6, 0.3]} />
-          <meshStandardMaterial color="#059669" />
-        </mesh>
-        <mesh position={[5.8, 0, 0]}>
-          <boxGeometry args={[0.25, 3.6, 0.3]} />
-          <meshStandardMaterial color="#059669" />
-        </mesh>
-      </group>
+      {/* 6. Glowing Start & Exit Checkpoint Flat Floor Ledges (Zero Arches/Pillars) */}
+      {/* Start Entrance Floor Ledge */}
+      <mesh position={[0, 0.17, 249]}>
+        <boxGeometry args={[11.8, 0.04, 1.2]} />
+        <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2.0} />
+      </mesh>
 
-      {/* Exit Jump-Off Ledge (-Z) */}
-      <group position={[0, 0, -250]}>
-        {/* Glowing Amber Jump Off Warning Edge */}
-        <mesh position={[0, 0.22, 0]}>
-          <boxGeometry args={[12, 0.12, 0.5]} />
-          <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.5} />
-        </mesh>
-        {/* Overhead Jump Indicator Arch */}
-        <group position={[0, 1.5, 0]}>
-          <mesh position={[0, 1.8, 0]}>
-            <boxGeometry args={[12.2, 0.3, 0.4]} />
-            <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.2} />
-          </mesh>
-          <mesh position={[-5.8, 0, 0]}>
-            <boxGeometry args={[0.25, 3.6, 0.3]} />
-            <meshStandardMaterial color="#d97706" />
-          </mesh>
-          <mesh position={[5.8, 0, 0]}>
-            <boxGeometry args={[0.25, 3.6, 0.3]} />
-            <meshStandardMaterial color="#d97706" />
-          </mesh>
-        </group>
-      </group>
+      {/* Exit Jump-Off Edge (-Z) - Glowing Amber Warning Line */}
+      <mesh position={[0, 0.17, -249]}>
+        <boxGeometry args={[11.8, 0.04, 1.2]} />
+        <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.5} />
+      </mesh>
     </group>
   );
 }

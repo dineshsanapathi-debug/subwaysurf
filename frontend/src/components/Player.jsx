@@ -180,11 +180,8 @@ export default function Player({
       Math.min(1, delta * 12)
     );
 
-    // Vertical Y position
-    let targetY = posY;
-    if (powerups.jetpack) {
-      targetY = 6.4 + Math.sin(time * 4) * 0.3;
-    }
+    // Vertical Y position: smoothly track authoritative physics height
+    const targetY = posY;
     groupRef.current.position.y = THREE.MathUtils.lerp(
       groupRef.current.position.y,
       targetY,
@@ -342,24 +339,33 @@ export default function Player({
         </group>
       )}
 
-      {/* Jetpack Equipment */}
-      {powerups.jetpack && (
-        <group position={[0, 1.3, -0.4]}>
-          <mesh position={[-0.22, 0, 0]} castShadow>
-            <cylinderGeometry args={[0.1, 0.12, 0.6, 12]} />
-            <meshStandardMaterial color="#334155" metalness={0.7} roughness={0.3} />
+      {/* Jetpack Equipment with Pulsing Rocket Thrusters */}
+      {(powerups.jetpack || (isElevated && !isLanding)) && (
+        <group position={[0, 1.3, -0.35]}>
+          <mesh position={[-0.24, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.13, 0.65, 12]} />
+            <meshStandardMaterial color="#dc2626" metalness={0.7} roughness={0.3} />
           </mesh>
-          <mesh position={[0.22, 0, 0]} castShadow>
-            <cylinderGeometry args={[0.1, 0.12, 0.6, 12]} />
-            <meshStandardMaterial color="#334155" metalness={0.7} roughness={0.3} />
+          <mesh position={[0.24, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.13, 0.65, 12]} />
+            <meshStandardMaterial color="#dc2626" metalness={0.7} roughness={0.3} />
           </mesh>
-          <mesh position={[-0.22, -0.4, 0]}>
-            <coneGeometry args={[0.12, 0.4, 8]} />
-            <meshBasicMaterial color="#f97316" />
+          {/* Twin Fiery Rocket Flames */}
+          <mesh position={[-0.24, -0.45, 0]}>
+            <coneGeometry args={[0.14, 0.55, 8]} />
+            <meshBasicMaterial color="#f97316" transparent opacity={0.9} />
           </mesh>
-          <mesh position={[0.22, -0.4, 0]}>
-            <coneGeometry args={[0.12, 0.4, 8]} />
-            <meshBasicMaterial color="#f97316" />
+          <mesh position={[0.24, -0.45, 0]}>
+            <coneGeometry args={[0.14, 0.55, 8]} />
+            <meshBasicMaterial color="#f97316" transparent opacity={0.9} />
+          </mesh>
+          <mesh position={[-0.24, -0.36, 0]}>
+            <coneGeometry args={[0.09, 0.35, 8]} />
+            <meshBasicMaterial color="#fde047" />
+          </mesh>
+          <mesh position={[0.24, -0.36, 0]}>
+            <coneGeometry args={[0.09, 0.35, 8]} />
+            <meshBasicMaterial color="#fde047" />
           </mesh>
         </group>
       )}

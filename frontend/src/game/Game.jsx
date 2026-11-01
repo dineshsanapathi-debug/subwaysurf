@@ -21,27 +21,20 @@ function CameraFollow({ playerX, posY, isSliding, isOnTrain, isElevated, isLandi
     const targetCamX = playerX * 0.75;
     const targetLookX = playerX * 0.75;
 
-    // Smooth continuous vertical camera target (no discrete threshold jerks!)
-    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 8.65 : 0);
-    let targetCamY = 4.8;
-    if (isElevated && !isLanding) {
-      targetCamY = 8.65 + 4.8; // 13.45m elevation for Upper Skyway
-    } else {
-      // Gentle, continuous elevation following tracking during jump off floor to ground
-      targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.35;
-      if (isSliding) targetCamY -= 0.4;
-    }
+    // Smooth continuous vertical camera target that perfectly follows player across ground, trains, and skyway
+    let targetCamY = posY + 4.8;
+    if (isSliding) targetCamY -= 0.4;
 
-    const targetCamZ = isElevated && !isLanding ? 8.5 : 7.0;
+    const targetCamZ = isElevated && !isLanding ? 7.5 : 7.0;
 
     // Smooth lerp tracking
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
     camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, Math.min(1, delta * 6));
     camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, Math.min(1, delta * 6));
 
-    // Continuous smooth lookAt without snapping
-    const targetLookY = baseGroundY + 1.8 + Math.max(0, posY - baseGroundY) * 0.2;
-    currentLookY.current = THREE.MathUtils.lerp(currentLookY.current, targetLookY, Math.min(1, delta * 6));
+    // Continuous smooth lookAt that always keeps the hero framed in clear view
+    const targetLookY = posY + 1.8;
+    currentLookY.current = THREE.MathUtils.lerp(currentLookY.current, targetLookY, Math.min(1, delta * 7));
     camera.lookAt(targetLookX, currentLookY.current, -14);
   });
 

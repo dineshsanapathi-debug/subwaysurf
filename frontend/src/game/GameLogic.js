@@ -204,6 +204,23 @@ export class GameEngine {
     this.elevatedRoute.maxDistance = duration * (this.speed || 22);
     this.elevatedRoute.isLanding = false;
     this.elevatedRoute.hasLeaped = false;
+
+    // Rocket thruster launch impulse: shoot up into the sky!
+    this.velocityY = 18;
+    this.isJumping = true;
+
+    // Immediately spawn rich lanes of collectible mangoes on the skyway ahead
+    const lanes = [-1, 0, 1];
+    for (let mz = -20; mz >= -220; mz -= 5.5) {
+      const lane = lanes[Math.floor(Math.random() * lanes.length)];
+      this.coinsList.push({
+        id: 'sky_mango_' + Math.random(),
+        x: lane * LANE_WIDTH,
+        y: 9.55, // Exact skyway collection height (surface 8.65 + 0.90)
+        z: mz
+      });
+    }
+
     if (this.onElevatedRouteStart) this.onElevatedRouteStart();
     if (this.onPowerupCollect) this.onPowerupCollect('jetpack');
   }
@@ -225,6 +242,22 @@ export class GameEngine {
   }
 
   spawnSegment(z) {
+    // If currently on the Upper Skyway, do NOT spawn any ground obstacles!
+    if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
+      // Spawn generous streams of mangoes along the 3 lanes on the skyway
+      const lanes = [-1, 0, 1];
+      const skyLane = lanes[Math.floor(Math.random() * lanes.length)];
+      for (let cz = z - 6; cz <= z + 6; cz += 2.5) {
+        this.coinsList.push({
+          id: 'sky_c_' + Math.random(),
+          x: skyLane * LANE_WIDTH,
+          y: 9.55,
+          z: cz
+        });
+      }
+      return;
+    }
+
     const laneChoices = [-1, 0, 1];
     const occupiedLanes = new Set();
 
@@ -447,9 +480,11 @@ export class GameEngine {
       this.elevatedRoute.distance = Math.floor(this.distance - this.elevatedRoute.startDistance);
 
       if (!this.elevatedRoute.isLanding) {
-        // Soar up smoothly to Upper Skyway deck (8.65m)
-        if (this.posY < 8.65 && !this.isJumping) {
-          this.posY = Math.min(8.65, this.posY + delta * 12.0);
+        // Smooth rocket ascent up to Upper Skyway deck (8.65m)
+        if (this.posY < 8.65) {
+          this.posY = Math.min(8.65, this.posY + delta * 20.0);
+          this.velocityY = 0;
+          this.isJumping = true;
         }
 
         // Rocket flight ends: hero runs off the skyway edge and leaps down to ground!
@@ -464,7 +499,7 @@ export class GameEngine {
 
     // 4. Stable Vertical Physics & Gravity
     let currentBaseY = this.isOnTrain ? this.trainRoofY : 0;
-    if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
+    if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding && this.posY >= 8.65) {
       currentBaseY = 8.65;
     }
 
