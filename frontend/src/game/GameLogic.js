@@ -109,7 +109,14 @@ export class GameEngine {
             return obs;
           }
         }
-      } else if (obs.type === 'roadblock' || obs.type === 'low_barrier' || obs.type === 'high_barrier') {
+      } else if (obs.type === 'high_barrier') {
+        if (obs.z >= -1.0 && obs.z <= 1.0) {
+          // If sliding under high barrier, allow smooth lane transition
+          if (!this.isSliding || this.posY > 0.4) {
+            return obs;
+          }
+        }
+      } else if (obs.type === 'roadblock' || obs.type === 'low_barrier') {
         if (obs.z >= -1.0 && obs.z <= 1.0) {
           return obs;
         }
@@ -162,7 +169,8 @@ export class GameEngine {
     if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
       groundY = 8.65;
     }
-    if (this.posY <= groundY + 0.25) {
+    // Jump from ground, train roof, or cancel active slide immediately
+    if (this.posY <= groundY + 0.35) {
       this.velocityY = 15.0;
       this.isJumping = true;
       this.isSliding = false;
@@ -176,14 +184,18 @@ export class GameEngine {
   slide() {
     if (this.isGameOver || this.isPaused) return false;
 
-    // Fast downward slam if currently in mid-air
-    const groundY = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) ? 8.65 : (this.isOnTrain ? this.trainRoofY : 0.3);
-    if (this.isJumping || this.posY > groundY) {
-      this.velocityY = -24;
+    // Fast downward dive slam if currently in mid-air
+    const groundY = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding)
+      ? 8.65
+      : (this.isOnTrain ? this.trainRoofY : 0);
+
+    if (this.isJumping || this.posY > groundY + 0.1) {
+      this.velocityY = -26;
     }
 
+    // 700ms slide timer with smooth restart on repeated presses
     this.isSliding = true;
-    this.slideTimer = 0.75;
+    this.slideTimer = 0.70;
     this.runStats.slides++;
     return true;
   }

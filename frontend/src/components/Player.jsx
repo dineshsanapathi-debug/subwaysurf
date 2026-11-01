@@ -107,9 +107,12 @@ export default function Player({
   powerups = {},
   isMenuPreview = false,
   position = [0, 0, 0],
-  scale = 1
+  scale = 1,
+  engine = null,
+  playerRef = null
 }) {
-  const groupRef = useRef();
+  const internalRef = useRef();
+  const groupRef = playerRef || internalRef;
   const leftLegRef = useRef();
   const rightLegRef = useRef();
   const leftArmRef = useRef();
@@ -133,12 +136,10 @@ export default function Player({
   const isFresh = !isDinesh && (characterName === 'Fresh');
   const isJake = !isDinesh && !isYutani && !isTricky && !isFresh;
 
-  const targetX = lane * 3.2;
-
   // Initialize group position on mount
   React.useEffect(() => {
     if (groupRef.current) {
-      groupRef.current.position.x = targetX;
+      groupRef.current.position.x = (lane || 0) * 3.2;
       groupRef.current.position.y = posY || 0;
       groupRef.current.position.z = position[2] || 0;
     }
@@ -148,11 +149,26 @@ export default function Player({
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
 
+    // Query active state directly from engine if passed for 100% frame-perfect sync
+    const activeLane = engine ? engine.lane : lane;
+    const activePosY = engine ? engine.posY : (posY || 0);
+    const activeIsJumping = engine ? engine.isJumping : isJumping;
+    const activeIsSliding = engine ? engine.isSliding : isSliding;
+    const activeIsOnTrain = engine ? engine.isOnTrain : isOnTrain;
+    const activePowerups = engine ? engine.powerups : powerups;
+
     if (isMenuPreview) {
       groupRef.current.position.y = Math.sin(time * 2.5) * 0.08 + (posY || 0.2);
       groupRef.current.rotation.y = time * 0.8;
       if (spriteMeshRef.current) {
         spriteMeshRef.current.position.y = 1.15 + Math.sin(time * 3) * 0.05;
+        spriteMeshRef.current.scale.set(1, 1, 1);
+        spriteMeshRef.current.rotation.set(0, 0, 0);
+      }
+      if (bodyRef.current) {
+        bodyRef.current.position.set(0, 0, 0);
+        bodyRef.current.rotation.set(0, 0, 0);
+        bodyRef.current.scale.set(1, 1, 1);
       }
       if (leftArmRef.current && rightArmRef.current) {
         leftArmRef.current.rotation.x = Math.sin(time * 2) * 0.15;
@@ -161,35 +177,36 @@ export default function Player({
       return;
     }
 
-    // Smooth horizontal lane transition
+    const currentTargetX = activeLane * 3.2;
+
+    // Smooth horizontal lane transition (continuous during slide, jump, and run)
     groupRef.current.position.x = THREE.MathUtils.lerp(
       groupRef.current.position.x,
-      targetX,
-      Math.min(1, delta * 18)
+      currentTargetX,
+      Math.min(1, delta * 20)
     );
 
-    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 8.65 : 0);
-    const isAirborne = isJumping || (posY > baseGroundY + 0.18);
+    const baseGroundY = activeIsOnTrain ? 3.2 : (isElevated && !isLanding ? 8.65 : 0);
+    const isAirborne = activeIsJumping || (activePosY > baseGroundY + 0.18);
 
     // Dynamic bank tilt: only tilt while steering on ground, stay stable upright in air
-    const xDiff = targetX - groupRef.current.position.x;
+    const xDiff = currentTargetX - groupRef.current.position.x;
     const targetTilt = isAirborne ? 0 : -xDiff * 0.16;
     groupRef.current.rotation.z = THREE.MathUtils.lerp(
       groupRef.current.rotation.z,
       targetTilt,
-      Math.min(1, delta * 12)
+      Math.min(1, delta * 14)
     );
 
-    // Vertical Y position: smoothly track authoritative physics height
-    const targetY = posY;
+    // Vertical Y position: track physics height smoothly and immediately
     groupRef.current.position.y = THREE.MathUtils.lerp(
       groupRef.current.position.y,
-      targetY,
-      Math.min(1, delta * 24)
+      activePosY,
+      Math.min(1, delta * 28)
     );
 
     // Running animation cycle
-    const runFreq = powerups.hoverboard ? 0 : 20;
+    const runFreq = activePowerups.hoverboard ? 0 : 20;
     const legAngle = Math.sin(time * runFreq) * 0.75;
     const armAngle = Math.sin(time * runFreq) * 0.75;
 
@@ -205,11 +222,17 @@ export default function Player({
       return;
     }
 
-    if (powerups.hoverboard) {
+    if (activePowerups.hoverboard) {
       if (bodyRef.current) {
         bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0.5 + Math.sin(time * 6) * 0.08, delta * 12);
         bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0.35, delta * 12);
         bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0, delta * 12);
+        bodyRef.current.scale.set(1, 1, 1);
+      }
+      if (spriteMeshRef.current) {
+        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 1.25, delta * 14);
+        spriteMeshRef.current.scale.set(1, 1, 1);
+        spriteMeshRef.current.rotation.set(0.08, 0, 0);
       }
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 0.3, delta * 12);
@@ -219,66 +242,94 @@ export default function Player({
         leftArmRef.current.rotation.z = THREE.MathUtils.lerp(leftArmRef.current.rotation.z, 0.4, delta * 12);
         rightArmRef.current.rotation.z = THREE.MathUtils.lerp(rightArmRef.current.rotation.z, -0.4, delta * 12);
       }
-    } else if (isSliding) {
+    } else if (activeIsSliding) {
+      // ===== ACTIVE SLIDE POSE =====
+      // Smoothly lower body scale to 0.55 while keeping contact with track/ground
       if (spriteMeshRef.current) {
-        // Slide animation: low ducking crouch, squash scale
-        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 0.65, delta * 16);
-        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 0.55, delta * 16);
-        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.25, delta * 16);
-        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.45, delta * 16);
+        // Lower center position to 0.63 so feet remain planted on the track
+        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 0.63, delta * 18);
+        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 0.55, delta * 18);
+        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.2, delta * 18);
+        spriteMeshRef.current.scale.z = 1;
+        // Keep plane visible to camera (slight pitch only, do NOT rotate edge-on!)
+        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.05, delta * 14);
+        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, 0, delta * 14);
       }
       if (bodyRef.current) {
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, -0.4, delta * 14);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.75, delta * 14);
-        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, -0.25, delta * 16);
+        bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.35, delta * 16);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 16);
+        bodyRef.current.scale.y = THREE.MathUtils.lerp(bodyRef.current.scale.y, 0.55, delta * 18);
+        bodyRef.current.scale.x = THREE.MathUtils.lerp(bodyRef.current.scale.x, 1.15, delta * 18);
+        bodyRef.current.scale.z = 1;
       }
       if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 1.3, delta * 14);
-        rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 1.3, delta * 14);
+        leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, 1.3, delta * 16);
+        rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, 1.3, delta * 16);
       }
       if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -0.8, delta * 14);
-        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, -0.8, delta * 14);
+        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, -0.8, delta * 16);
+        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, -0.8, delta * 16);
       }
     } else if (isAirborne) {
+      // ===== AIRBORNE / JUMP POSE (also cancels slide cleanly) =====
       if (spriteMeshRef.current) {
-        // Jump animation: dynamic vertical stretch and pitch
-        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 1.25, delta * 14);
-        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.1, delta * 14);
-        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 0.92, delta * 14);
-        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.18, delta * 14);
+        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 1.25, delta * 16);
+        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.1, delta * 16);
+        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 0.92, delta * 16);
+        spriteMeshRef.current.scale.z = 1;
+        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.12, delta * 14);
+        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, 0, delta * 14);
       }
       if (bodyRef.current) {
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0.05, delta * 12);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.22, delta * 12);
-        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 12);
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0.05, delta * 16);
+        bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.22, delta * 14);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
+        bodyRef.current.scale.set(1, 1, 1);
       }
       if (leftLegRef.current && rightLegRef.current) {
-        leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, -0.6, delta * 12);
-        rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, -0.4, delta * 12);
+        leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, -0.6, delta * 14);
+        rightLegRef.current.rotation.x = THREE.MathUtils.lerp(rightLegRef.current.rotation.x, -0.4, delta * 14);
       }
       if (leftArmRef.current && rightArmRef.current) {
-        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 1.1, delta * 12);
-        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 12);
+        leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, 1.1, delta * 14);
+        rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 14);
       }
     } else if (isDinesh) {
-      // Dinesh's Signature Dynamic Rail-Surfer Glide Stance for 4K Sprite
+      // ===== DINESH UPRIGHT RUNNING GLIDE STANCE (POST-SLIDE RECOVERY) =====
+      const surfBob = Math.sin(time * 16) * 0.07;
+      const surfSway = Math.sin(time * 8) * 0.04;
+
       if (spriteMeshRef.current) {
-        const runFreq = powerups.hoverboard ? 0 : 16;
-        const surfBob = Math.sin(time * runFreq) * 0.07;
-        const surfSway = Math.sin(time * (runFreq * 0.5)) * 0.04;
+        // Reliably restore full upright height, scale, and stance
         spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 1.15 + surfBob, delta * 16);
-        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.0, delta * 14);
-        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.0, delta * 14);
-        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.1, delta * 12);
-        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, surfSway, delta * 12);
+        spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.0, delta * 16);
+        spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.0, delta * 16);
+        spriteMeshRef.current.scale.z = 1;
+        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.08, delta * 14);
+        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, surfSway, delta * 14);
+      }
+      if (bodyRef.current) {
+        // Crucial fix: explicitly restore body transform to upright 0,0,0 and 1,1,1 scale
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0, delta * 16);
+        bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0, delta * 14);
+        bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
+        bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, 0, delta * 14);
+        bodyRef.current.scale.set(1, 1, 1);
       }
     } else {
+      // ===== PROCEDURAL CHARACTERS UPRIGHT RUNNING (POST-SLIDE RECOVERY) =====
       if (bodyRef.current) {
         const bounce = Math.abs(Math.sin(time * runFreq)) * 0.14;
         bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, bounce, delta * 16);
+        bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
         bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.18, delta * 14);
         bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
+        bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, 0, delta * 14);
+        bodyRef.current.scale.set(1, 1, 1);
       }
       if (leftLegRef.current && rightLegRef.current) {
         leftLegRef.current.rotation.x = THREE.MathUtils.lerp(leftLegRef.current.rotation.x, legAngle, delta * 18);
@@ -292,10 +343,10 @@ export default function Player({
 
     // Dynamic 3D Track Ground Shadow tracking (handles ground, train roof, and upper skyway)
     if (shadowRef.current) {
-      const surfaceY = isOnTrain ? 3.22 : (isElevated && !isLanding ? 8.67 : 0.03);
-      const relY = Math.max(0, posY - baseGroundY);
-      shadowRef.current.position.y = surfaceY - posY;
-      shadowRef.current.scale.setScalar(Math.max(0.4, 1.0 - relY * 0.15));
+      const surfaceY = activeIsOnTrain ? 3.22 : (isElevated && !isLanding ? 8.67 : 0.03);
+      const relY = Math.max(0, activePosY - baseGroundY);
+      shadowRef.current.position.y = surfaceY - activePosY;
+      shadowRef.current.scale.setScalar(Math.max(0.4, (activeIsSliding ? 1.25 : 1.0) - relY * 0.15));
     }
   });
 

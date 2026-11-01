@@ -194,22 +194,22 @@ function Scene({
       />
 
       {/* Player Character */}
-      <group ref={playerGroupRef}>
-        <React.Suspense fallback={null}>
-          <Player
-            lane={engine?.lane || 0}
-            posY={engine?.posY || 0}
-            isJumping={engine?.isJumping}
-            isSliding={engine?.isSliding}
-            isOnTrain={engine?.isOnTrain}
-            isElevated={isSkyway}
-            isLanding={isLanding}
-            isCrashing={engine?.isGameOver}
-            characterName={selectedCharacter}
-            powerups={engine?.powerups || {}}
-          />
-        </React.Suspense>
-      </group>
+      <React.Suspense fallback={null}>
+        <Player
+          playerRef={playerGroupRef}
+          engine={engine}
+          lane={engine?.lane || 0}
+          posY={engine?.posY || 0}
+          isJumping={engine?.isJumping}
+          isSliding={engine?.isSliding}
+          isOnTrain={engine?.isOnTrain}
+          isElevated={isSkyway}
+          isLanding={isLanding}
+          isCrashing={engine?.isGameOver}
+          characterName={selectedCharacter}
+          powerups={engine?.powerups || {}}
+        />
+      </React.Suspense>
 
       {/* Police Officer in hot pursuit when a side collision occurs */}
       {!showIntro && (

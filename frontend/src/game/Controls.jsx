@@ -135,6 +135,7 @@ export default function Controls({
         {/* Left & Right D-pad */}
         <div className="flex gap-2">
           <button
+            onPointerDown={(e) => { e.preventDefault(); onMoveLeft(); }}
             onClick={onMoveLeft}
             className="w-14 h-14 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-cyan-500/40 text-cyan-400 flex items-center justify-center active:scale-95 shadow-lg active:bg-cyan-500/20"
             aria-label="Move Left"
@@ -142,6 +143,7 @@ export default function Controls({
             <ArrowLeft size={28} />
           </button>
           <button
+            onPointerDown={(e) => { e.preventDefault(); onMoveRight(); }}
             onClick={onMoveRight}
             className="w-14 h-14 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-cyan-500/40 text-cyan-400 flex items-center justify-center active:scale-95 shadow-lg active:bg-cyan-500/20"
             aria-label="Move Right"
@@ -153,6 +155,7 @@ export default function Controls({
         {/* Action Buttons: Slide, Hoverboard, Jump */}
         <div className="flex gap-2 items-center">
           <button
+            onPointerDown={(e) => { e.preventDefault(); if (onHoverboard) onHoverboard(); }}
             onClick={onHoverboard}
             className="w-12 h-12 rounded-xl bg-cyan-600/80 text-white flex items-center justify-center active:scale-95 shadow-lg"
             aria-label="Hoverboard"
@@ -160,6 +163,7 @@ export default function Controls({
             <Shield size={22} />
           </button>
           <button
+            onPointerDown={(e) => { e.preventDefault(); onSlide(); }}
             onClick={onSlide}
             className="w-14 h-14 rounded-2xl bg-amber-500/80 text-white flex items-center justify-center active:scale-95 shadow-lg"
             aria-label="Slide"
@@ -167,6 +171,7 @@ export default function Controls({
             <ArrowDown size={28} />
           </button>
           <button
+            onPointerDown={(e) => { e.preventDefault(); onJump(); }}
             onClick={onJump}
             className="w-14 h-14 rounded-2xl bg-pink-500/80 text-white flex items-center justify-center active:scale-95 shadow-lg"
             aria-label="Jump"

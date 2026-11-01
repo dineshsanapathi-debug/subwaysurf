@@ -22,7 +22,7 @@ try {
 export default function PoliceCharacter({
   playerRef,
   initialPosition = [0, 0, 7],
-  followSpeed = 4.5,
+  followSpeed = 4,
   active = true,
   distanceBehind = 3.5
 }) {
@@ -104,17 +104,17 @@ export default function PoliceCharacter({
     <group ref={policeRef} position={initialPosition} visible={active}>
       {/* Dynamic Ground Shadow */}
       <mesh ref={shadowRef} position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[1.6, 0.85]} />
+        <planeGeometry args={[1.8, 0.9]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
 
-      {/* Indian Police Officer 2D Billboard Sprite (Aspect Ratio 0.464) */}
+      {/* Indian Police Officer 2D Billboard Sprite */}
       <mesh ref={spriteMeshRef} position={[0, 1.75, 0]}>
-        <planeGeometry args={[1.65, 3.5]} />
+        <planeGeometry args={[2.0, 3.5]} />
         <meshBasicMaterial
           map={texture}
           transparent={true}
-          alphaTest={0.05}
+          alphaTest={0.08}
           side={THREE.DoubleSide}
           depthWrite={false}
         />

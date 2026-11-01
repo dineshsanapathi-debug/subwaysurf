@@ -242,6 +242,7 @@ export default function GameUI({
             <div className="flex items-center gap-3">
               {/* Left Arrow Button */}
               <button
+                onPointerDown={(e) => { e.preventDefault(); window.gameActions?.moveLeft(); }}
                 onClick={() => window.gameActions?.moveLeft()}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-cyan-400 via-blue-600 to-blue-800 border-2 sm:border-4 border-cyan-200/90 shadow-[0_6px_20px_rgba(37,99,235,0.6)] flex items-center justify-center active:scale-90 transition-transform active:brightness-125"
                 aria-label="Move Left"
@@ -251,6 +252,7 @@ export default function GameUI({
 
               {/* Right Arrow Button */}
               <button
+                onPointerDown={(e) => { e.preventDefault(); window.gameActions?.moveRight(); }}
                 onClick={() => window.gameActions?.moveRight()}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-cyan-400 via-blue-600 to-blue-800 border-2 sm:border-4 border-cyan-200/90 shadow-[0_6px_20px_rgba(37,99,235,0.6)] flex items-center justify-center active:scale-90 transition-transform active:brightness-125"
                 aria-label="Move Right"
@@ -263,6 +265,7 @@ export default function GameUI({
             <div className="flex flex-col items-center gap-3">
               {/* Jump Up Arrow Button */}
               <button
+                onPointerDown={(e) => { e.preventDefault(); window.gameActions?.jump(); }}
                 onClick={() => window.gameActions?.jump()}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-cyan-400 via-blue-600 to-blue-800 border-2 sm:border-4 border-cyan-200/90 shadow-[0_6px_20px_rgba(37,99,235,0.6)] flex items-center justify-center active:scale-90 transition-transform active:brightness-125"
                 aria-label="Jump"
@@ -272,6 +275,7 @@ export default function GameUI({
 
               {/* Slide Down Arrow Button */}
               <button
+                onPointerDown={(e) => { e.preventDefault(); window.gameActions?.slide(); }}
                 onClick={() => window.gameActions?.slide()}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-b from-cyan-400 via-blue-600 to-blue-800 border-2 sm:border-4 border-cyan-200/90 shadow-[0_6px_20px_rgba(37,99,235,0.6)] flex items-center justify-center active:scale-90 transition-transform active:brightness-125"
                 aria-label="Slide"
