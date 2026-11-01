@@ -201,6 +201,8 @@ function Scene({
           <ChaseIntro
             onComplete={onIntroComplete}
             characterName={selectedCharacter}
+            playerRef={playerGroupRef}
+            engine={engine}
           />
         </React.Suspense>
       )}
@@ -253,6 +255,8 @@ function Scene({
           shieldActive={shieldActive}
           characterName={selectedCharacter}
           powerups={engine?.powerups || {}}
+          isIntro={showIntro}
+          policeChasing={policeChasing}
         />
       </React.Suspense>
 

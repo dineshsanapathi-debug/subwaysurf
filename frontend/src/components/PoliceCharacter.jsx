@@ -76,13 +76,14 @@ export default function PoliceCharacter({
       policeRef.current.position.copy(currentPos.current);
       policeRef.current.visible = true;
 
-      // Subtle, energetic running bobbing animation
-      const bobY = Math.abs(Math.sin(time * 15)) * 0.12;
-      const swayZ = Math.sin(time * 7.5) * 0.04;
+      // Energetic forward sprint running bobbing and forward lean
+      const bobY = Math.abs(Math.sin(time * 16)) * 0.14;
+      const swayZ = Math.sin(time * 8) * 0.05;
 
       if (spriteMeshRef.current) {
         spriteMeshRef.current.position.y = 1.75 + bobY;
-        spriteMeshRef.current.rotation.z = swayZ;
+        // Officer faces opposite to screen (facing down the tracks towards -Z chasing the player)
+        spriteMeshRef.current.rotation.set(-0.14, Math.PI, swayZ);
       }
 
       // Ground shadow tracking
@@ -108,8 +109,8 @@ export default function PoliceCharacter({
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
 
-      {/* Indian Police Officer 2D Billboard Sprite */}
-      <mesh ref={spriteMeshRef} position={[0, 1.75, 0]}>
+      {/* Indian Police Officer 2D Billboard Sprite - Facing opposite to screen */}
+      <mesh ref={spriteMeshRef} position={[0, 1.75, 0]} rotation={[-0.14, Math.PI, 0]}>
         <planeGeometry args={[2.0, 3.5]} />
         <meshBasicMaterial
           map={texture}

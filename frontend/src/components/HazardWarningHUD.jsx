@@ -50,3 +50,4 @@ export default function HazardWarningHUD({ warning = null }) {
     </>
   );
 }
+

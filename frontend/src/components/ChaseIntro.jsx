@@ -10,8 +10,8 @@ function StylizedPoliceInspector({ runTime = 0 }) {
     return tex;
   }, []);
 
-  const bobY = Math.abs(Math.sin(runTime * 14)) * 0.12;
-  const swayZ = Math.sin(runTime * 7) * 0.04;
+  const bobY = Math.abs(Math.sin(runTime * 16)) * 0.14;
+  const swayZ = Math.sin(runTime * 8) * 0.05;
 
   return (
     <group position={[0, 0, 0]}>
@@ -20,9 +20,9 @@ function StylizedPoliceInspector({ runTime = 0 }) {
         <planeGeometry args={[1.6, 0.85]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
-      {/* Indian Police Officer Cutout Sprite */}
-      <mesh position={[0, 1.75 + bobY, 0]} rotation={[0, 0, swayZ]}>
-        <planeGeometry args={[1.65, 3.5]} />
+      {/* Indian Police Officer Cutout Sprite - Facing opposite to screen (running down the track in hot pursuit) */}
+      <mesh position={[0, 1.75 + bobY, 0]} rotation={[-0.14, Math.PI, swayZ]}>
+        <planeGeometry args={[1.75, 3.5]} />
         <meshBasicMaterial
           map={texture}
           transparent={true}
@@ -165,7 +165,13 @@ function GraffitiWall() {
   );
 }
 
-export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bhargav' }) {
+export default function ChaseIntro({
+  onComplete,
+  onSkip,
+  characterName = 'Bhargav',
+  playerRef = null,
+  engine = null
+}) {
   const policeRef = useRef();
   const dogRef = useRef();
   const elapsed = useRef(0);
@@ -175,6 +181,12 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bharga
   useEffect(() => {
     elapsed.current = 0;
     completed.current = false;
+    return () => {
+      if (playerRef?.current) {
+        playerRef.current.position.set(0, 0, 0);
+        playerRef.current.rotation.set(0, 0, 0);
+      }
+    };
   }, []);
 
   useFrame((state, delta) => {
@@ -183,6 +195,34 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bharga
     const t = elapsed.current;
     setCurrentTime(t);
 
+    // Dynamic Hero running movement during the chase sequence
+    if (playerRef?.current) {
+      if (t < 1.3) {
+        // Hero caught spray-painting near graffiti wall
+        playerRef.current.position.x = -1.0;
+        playerRef.current.position.y = 0;
+        playerRef.current.position.z = 0.4;
+        playerRef.current.rotation.y = Math.PI * 0.42; // Facing the wall
+      } else {
+        // Hero turns forward and sprints down the tracks away from the police!
+        playerRef.current.position.x = THREE.MathUtils.lerp(playerRef.current.position.x, 0, delta * 7);
+        playerRef.current.position.z = THREE.MathUtils.lerp(playerRef.current.position.z, -0.6, delta * 5);
+        playerRef.current.rotation.y = THREE.MathUtils.lerp(playerRef.current.rotation.y, 0, delta * 9);
+      }
+    }
+
+    // Scroll tracks during chase sprint (t >= 1.3s)
+    if (t >= 1.3 && engine?.chunks) {
+      const moveDist = delta * 20;
+      for (const chunk of engine.chunks) {
+        chunk.z += moveDist;
+        if (chunk.z > 100) {
+          const minZ = Math.min(...engine.chunks.map((c) => c.z));
+          chunk.z = minZ - 100;
+        }
+      }
+    }
+
     // Inspector and Dog movement during the chase
     if (policeRef.current) {
       if (t < 1.3) {
@@ -190,8 +230,8 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bharga
         policeRef.current.position.z = 4.2 - t * 0.5;
         policeRef.current.position.x = 0.3;
       } else {
-        // Chasing in hot pursuit behind the player
-        policeRef.current.position.z = 3.6 - (t - 1.3) * 0.45;
+        // Chasing in hot pursuit behind the player down the tracks
+        policeRef.current.position.z = 3.6 - (t - 1.3) * 0.42;
         policeRef.current.position.x = Math.sin(t * 3) * 0.2;
       }
     }
@@ -201,7 +241,7 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bharga
         dogRef.current.position.z = 5.0 - t * 0.4;
         dogRef.current.position.x = 1.1;
       } else {
-        dogRef.current.position.z = 4.5 - (t - 1.3) * 0.45;
+        dogRef.current.position.z = 4.5 - (t - 1.3) * 0.42;
         dogRef.current.position.x = 0.95 + Math.sin(t * 4) * 0.15;
       }
     }
@@ -227,6 +267,10 @@ export default function ChaseIntro({ onComplete, onSkip, characterName = 'Bharga
     // After 5 seconds, finish intro and begin endless running!
     if (t >= 5.0 && !completed.current) {
       completed.current = true;
+      if (playerRef?.current) {
+        playerRef.current.position.set(0, 0, 0);
+        playerRef.current.rotation.set(0, 0, 0);
+      }
       if (onComplete) onComplete();
     }
   });

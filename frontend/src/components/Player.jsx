@@ -23,7 +23,9 @@ export default function Player({
   position = [0, 0, 0],
   scale = 1,
   engine = null,
-  playerRef = null
+  playerRef = null,
+  isIntro = false,
+  policeChasing = false
 }) {
   const internalRef = useRef();
   const groupRef = playerRef || internalRef;
@@ -120,10 +122,11 @@ export default function Player({
       Math.min(1, delta * 28)
     );
 
-    // Running animation cycle
-    const runFreq = activePowerups.hoverboard ? 0 : 20;
-    const legAngle = Math.sin(time * runFreq) * 0.75;
-    const armAngle = Math.sin(time * runFreq) * 0.75;
+    // Running animation cycle (higher frequency and deeper sprint when chased)
+    const isChased = policeChasing || isIntro;
+    const runFreq = isChased ? 26 : (activePowerups.hoverboard ? 0 : 20);
+    const legAngle = Math.sin(time * runFreq) * (isChased ? 0.95 : 0.75);
+    const armAngle = Math.sin(time * runFreq) * (isChased ? 0.95 : 0.75);
 
     // Foot spark pulsing effect
     if (footSparkRef.current) {
@@ -216,35 +219,44 @@ export default function Player({
         rightArmRef.current.rotation.x = THREE.MathUtils.lerp(rightArmRef.current.rotation.x, 1.1, delta * 14);
       }
     } else if (isDinesh) {
-      // ===== BHARGAV UPRIGHT RUNNING GLIDE STANCE (POST-SLIDE RECOVERY) =====
-      const surfBob = Math.sin(time * 16) * 0.07;
-      const surfSway = Math.sin(time * 8) * 0.04;
+      // ===== BHARGAV ENERGETIC RUNNING SPRINT (DYNAMIC STRIDE WHEN CHASED) =====
+      const isChased = policeChasing || isIntro;
+      const sprintSpeed = isChased ? 26 : (activePowerups.hoverboard ? 0 : 20);
+      const runBob = Math.abs(Math.sin(time * sprintSpeed)) * (isChased ? 0.16 : 0.11);
+      const runSway = Math.sin(time * (sprintSpeed * 0.5)) * (isChased ? 0.08 : 0.04);
+      const sprintLean = isChased ? 0.25 : 0.12;
 
       if (spriteMeshRef.current) {
-        // Reliably restore full upright height, scale, and stance
-        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(spriteMeshRef.current.position.y, 1.15 + surfBob, delta * 16);
+        // High-energy running stride bobbing and forward sprint lean
+        spriteMeshRef.current.position.y = THREE.MathUtils.lerp(
+          spriteMeshRef.current.position.y,
+          1.15 + runBob,
+          delta * 18
+        );
         spriteMeshRef.current.scale.y = THREE.MathUtils.lerp(spriteMeshRef.current.scale.y, 1.0, delta * 16);
         spriteMeshRef.current.scale.x = THREE.MathUtils.lerp(spriteMeshRef.current.scale.x, 1.0, delta * 16);
         spriteMeshRef.current.scale.z = 1;
-        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, 0.08, delta * 14);
-        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, surfSway, delta * 14);
+        spriteMeshRef.current.rotation.x = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.x, sprintLean, delta * 16);
+        spriteMeshRef.current.rotation.z = THREE.MathUtils.lerp(spriteMeshRef.current.rotation.z, runSway, delta * 16);
       }
       if (bodyRef.current) {
-        // Crucial fix: explicitly restore body transform to upright 0,0,0 and 1,1,1 scale
-        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, 0, delta * 16);
+        bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, runBob * 0.5, delta * 18);
         bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0, delta * 14);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, sprintLean * 0.5, delta * 16);
         bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
-        bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, 0, delta * 14);
+        bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, runSway * 0.5, delta * 14);
         bodyRef.current.scale.set(1, 1, 1);
       }
     } else {
       // ===== PROCEDURAL CHARACTERS UPRIGHT RUNNING (POST-SLIDE RECOVERY) =====
+      const isChased = policeChasing || isIntro;
+      const sprintLean = isChased ? 0.28 : 0.18;
+      const bounce = Math.abs(Math.sin(time * runFreq)) * (isChased ? 0.18 : 0.14);
+
       if (bodyRef.current) {
-        const bounce = Math.abs(Math.sin(time * runFreq)) * 0.14;
         bodyRef.current.position.y = THREE.MathUtils.lerp(bodyRef.current.position.y, bounce, delta * 16);
         bodyRef.current.position.z = THREE.MathUtils.lerp(bodyRef.current.position.z, 0, delta * 16);
-        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, 0.18, delta * 14);
+        bodyRef.current.rotation.x = THREE.MathUtils.lerp(bodyRef.current.rotation.x, sprintLean, delta * 14);
         bodyRef.current.rotation.y = THREE.MathUtils.lerp(bodyRef.current.rotation.y, 0, delta * 14);
         bodyRef.current.rotation.z = THREE.MathUtils.lerp(bodyRef.current.rotation.z, 0, delta * 14);
         bodyRef.current.scale.set(1, 1, 1);
@@ -385,8 +397,8 @@ export default function Player({
               />
             </mesh>
 
-            {/* Bhargav's Custom Graffiti Skateboard */}
-            {!powerups.hoverboard && (
+            {/* Bhargav's Custom Graffiti Skateboard - Active ONLY when hoverboard powerup is used; hero runs on foot! */}
+            {powerups.hoverboard && (
               <group position={[0, 0.08, 0]}>
                 <mesh castShadow receiveShadow>
                   <boxGeometry args={[0.72, 0.07, 1.75]} />
@@ -409,14 +421,14 @@ export default function Player({
               </group>
             )}
 
-            {/* Glowing Golden Speed Sparks under Skateboard */}
-            {!powerups.jetpack && (
-              <group position={[0, 0.08, 0.35]}>
+            {/* Glowing Golden Speed Sparks under Sneakers */}
+            {!powerups.jetpack && !isSliding && (
+              <group position={[0, 0.08, 0.25]}>
                 <mesh rotation={[-Math.PI / 2, 0, 0]}>
                   <ringGeometry args={[0.08, 0.35, 12]} />
                   <meshBasicMaterial color="#f59e0b" transparent opacity={0.8} side={THREE.DoubleSide} />
                 </mesh>
-                <mesh position={[0, 0.04, 0.15]}>
+                <mesh position={[0, 0.04, 0.12]}>
                   <coneGeometry args={[0.2, 0.35, 6]} rotation={[Math.PI / 2, 0, 0]} />
                   <meshBasicMaterial color="#fbbf24" transparent opacity={0.65} />
                 </mesh>
