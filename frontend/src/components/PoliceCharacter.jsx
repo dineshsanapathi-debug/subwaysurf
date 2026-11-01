@@ -81,7 +81,7 @@ export default function PoliceCharacter({
       const swayZ = Math.sin(time * 8) * 0.05;
 
       if (spriteMeshRef.current) {
-        spriteMeshRef.current.position.y = 1.75 + bobY;
+        spriteMeshRef.current.position.y = 1.6 + bobY;
         // Officer faces opposite to screen (facing down the tracks towards -Z chasing the player)
         spriteMeshRef.current.rotation.set(-0.14, Math.PI, swayZ);
       }
@@ -110,12 +110,12 @@ export default function PoliceCharacter({
       </mesh>
 
       {/* Indian Police Officer 2D Billboard Sprite - Facing opposite to screen */}
-      <mesh ref={spriteMeshRef} position={[0, 1.75, 0]} rotation={[-0.14, Math.PI, 0]}>
-        <planeGeometry args={[2.0, 3.5]} />
+      <mesh ref={spriteMeshRef} position={[0, 1.6, 0]} rotation={[-0.14, Math.PI, 0]}>
+        <planeGeometry args={[2.06, 3.2]} />
         <meshBasicMaterial
           map={texture}
           transparent={true}
-          alphaTest={0.08}
+          alphaTest={0.05}
           side={THREE.DoubleSide}
           depthWrite={false}
         />

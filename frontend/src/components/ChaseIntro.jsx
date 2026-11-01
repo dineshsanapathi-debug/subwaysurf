@@ -21,8 +21,8 @@ function StylizedPoliceInspector({ runTime = 0 }) {
         <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
       {/* Indian Police Officer Cutout Sprite - Facing opposite to screen (running down the track in hot pursuit) */}
-      <mesh position={[0, 1.75 + bobY, 0]} rotation={[-0.14, Math.PI, swayZ]}>
-        <planeGeometry args={[1.75, 3.5]} />
+      <mesh position={[0, 1.6 + bobY, 0]} rotation={[-0.14, Math.PI, swayZ]}>
+        <planeGeometry args={[2.06, 3.2]} />
         <meshBasicMaterial
           map={texture}
           transparent={true}
