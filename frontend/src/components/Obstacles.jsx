@@ -153,6 +153,147 @@ export function ElevatedRamp({ position = [0, 0, 0] }) {
   );
 }
 
+export function SkyLaserGate({ position = [0, 8.65, 0] }) {
+  return (
+    <group position={position}>
+      {/* Side Energy Pylons on edges of runway deck */}
+      <mesh position={[-5.8, 1.35, 0]} castShadow>
+        <boxGeometry args={[0.3, 2.7, 0.4]} />
+        <meshStandardMaterial color="#0284c7" metalness={0.7} />
+      </mesh>
+      <mesh position={[5.8, 1.35, 0]} castShadow>
+        <boxGeometry args={[0.3, 2.7, 0.4]} />
+        <meshStandardMaterial color="#0284c7" metalness={0.7} />
+      </mesh>
+
+      {/* Top Cross Truss */}
+      <mesh position={[0, 2.7, 0]}>
+        <boxGeometry args={[11.8, 0.35, 0.35]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.3} />
+      </mesh>
+
+      {/* Blinking Hazard Beacon Domes */}
+      {[-5.8, -2.5, 2.5, 5.8].map((bx, bi) => (
+        <mesh key={bi} position={[bx, 2.95, 0]}>
+          <cylinderGeometry args={[0.12, 0.15, 0.2, 12]} />
+          <meshBasicMaterial color="#ef4444" />
+        </mesh>
+      ))}
+
+      {/* Glowing Pulsing Laser Beam (Clearance below: 1.1m; requires SLIDE to pass under!) */}
+      <mesh position={[0, 1.35, 0]}>
+        <cylinderGeometry args={[0.07, 0.07, 11.6, 16]} rotation={[0, 0, Math.PI / 2]} />
+        <meshStandardMaterial
+          color="#f43f5e"
+          emissive="#f43f5e"
+          emissiveIntensity={3.0}
+        />
+      </mesh>
+      {/* Outer energy aura cylinder */}
+      <mesh position={[0, 1.35, 0]}>
+        <cylinderGeometry args={[0.16, 0.16, 11.6, 12]} rotation={[0, 0, Math.PI / 2]} />
+        <meshBasicMaterial color="#fb7185" transparent opacity={0.4} />
+      </mesh>
+
+      {/* Downward Slide Indicator Chevron Hologram */}
+      <mesh position={[0, 2.2, 0.2]}>
+        <planeGeometry args={[1.8, 0.7]} />
+        <meshBasicMaterial color="#fbbf24" />
+      </mesh>
+    </group>
+  );
+}
+
+export function SkyDrone({ position = [0, 8.65, 0] }) {
+  return (
+    <group position={position}>
+      {/* Floating Aerial Cyber Drone Obstacle at Y = 1.35m above runway deck */}
+      <group position={[0, 1.35, 0]}>
+        {/* Central Core Chassis */}
+        <mesh castShadow>
+          <sphereGeometry args={[0.45, 16, 16]} />
+          <meshStandardMaterial color="#0f172a" metalness={0.8} roughness={0.2} />
+        </mesh>
+        {/* Pulsing Red Eye / Scanner Visor */}
+        <mesh position={[0, 0, 0.38]}>
+          <sphereGeometry args={[0.2, 12, 12]} />
+          <meshBasicMaterial color="#ef4444" />
+        </mesh>
+        {/* Red Threat Beacon Ring */}
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.55, 0.7, 16]} />
+          <meshBasicMaterial color="#f43f5e" transparent opacity={0.7} />
+        </mesh>
+
+        {/* Rotor Arms */}
+        {[-0.65, 0.65].map((rx, ri) => (
+          <group key={ri} position={[rx, 0.1, 0]}>
+            <mesh>
+              <boxGeometry args={[0.45, 0.06, 0.08]} />
+              <meshStandardMaterial color="#334155" />
+            </mesh>
+            {/* Spinning Rotor Disc */}
+            <mesh position={[rx > 0 ? 0.2 : -0.2, 0.08, 0]}>
+              <cylinderGeometry args={[0.3, 0.3, 0.02, 12]} />
+              <meshBasicMaterial color="#00ccff" transparent opacity={0.65} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Holographic Warning Forcefield (Must switch lanes to avoid!) */}
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry args={[2.0, 1.8, 0.3]} />
+          <meshBasicMaterial color="#f43f5e" transparent opacity={0.25} wireframe />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+export function OverheadBeam({ position = [0, 0, 0] }) {
+  return (
+    <group position={position}>
+      {/* Heavy Industrial Overhead Girder at Y = 5.25m over ground tracks */}
+      {/* Support Columns on sides */}
+      <mesh position={[-6.2, 2.7, 0]} castShadow>
+        <boxGeometry args={[0.4, 5.4, 0.4]} />
+        <meshStandardMaterial color="#334155" metalness={0.6} />
+      </mesh>
+      <mesh position={[6.2, 2.7, 0]} castShadow>
+        <boxGeometry args={[0.4, 5.4, 0.4]} />
+        <meshStandardMaterial color="#334155" metalness={0.6} />
+      </mesh>
+
+      {/* Main Low Clearance Crossbeam (Y = 5.25m: hits players standing/jumping on train roof!) */}
+      <mesh position={[0, 5.25, 0]} castShadow>
+        <boxGeometry args={[12.8, 0.65, 0.6]} />
+        <meshStandardMaterial color="#eab308" roughness={0.4} />
+      </mesh>
+
+      {/* Hazard Yellow & Black Striping */}
+      {[-4.5, -3, -1.5, 0, 1.5, 3, 4.5].map((sx, idx) => (
+        <mesh key={idx} position={[sx, 5.25, 0.32]} rotation={[0, 0, 0.4]}>
+          <planeGeometry args={[0.35, 0.65]} />
+          <meshBasicMaterial color="#0f172a" />
+        </mesh>
+      ))}
+
+      {/* Low Clearance Warning Sign */}
+      <mesh position={[0, 4.65, 0.35]}>
+        <boxGeometry args={[3.6, 0.55, 0.08]} />
+        <meshStandardMaterial color="#dc2626" />
+      </mesh>
+      {/* Flashing Hazard Beacon Lights */}
+      {[-2.0, 0, 2.0].map((lx, li) => (
+        <mesh key={li} position={[lx, 5.7, 0]}>
+          <cylinderGeometry args={[0.15, 0.18, 0.3, 12]} />
+          <meshBasicMaterial color="#ef4444" />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 export default function Obstacles({ obstacles = [] }) {
   return (
     <group>
@@ -179,6 +320,15 @@ export default function Obstacles({ obstacles = [] }) {
         }
         if (obs.type === 'roadblock') {
           return <Roadblock key={obs.id} position={[obs.x, obs.y, obs.z]} />;
+        }
+        if (obs.type === 'sky_laser_gate') {
+          return <SkyLaserGate key={obs.id} position={[obs.x, obs.y, obs.z]} />;
+        }
+        if (obs.type === 'sky_drone') {
+          return <SkyDrone key={obs.id} position={[obs.x, obs.y, obs.z]} />;
+        }
+        if (obs.type === 'overhead_beam') {
+          return <OverheadBeam key={obs.id} position={[obs.x, obs.y, obs.z]} />;
         }
         return null;
       })}

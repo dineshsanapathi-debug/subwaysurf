@@ -79,6 +79,7 @@ export class GameEngine {
     this.obstacles = [];
     this.coinsList = [];
     this.powerupsList = [];
+    this.warningState = null;
 
     this.nextSpawnZ = -35;
     this.initSpawnPool();
@@ -255,18 +256,65 @@ export class GameEngine {
   }
 
   spawnSegment(z) {
-    // If currently on the Upper Skyway, do NOT spawn any ground obstacles!
+    // Upper Skyway Spawning: Dynamic high-altitude hazards (Laser gates, aerial drones & mango waves)
     if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
-      // Spawn generous streams of mangoes along the 3 lanes on the skyway
-      const lanes = [-1, 0, 1];
-      const skyLane = lanes[Math.floor(Math.random() * lanes.length)];
-      for (let cz = z - 6; cz <= z + 6; cz += 2.5) {
-        this.coinsList.push({
-          id: 'sky_c_' + Math.random(),
-          x: skyLane * LANE_WIDTH,
-          y: 9.55,
-          z: cz
+      const laneChoices = [-1, 0, 1];
+      const roll = Math.random();
+
+      if (roll < 0.38) {
+        // Sky Laser Gate (Spans runway deck at Y=8.65; clearance requires SLIDE)
+        this.obstacles.push({
+          id: 'skygate_' + Math.random(),
+          type: 'sky_laser_gate',
+          lane: 0,
+          x: 0,
+          y: 8.65,
+          z
         });
+        // Low sliding mango trail underneath the laser gate
+        const slideLane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+        for (let cz = z - 4; cz <= z + 4; cz += 2.0) {
+          this.coinsList.push({
+            id: 'sky_c_' + Math.random(),
+            x: slideLane * LANE_WIDTH,
+            y: 9.15,
+            z: cz
+          });
+        }
+      } else if (roll < 0.72) {
+        // Aerial Cyber Drone in 1 lane (Dodging required)
+        const droneLane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+        this.obstacles.push({
+          id: 'skydrone_' + Math.random(),
+          type: 'sky_drone',
+          lane: droneLane,
+          x: droneLane * LANE_WIDTH,
+          y: 8.65,
+          z
+        });
+
+        // Open lanes get mango streams
+        const openLanes = laneChoices.filter((l) => l !== droneLane);
+        const rewardLane = openLanes[Math.floor(Math.random() * openLanes.length)];
+        for (let cz = z - 6; cz <= z + 6; cz += 2.2) {
+          this.coinsList.push({
+            id: 'sky_c_' + Math.random(),
+            x: rewardLane * LANE_WIDTH,
+            y: 9.55,
+            z: cz
+          });
+        }
+      } else {
+        // Bonus mango streams across skyway lanes
+        const skyLane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+        for (let cz = z - 6; cz <= z + 6; cz += 2.2) {
+          this.coinsList.push({
+            id: 'sky_c_' + Math.random(),
+            x: skyLane * LANE_WIDTH,
+            y: 9.55,
+            z: cz
+          });
+        }
       }
       return;
     }
@@ -323,6 +371,18 @@ export class GameEngine {
           x: trainLane * LANE_WIDTH,
           y: 3.7,
           z: cz
+        });
+      }
+
+      // 35% chance to spawn an overhead beam girder crossing above this train rake
+      if (Math.random() < 0.35) {
+        this.obstacles.push({
+          id: 'overhead_' + Math.random(),
+          type: 'overhead_beam',
+          lane: 0,
+          x: 0,
+          y: 0,
+          z: z - 12
         });
       }
     }
@@ -586,6 +646,102 @@ export class GameEngine {
     if (this.invulnerableTimer <= 0) {
       this.checkObstacleCollisions();
     }
+
+    // Advance Hazard Warning scanner (Sky lasers, drones, overhead beams, trains)
+    this.updateHazardWarning();
+  }
+
+  updateHazardWarning() {
+    if (this.isGameOver || this.isPaused) {
+      this.warningState = null;
+      return;
+    }
+
+    const isPlayerElevated = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) || this.posY >= 7.0;
+    const playerX = this.lane * LANE_WIDTH;
+
+    let closestHazard = null;
+    let minDistance = Infinity;
+
+    for (const obs of this.obstacles) {
+      // Player is at z = 0; oncoming obstacles are at negative z (e.g. z = -25 is 25m ahead)
+      const dist = -obs.z;
+
+      // 1. SKY LASER GATE (Spans across skyway runway; duck/slide required)
+      if (obs.type === 'sky_laser_gate') {
+        if (isPlayerElevated && dist > 5 && dist < 42) {
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestHazard = {
+              active: true,
+              message: 'SKY LASER GATE',
+              action: 'SLIDE',
+              distance: Math.max(1, Math.round(dist))
+            };
+          }
+        }
+      }
+      // 2. AERIAL SKY DRONE IN PLAYER'S LANE (Lane switch required)
+      else if (obs.type === 'sky_drone') {
+        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.35 && dist > 5 && dist < 42) {
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestHazard = {
+              active: true,
+              message: 'SKY DRONE IN LANE',
+              action: 'SWITCH_LANE',
+              distance: Math.max(1, Math.round(dist))
+            };
+          }
+        }
+      }
+      // 3. LOW OVERHEAD GIRDER (Over train tracks; slide/duck required)
+      else if (obs.type === 'overhead_beam') {
+        if ((this.isOnTrain || this.posY >= 3.0) && dist > 5 && dist < 42) {
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestHazard = {
+              active: true,
+              message: 'LOW OVERHEAD GIRDER',
+              action: 'SLIDE',
+              distance: Math.max(1, Math.round(dist))
+            };
+          }
+        }
+      }
+      // 4. ONCOMING HEAD-ON TRAIN (Lane switch required)
+      else if (obs.type === 'train' && !isPlayerElevated) {
+        const halfL = (obs.length || 28) / 2;
+        const frontDist = -(obs.z + halfL);
+        if (Math.abs(playerX - obs.x) < 1.35 && frontDist > 8 && frontDist < 42 && !obs.hasRamp && !this.isOnTrain) {
+          if (frontDist < minDistance) {
+            minDistance = frontDist;
+            closestHazard = {
+              active: true,
+              message: 'HEAD-ON TRAIN',
+              action: 'SWITCH_LANE',
+              distance: Math.max(1, Math.round(frontDist))
+            };
+          }
+        }
+      }
+      // 5. HIGH BARRIER ON GROUND TRACK (Slide required)
+      else if (obs.type === 'high_barrier' && !isPlayerElevated) {
+        if (Math.abs(playerX - obs.x) < 1.35 && dist > 5 && dist < 35 && !this.isOnTrain) {
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestHazard = {
+              active: true,
+              message: 'HIGH BARRIER',
+              action: 'SLIDE',
+              distance: Math.max(1, Math.round(dist))
+            };
+          }
+        }
+      }
+    }
+
+    this.warningState = closestHazard;
   }
 
   checkCoinCollections() {
@@ -630,17 +786,61 @@ export class GameEngine {
   }
 
   checkObstacleCollisions() {
-    // Running on upper skyway bypasses all ground/train obstacle collisions!
-    if (this.powerups.jetpack > 0 || this.posY > 5.0 || (this.elevatedRoute?.active && !this.elevatedRoute.isLanding)) return;
-
+    const isPlayerElevated = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) || this.posY >= 7.0;
     const playerX = this.lane * LANE_WIDTH;
 
     for (const obs of this.obstacles) {
-      // Must be roughly in same lane
-      if (Math.abs(playerX - obs.x) > 1.35) continue;
-
       const prevZ = obs.prevZ !== undefined ? obs.prevZ : obs.z;
       const curZ = obs.z;
+
+      // 1. SKY LASER GATE (Upper Skyway runway)
+      if (obs.type === 'sky_laser_gate') {
+        if (isPlayerElevated) {
+          const swept = (curZ >= -1.6 && prevZ <= 1.6);
+          if (swept) {
+            // Player must be sliding (ducking under 1.35m laser) to clear!
+            if (!this.isSliding || this.posY > 8.9) {
+              this.handleCollision('sky_laser_gate');
+              return;
+            }
+          }
+        }
+        continue;
+      }
+
+      // 2. SKY DRONE (Upper Skyway lane obstacle)
+      if (obs.type === 'sky_drone') {
+        if (isPlayerElevated && Math.abs(playerX - obs.x) < 1.35) {
+          const swept = (curZ >= -1.5 && prevZ <= 1.5);
+          if (swept) {
+            this.handleCollision('sky_drone');
+            return;
+          }
+        }
+        continue;
+      }
+
+      // 3. OVERHEAD INDUSTRIAL GIRDER (Over train tracks)
+      if (obs.type === 'overhead_beam') {
+        const swept = (curZ >= -1.5 && prevZ <= 1.5);
+        if (swept) {
+          // If player is on train or jumping high, must slide to duck under beam at Y=5.25m!
+          if (this.posY >= 4.6) {
+            this.handleCollision('overhead_beam');
+            return;
+          } else if (this.isOnTrain && (!this.isSliding || this.posY > 4.1)) {
+            this.handleCollision('overhead_beam');
+            return;
+          }
+        }
+        continue;
+      }
+
+      // Ground hazards below: if player is elevated high in skyway, ground hazards cannot hit them!
+      if (isPlayerElevated) continue;
+
+      // Must be roughly in same lane
+      if (Math.abs(playerX - obs.x) > 1.35) continue;
 
       if (obs.type === 'low_barrier') {
         // Continuous swept test: did the barrier pass through player z=0?

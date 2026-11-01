@@ -12,6 +12,7 @@ import PoliceCharacter from '../components/PoliceCharacter';
 import RemoveDebugLines from '../components/RemoveDebugLines';
 import WorldThemes, { THEMES } from '../components/WorldThemes';
 import MangoShieldBar from '../components/MangoShieldBar';
+import HazardWarningHUD from '../components/HazardWarningHUD';
 import useMangoShield from '../hooks/useMangoShield';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
@@ -69,6 +70,7 @@ function ParticleSystem({ particles = [] }) {
 function Scene({
   engine,
   onEngineTick,
+  onWarningChange,
   selectedCharacter,
   theme,
   showIntro = false,
@@ -81,6 +83,7 @@ function Scene({
   const [currentWorldTheme, setCurrentWorldTheme] = useState(THEMES[0]);
   const [particles, setParticles] = useState([]);
   const playerGroupRef = useRef();
+  const lastWarningKey = useRef('none');
 
   const handleWorldChange = (newTheme, themeIdx, distance) => {
     setCurrentWorldTheme(newTheme);
@@ -112,8 +115,17 @@ function Scene({
       isOnTrain: engine.isOnTrain,
       isGameOver: engine.isGameOver,
       isPaused: engine.isPaused,
-      isIntro: showIntro
+      isIntro: showIntro,
+      warningState: engine.warningState
     });
+
+    // Notify warning state updates to React HUD
+    const currentWarn = engine.warningState || null;
+    const warnKey = currentWarn?.active ? `${currentWarn.message}_${currentWarn.distance}_${currentWarn.action}` : 'none';
+    if (warnKey !== lastWarningKey.current) {
+      lastWarningKey.current = warnKey;
+      if (onWarningChange) onWarningChange(currentWarn);
+    }
 
     if (!showIntro) {
       // Particle update
@@ -279,6 +291,7 @@ export default function Game({
   const [showIntro, setShowIntro] = useState(true);
   const [policeChasing, setPoliceChasing] = useState(false);
   const [worldAnnouncement, setWorldAnnouncement] = useState(null);
+  const [warningState, setWarningState] = useState(null);
   const announcementTimerRef = useRef(null);
   const engineRef = useRef(null);
 
@@ -413,6 +426,11 @@ export default function Game({
 
   return (
     <div className="w-full h-full relative">
+      {/* Dynamic Advance Hazard Warning HUD (Screen Edge Danger Vignette + Directional Pill + Sound) */}
+      {!showIntro && (
+        <HazardWarningHUD warning={warningState} />
+      )}
+
       {/* Mango Shield Challenge Progress Bar */}
       {!showIntro && (
         <MangoShieldBar
@@ -432,6 +450,7 @@ export default function Game({
           <Scene
             engine={engine}
             onEngineTick={onUpdateStats}
+            onWarningChange={setWarningState}
             selectedCharacter={selectedCharacter}
             theme={theme}
             showIntro={showIntro}

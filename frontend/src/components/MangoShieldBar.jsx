@@ -96,3 +96,4 @@ const styles = {
     animation: 'pulse 1.2s ease-in-out infinite'
   }
 };
+
