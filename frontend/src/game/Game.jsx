@@ -8,7 +8,7 @@ import MangoCollection from '../components/MangoCollection';
 import ChaseIntro from '../components/ChaseIntro';
 import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
-import PoliceChase from '../components/PoliceChase';
+import PoliceCharacter from '../components/PoliceCharacter';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
@@ -210,11 +210,13 @@ function Scene({
         </React.Suspense>
       </group>
 
-      {/* Police Officer & Dog in hot pursuit when a side collision occurs */}
+      {/* Police Officer in hot pursuit when a side collision occurs */}
       {!showIntro && (
-        <PoliceChase
+        <PoliceCharacter
           active={policeChasing}
           playerRef={playerGroupRef}
+          initialPosition={[0, 0, 7]}
+          followSpeed={4}
         />
       )}
 

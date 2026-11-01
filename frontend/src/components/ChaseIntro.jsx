@@ -1,172 +1,36 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// Procedural 3D Subway Surfers Police Inspector
+// Subway Surfers Police Inspector Cutout Sprite
 function StylizedPoliceInspector({ runTime = 0 }) {
-  const leftLegRef = useRef();
-  const rightLegRef = useRef();
-  const leftArmRef = useRef();
-  const rightArmRef = useRef();
-  const bodyRef = useRef();
+  const texture = useMemo(() => {
+    const tex = new THREE.TextureLoader().load('/images/police.png');
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }, []);
 
-  useFrame(() => {
-    const angle = Math.sin(runTime * 14) * 0.75;
-    if (leftLegRef.current && rightLegRef.current) {
-      leftLegRef.current.rotation.x = angle;
-      rightLegRef.current.rotation.x = -angle;
-    }
-    if (leftArmRef.current && rightArmRef.current) {
-      leftArmRef.current.rotation.x = -angle * 0.9;
-      rightArmRef.current.rotation.x = angle * 0.9;
-    }
-    if (bodyRef.current) {
-      bodyRef.current.position.y = Math.abs(Math.sin(runTime * 14)) * 0.12;
-      bodyRef.current.rotation.z = Math.sin(runTime * 7) * 0.04;
-    }
-  });
+  const bobY = Math.abs(Math.sin(runTime * 14)) * 0.12;
+  const swayZ = Math.sin(runTime * 7) * 0.04;
 
   return (
-    <group ref={bodyRef}>
-      {/* Inspector Torso - Plump Navy Blue Uniform */}
-      <group position={[0, 1.25, 0]}>
-        {/* Uniform Coat */}
-        <mesh castShadow>
-          <boxGeometry args={[0.76, 0.75, 0.52]} />
-          <meshStandardMaterial color="#1e3a8a" roughness={0.6} />
-        </mesh>
-        {/* Gold Uniform Buttons */}
-        <mesh position={[0, 0.18, 0.27]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.02, 12]} rotation={[Math.PI / 2, 0, 0]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh position={[0, 0.02, 0.27]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.02, 12]} rotation={[Math.PI / 2, 0, 0]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh position={[0, -0.14, 0.27]}>
-          <cylinderGeometry args={[0.035, 0.035, 0.02, 12]} rotation={[Math.PI / 2, 0, 0]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} roughness={0.2} />
-        </mesh>
-        {/* Gold Officer Shield Badge */}
-        <mesh position={[-0.22, 0.18, 0.27]}>
-          <boxGeometry args={[0.1, 0.12, 0.02]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.9} roughness={0.2} />
-        </mesh>
-        {/* Black Duty Belt with Gold Buckle */}
-        <mesh position={[0, -0.32, 0]} castShadow>
-          <boxGeometry args={[0.78, 0.12, 0.54]} />
-          <meshStandardMaterial color="#0f172a" roughness={0.5} />
-        </mesh>
-        <mesh position={[0, -0.32, 0.28]}>
-          <boxGeometry args={[0.14, 0.1, 0.02]} />
-          <meshStandardMaterial color="#fbbf24" metalness={0.8} />
-        </mesh>
-        {/* Police Walkie Talkie on Belt */}
-        <mesh position={[0.36, -0.22, 0.15]}>
-          <boxGeometry args={[0.1, 0.22, 0.1]} />
-          <meshStandardMaterial color="#1e293b" />
-        </mesh>
-      </group>
-
-      {/* Head with Moustache & Police Visor Hat */}
-      <group position={[0, 1.88, 0]}>
-        {/* Chubby Face */}
-        <mesh castShadow>
-          <sphereGeometry args={[0.3, 16, 16]} />
-          <meshStandardMaterial color="#fcd5b4" roughness={0.7} />
-        </mesh>
-        {/* Big Nose */}
-        <mesh position={[0, 0, 0.3]}>
-          <sphereGeometry args={[0.08, 12, 12]} />
-          <meshStandardMaterial color="#f87171" roughness={0.6} />
-        </mesh>
-        {/* Dark Bushy Moustache */}
-        <mesh position={[0, -0.08, 0.28]}>
-          <boxGeometry args={[0.24, 0.07, 0.06]} />
-          <meshStandardMaterial color="#3f2e21" roughness={0.9} />
-        </mesh>
-        {/* Eyes */}
-        <mesh position={[-0.1, 0.08, 0.27]}>
-          <sphereGeometry args={[0.04, 8, 8]} />
-          <meshBasicMaterial color="#0f172a" />
-        </mesh>
-        <mesh position={[0.1, 0.08, 0.27]}>
-          <sphereGeometry args={[0.04, 8, 8]} />
-          <meshBasicMaterial color="#0f172a" />
-        </mesh>
-
-        {/* Navy Police Hat with Visor */}
-        <group position={[0, 0.22, -0.02]}>
-          <mesh castShadow>
-            <cylinderGeometry args={[0.36, 0.32, 0.22, 16]} />
-            <meshStandardMaterial color="#1e3a8a" roughness={0.5} />
-          </mesh>
-          {/* Black Shiny Visor Brim */}
-          <mesh position={[0, -0.08, 0.24]} rotation={[0.25, 0, 0]}>
-            <boxGeometry args={[0.42, 0.04, 0.24]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.2} metalness={0.5} />
-          </mesh>
-          {/* Gold Hat Badge */}
-          <mesh position={[0, 0.04, 0.34]}>
-            <circleGeometry args={[0.07, 8]} />
-            <meshStandardMaterial color="#fbbf24" metalness={0.9} />
-          </mesh>
-        </group>
-      </group>
-
-      {/* Arms */}
-      <group ref={leftArmRef} position={[-0.48, 1.5, 0]}>
-        <mesh position={[0, -0.28, 0]} castShadow>
-          <boxGeometry args={[0.2, 0.62, 0.22]} />
-          <meshStandardMaterial color="#1e3a8a" />
-        </mesh>
-        {/* Hand with Baton */}
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.1, 8, 8]} />
-          <meshStandardMaterial color="#fcd5b4" />
-        </mesh>
-        {/* Police Baton */}
-        <mesh position={[0, -0.62, 0.2]} rotation={[0.6, 0, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.55, 8]} />
-          <meshStandardMaterial color="#0f172a" />
-        </mesh>
-      </group>
-
-      <group ref={rightArmRef} position={[0.48, 1.5, 0]}>
-        <mesh position={[0, -0.28, 0]} castShadow>
-          <boxGeometry args={[0.2, 0.62, 0.22]} />
-          <meshStandardMaterial color="#1e3a8a" />
-        </mesh>
-        <mesh position={[0, -0.62, 0]}>
-          <sphereGeometry args={[0.1, 8, 8]} />
-          <meshStandardMaterial color="#fcd5b4" />
-        </mesh>
-      </group>
-
-      {/* Legs */}
-      <group ref={leftLegRef} position={[-0.2, 0.85, 0]}>
-        <mesh position={[0, -0.35, 0]} castShadow>
-          <boxGeometry args={[0.26, 0.7, 0.26]} />
-          <meshStandardMaterial color="#172554" />
-        </mesh>
-        {/* Black Boots */}
-        <mesh position={[0, -0.72, 0.08]} castShadow>
-          <boxGeometry args={[0.28, 0.18, 0.44]} />
-          <meshStandardMaterial color="#020617" roughness={0.3} metalness={0.4} />
-        </mesh>
-      </group>
-
-      <group ref={rightLegRef} position={[0.2, 0.85, 0]}>
-        <mesh position={[0, -0.35, 0]} castShadow>
-          <boxGeometry args={[0.26, 0.7, 0.26]} />
-          <meshStandardMaterial color="#172554" />
-        </mesh>
-        <mesh position={[0, -0.72, 0.08]} castShadow>
-          <boxGeometry args={[0.28, 0.18, 0.44]} />
-          <meshStandardMaterial color="#020617" roughness={0.3} metalness={0.4} />
-        </mesh>
-      </group>
+    <group position={[0, 0, 0]}>
+      {/* Ground Shadow */}
+      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.6, 0.85]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.4} />
+      </mesh>
+      {/* High-Resolution Police Officer Cutout */}
+      <mesh position={[0, 1.75 + bobY, 0]} rotation={[0, 0, swayZ]}>
+        <planeGeometry args={[2.05, 3.5]} />
+        <meshBasicMaterial
+          map={texture}
+          transparent={true}
+          alphaTest={0.05}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
     </group>
   );
 }
