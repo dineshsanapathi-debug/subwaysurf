@@ -120,7 +120,7 @@ function createGraffitiTexture(text, style = 'run') {
   return texture;
 }
 
-export default function Track({ position = [0, 0, 0], theme = 'sunset' }) {
+export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false }) {
   // Generate procedural graffiti textures once
   const { leftWallTex, rightWallTex } = useMemo(() => {
     return {
@@ -319,8 +319,8 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset' }) {
         </React.Fragment>
       ))}
 
-      {/* 7. Overhead Steel Lattice Gantries & Catenary Wires */}
-      {[-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (
+      {/* 7. Overhead Steel Lattice Gantries & Catenary Wires (cleared during upper skyway flight) */}
+      {!isSkyway && [-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (
         <group key={gi} position={[0, 0, gantryZ]}>
           {/* Yellow Lattice Crossbeam Arch */}
           <mesh position={[0, 6.8, 0]} castShadow>
@@ -361,7 +361,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset' }) {
       ))}
 
       {/* Continuous Overhead Wire Lines stretching through chunk */}
-      {LANES_X.map((lx, lIdx) => (
+      {!isSkyway && LANES_X.map((lx, lIdx) => (
         <mesh key={lIdx} position={[lx, 5.6, 0]}>
           <cylinderGeometry args={[0.015, 0.015, CHUNK_LENGTH, 4]} rotation={[Math.PI / 2, 0, 0]} />
           <meshStandardMaterial color="#1e293b" />

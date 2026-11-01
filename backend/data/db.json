@@ -1053,6 +1053,44 @@
         "timePlayed": 60.83700000020931,
         "mangoes": 68
       }
+    },
+    {
+      "id": "sc_1793528546421",
+      "username": "Guest Runner",
+      "score": 1595,
+      "distance": 388,
+      "coins": 58,
+      "characterUsed": "Dinesh",
+      "date": "2026-11-01T10:22:26.421Z",
+      "runStats": {
+        "jumps": 6,
+        "slides": 0,
+        "coins": 58,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 22.262300000578108,
+        "mangoes": 58
+      }
+    },
+    {
+      "id": "sc_1793528643292",
+      "username": "Guest Runner",
+      "score": 4204,
+      "distance": 1756,
+      "coins": 109,
+      "characterUsed": "Dinesh",
+      "date": "2026-11-01T10:24:03.292Z",
+      "runStats": {
+        "jumps": 20,
+        "slides": 0,
+        "coins": 109,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 93.12039999938081,
+        "mangoes": 109
+      }
     }
   ],
   "analytics": [
@@ -2429,6 +2467,56 @@
         "difficultyRecommendation": "Easy"
       },
       "timestamp": "2026-11-01T10:13:01.867Z"
+    },
+    {
+      "id": "an_1793528546424",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 1595,
+        "distance": 388,
+        "coins": 58,
+        "characterUsed": "Dinesh",
+        "jumps": 6,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 388m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-01T10:22:26.424Z"
+    },
+    {
+      "id": "an_1793528643297",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 4204,
+        "distance": 1756,
+        "coins": 109,
+        "characterUsed": "Dinesh",
+        "jumps": 20,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "B",
+        "headline": "🛹 Getting in the Groove!",
+        "feedback": "Good run! You cleared 1756m, but that high_barrier caught you off guard.",
+        "proTip": "Remember to use Down Arrow / Swipe Down! High roadblocks must be dodged with slides.",
+        "challenge": "Collect at least 40 coins in your next run with Dinesh.",
+        "rewardCoins": 60,
+        "difficultyRecommendation": "Medium"
+      },
+      "timestamp": "2026-11-01T10:24:03.297Z"
     }
   ]
 }

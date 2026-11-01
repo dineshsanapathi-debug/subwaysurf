@@ -1,12 +1,16 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import MangoItem from './Mango';
 
 /**
- * 500-Metre Elevated Running Route
- * One continuous 500-metre upper floor with three running lanes,
- * glowing cyan boundaries, elevated supports, and vertical mango collectibles.
+ * Upper Skyway Route (Activated EXCLUSIVELY by the Rocket)
+ * High-altitude, 100% pristine and clear 3-lane neon skyway:
+ * - Elevated at Y = 8.5m (well above all ground walls, trains, and obstacles)
+ * - Zero pillars from below or arches blocking the running lanes
+ * - 3 clear running lanes with glowing cyan boundary rails
+ * - Rows of vertical 3D mango collectibles
+ * - Smooth jump-off ledge at the exit where hero dives back to ground tracks
  */
 export default function ElevatedFloor({
   active = false,
@@ -49,203 +53,119 @@ export default function ElevatedFloor({
 
   if (!active) return null;
 
-  // Calculate centered Z position so 500m platform streams under player at Z=0
-  // Starts ahead at Z = -250 and streams through to Z = +250, continuing smoothly as player leaps off
+  // Continuous forward stream so platform slides smoothly past hero as they leap off
   const dist = Math.max(0, distanceTraveled || currentOffsetZ.current);
   const zCenter = -250 + dist;
 
   return (
-    <group ref={floorGroupRef} position={[0, 4.5, zCenter]}>
-      {/* 1. One Continuous 500-Metre Upper Floor Deck */}
+    <group ref={floorGroupRef} position={[0, 8.5, zCenter]}>
+      {/* 1. Main Clear 3-Lane Skyway Deck (Elevated at 8.5m - 100% Clear Runway) */}
       <mesh receiveShadow position={[0, 0, 0]}>
-        <boxGeometry args={[12, 0.5, 500]} />
+        <boxGeometry args={[12, 0.3, 500]} />
         <meshStandardMaterial
-          color="#334155" // Dark metallic slate deck
-          metalness={0.65}
-          roughness={0.4}
+          color="#0f172a" // Deep sleek slate carbon deck
+          metalness={0.7}
+          roughness={0.3}
         />
       </mesh>
 
-      {/* Surface Grip Floor Panels Texture Lines */}
-      {[-4, 0, 4].map((px) => (
-        <mesh key={px} position={[px, 0.255, 0]} receiveShadow>
+      {/* Surface Grip Floor Runway Strips for All 3 Lanes */}
+      {[-3.2, 0, 3.2].map((lx) => (
+        <mesh key={lx} position={[lx, 0.155, 0]} receiveShadow>
           <boxGeometry args={[2.8, 0.01, 500]} />
-          <meshStandardMaterial color="#1e293b" roughness={0.7} />
+          <meshStandardMaterial color="#1e293b" roughness={0.6} />
         </mesh>
       ))}
 
-      {/* 2. Left Glowing Boundary Rail */}
+      {/* 2. Left Glowing Cyan Boundary Rail */}
       <mesh position={[-5.8, 0.35, 0]}>
-        <boxGeometry args={[0.2, 0.4, 500]} />
+        <boxGeometry args={[0.2, 0.45, 500]} />
         <meshStandardMaterial
           color="#00ccff"
           emissive="#00ccff"
-          emissiveIntensity={1.8}
+          emissiveIntensity={2.2}
         />
       </mesh>
-      {/* Left Boundary Glow Flare Line */}
+      {/* Left Neon Light Guide Line */}
       <mesh position={[-5.8, 0.6, 0]}>
-        <boxGeometry args={[0.08, 0.1, 500]} />
+        <boxGeometry args={[0.08, 0.08, 500]} />
         <meshBasicMaterial color="#a5f3fc" />
       </mesh>
 
-      {/* 3. Right Glowing Boundary Rail */}
+      {/* 3. Right Glowing Cyan Boundary Rail */}
       <mesh position={[5.8, 0.35, 0]}>
-        <boxGeometry args={[0.2, 0.4, 500]} />
+        <boxGeometry args={[0.2, 0.45, 500]} />
         <meshStandardMaterial
           color="#00ccff"
           emissive="#00ccff"
-          emissiveIntensity={1.8}
+          emissiveIntensity={2.2}
         />
       </mesh>
-      {/* Right Boundary Glow Flare Line */}
+      {/* Right Neon Light Guide Line */}
       <mesh position={[5.8, 0.6, 0]}>
-        <boxGeometry args={[0.08, 0.1, 500]} />
+        <boxGeometry args={[0.08, 0.08, 500]} />
         <meshBasicMaterial color="#a5f3fc" />
       </mesh>
 
-      {/* 4. Three Marked Running Lanes (Lane width 3.2m: -3.2, 0, +3.2) */}
+      {/* 4. Three Marked Running Lanes (Laser dividers at X = -1.6m and X = +1.6m) */}
       {[-1.6, 1.6].map((lx) => (
-        <mesh key={lx} position={[lx, 0.26, 0]}>
+        <mesh key={lx} position={[lx, 0.16, 0]}>
           <boxGeometry args={[0.08, 0.02, 500]} />
           <meshBasicMaterial color="#38bdf8" />
         </mesh>
       ))}
 
-      {/* 5. Structural Support Pillars extending to ground rails */}
-      {Array.from({ length: 26 }, (_, i) => -240 + i * 20).map((pz, idx) => (
-        <group key={idx} position={[0, -2.25, pz]}>
-          {/* Left concrete/steel pillar */}
-          <mesh position={[-5.5, 0, 0]} castShadow>
-            <boxGeometry args={[0.6, 4.5, 0.8]} />
-            <meshStandardMaterial color="#475569" roughness={0.8} />
-          </mesh>
-          {/* Right concrete/steel pillar */}
-          <mesh position={[5.5, 0, 0]} castShadow>
-            <boxGeometry args={[0.6, 4.5, 0.8]} />
-            <meshStandardMaterial color="#475569" roughness={0.8} />
-          </mesh>
-          {/* Crossbeam girder under deck */}
-          <mesh position={[0, 1.9, 0]}>
-            <boxGeometry args={[11.6, 0.4, 0.6]} />
-            <meshStandardMaterial color="#1e293b" metalness={0.7} />
-          </mesh>
-        </group>
-      ))}
-
-      {/* 6. Glowing Overhead Cyber Arches every 50 metres */}
-      {[-200, -150, -100, -50, 0, 50, 100, 150, 200].map((az, ai) => (
-        <group key={ai} position={[0, 2.4, az]}>
-          {/* Overhead horizontal neon bar */}
-          <mesh position={[0, 1.4, 0]}>
-            <boxGeometry args={[12, 0.18, 0.3]} />
-            <meshStandardMaterial
-              color="#00ccff"
-              emissive="#00ccff"
-              emissiveIntensity={1.5}
-            />
-          </mesh>
-          {/* Left upright post */}
-          <mesh position={[-5.8, 0, 0]}>
-            <boxGeometry args={[0.2, 2.8, 0.3]} />
-            <meshStandardMaterial color="#0284c7" />
-          </mesh>
-          {/* Right upright post */}
-          <mesh position={[5.8, 0, 0]}>
-            <boxGeometry args={[0.2, 2.8, 0.3]} />
-            <meshStandardMaterial color="#0284c7" />
-          </mesh>
-        </group>
-      ))}
-
-      {/* 7. Vertical Standing Mango Collectibles along the 500-metre Upper Highway */}
-      {Array.from({ length: 45 }, (_, mi) => {
-        const mz = -230 + mi * 10.5;
-        const mx = ((mi % 3) - 1) * 3.2; // Spans lanes -3.2, 0, 3.2
+      {/* 5. Clear Vertical Standing Mango Collectibles (Unobstructed across 3 lanes) */}
+      {Array.from({ length: 48 }, (_, mi) => {
+        const mz = -230 + mi * 10.0;
+        const mx = ((mi % 3) - 1) * 3.2; // Cleanly placed in lanes -3.2, 0, 3.2
         return (
           <group key={mi} position={[mx, 0.9, mz]}>
-            <MangoItem position={[0, 0, 0]} scale={0.9} />
+            <MangoItem position={[0, 0, 0]} scale={0.92} />
           </group>
         );
       })}
 
-      {/* 8. 500-Metre Start & Finish Neon Checkpoints & Ramps */}
-      {/* Entrance Ascent Ramp (+Z) */}
-      <group position={[0, -2.25, 258]}>
-        <mesh rotation={[-0.27, 0, 0]} receiveShadow castShadow>
-          <boxGeometry args={[12, 0.45, 17]} />
-          <meshStandardMaterial color="#1e293b" metalness={0.65} roughness={0.4} />
-        </mesh>
-        {/* Entrance Chevrons pointing up to the floor */}
-        {[-5, -1, 3].map((cz, ci) => (
-          <mesh key={ci} position={[0, 0.26, cz]} rotation={[-1.3, 0, 0]}>
-            <planeGeometry args={[10, 0.8]} />
-            <meshBasicMaterial color="#10b981" />
-          </mesh>
-        ))}
-        {/* Ramp glowing side rails */}
-        {[-5.8, 5.8].map((rx) => (
-          <mesh key={rx} position={[rx, 0.35, 0]} rotation={[-0.27, 0, 0]}>
-            <boxGeometry args={[0.2, 0.4, 17]} />
-            <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2} />
-          </mesh>
-        ))}
-      </group>
-
-      {/* Start Arch Gate */}
-      <group position={[0, 2.0, 248]}>
-        <mesh position={[0, 2.0, 0]}>
-          <boxGeometry args={[12.2, 0.4, 0.5]} />
+      {/* 6. Glowing Start & Exit Checkpoint Ledges */}
+      {/* Start Entrance Gate (+Z) */}
+      <group position={[0, 1.5, 248]}>
+        <mesh position={[0, 1.8, 0]}>
+          <boxGeometry args={[12.2, 0.3, 0.4]} />
           <meshStandardMaterial color="#10b981" emissive="#10b981" emissiveIntensity={2.2} />
         </mesh>
         <mesh position={[-5.8, 0, 0]}>
-          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <boxGeometry args={[0.25, 3.6, 0.3]} />
           <meshStandardMaterial color="#059669" />
         </mesh>
         <mesh position={[5.8, 0, 0]}>
-          <boxGeometry args={[0.3, 4.0, 0.4]} />
+          <boxGeometry args={[0.25, 3.6, 0.3]} />
           <meshStandardMaterial color="#059669" />
         </mesh>
       </group>
 
-      {/* Finish Arch Gate */}
-      <group position={[0, 2.0, -248]}>
-        <mesh position={[0, 2.0, 0]}>
-          <boxGeometry args={[12.2, 0.4, 0.5]} />
-          <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.2} />
+      {/* Exit Jump-Off Ledge (-Z) */}
+      <group position={[0, 0, -250]}>
+        {/* Glowing Amber Jump Off Warning Edge */}
+        <mesh position={[0, 0.22, 0]}>
+          <boxGeometry args={[12, 0.12, 0.5]} />
+          <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.5} />
         </mesh>
-        <mesh position={[-5.8, 0, 0]}>
-          <boxGeometry args={[0.3, 4.0, 0.4]} />
-          <meshStandardMaterial color="#d97706" />
-        </mesh>
-        <mesh position={[5.8, 0, 0]}>
-          <boxGeometry args={[0.3, 4.0, 0.4]} />
-          <meshStandardMaterial color="#d97706" />
-        </mesh>
-      </group>
-
-      {/* Exit Descent Ramp (-Z) */}
-      <group position={[0, -2.25, -258]}>
-        <mesh rotation={[0.27, 0, 0]} receiveShadow castShadow>
-          <boxGeometry args={[12, 0.45, 17]} />
-          <meshStandardMaterial color="#1e293b" metalness={0.65} roughness={0.4} />
-        </mesh>
-        {/* Exit Chevrons pointing down to ground rails */}
-        {[-3, 1, 5].map((cz, ci) => (
-          <mesh key={ci} position={[0, 0.26, cz]} rotation={[-1.84, 0, 0]}>
-            <planeGeometry args={[10, 0.8]} />
-            <meshBasicMaterial color="#f59e0b" />
+        {/* Overhead Jump Indicator Arch */}
+        <group position={[0, 1.5, 0]}>
+          <mesh position={[0, 1.8, 0]}>
+            <boxGeometry args={[12.2, 0.3, 0.4]} />
+            <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2.2} />
           </mesh>
-        ))}
-        {/* Ramp glowing side rails */}
-        {[-5.8, 5.8].map((rx) => (
-          <mesh key={rx} position={[rx, 0.35, 0]} rotation={[0.27, 0, 0]}>
-            <boxGeometry args={[0.2, 0.4, 17]} />
-            <meshStandardMaterial color="#f59e0b" emissive="#f59e0b" emissiveIntensity={2} />
+          <mesh position={[-5.8, 0, 0]}>
+            <boxGeometry args={[0.25, 3.6, 0.3]} />
+            <meshStandardMaterial color="#d97706" />
           </mesh>
-        ))}
+          <mesh position={[5.8, 0, 0]}>
+            <boxGeometry args={[0.25, 3.6, 0.3]} />
+            <meshStandardMaterial color="#d97706" />
+          </mesh>
+        </group>
       </group>
     </group>
   );
 }
-

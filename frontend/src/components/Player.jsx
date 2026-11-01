@@ -168,7 +168,7 @@ export default function Player({
       Math.min(1, delta * 18)
     );
 
-    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 4.75 : 0);
+    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 8.65 : 0);
     const isAirborne = isJumping || (posY > baseGroundY + 0.18);
 
     // Dynamic bank tilt: only tilt while steering on ground, stay stable upright in air
@@ -293,9 +293,9 @@ export default function Player({
       }
     }
 
-    // Dynamic 3D Track Ground Shadow tracking (handles ground, train roof, and upper floor)
+    // Dynamic 3D Track Ground Shadow tracking (handles ground, train roof, and upper skyway)
     if (shadowRef.current) {
-      const surfaceY = isOnTrain ? 3.22 : (isElevated && !isLanding ? 4.77 : 0.03);
+      const surfaceY = isOnTrain ? 3.22 : (isElevated && !isLanding ? 8.67 : 0.03);
       const relY = Math.max(0, posY - baseGroundY);
       shadowRef.current.position.y = surfaceY - posY;
       shadowRef.current.scale.setScalar(Math.max(0.4, 1.0 - relY * 0.15));
@@ -305,7 +305,7 @@ export default function Player({
   return (
     <group ref={groupRef} scale={scale}>
       {/* Dynamic 3D Track Ground Shadow */}
-      <mesh ref={shadowRef} position={[0, isOnTrain ? 3.22 : (isElevated && !isLanding ? 4.77 : 0.04), 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={shadowRef} position={[0, isOnTrain ? 3.22 : (isElevated && !isLanding ? 8.67 : 0.04), 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.3, 0.7]} />
         <meshBasicMaterial color="#000000" transparent opacity={0.45} />
       </mesh>

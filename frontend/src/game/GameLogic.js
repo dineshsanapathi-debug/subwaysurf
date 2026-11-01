@@ -48,7 +48,7 @@ export class GameEngine {
       multiplier: 0
     };
 
-    // 500-Metre Elevated Running Route
+    // Upper Skyway Route (Activated EXCLUSIVELY by the Rocket)
     this.elevatedRoute = {
       active: false,
       startDistance: 0,
@@ -56,7 +56,7 @@ export class GameEngine {
       maxDistance: 500,
       isLanding: false
     };
-    this.lastElevatedDistance = -150;
+    this.lastRocketDistance = -120;
 
     // Tracking for AI Coach
     this.runStats = {
@@ -160,9 +160,9 @@ export class GameEngine {
     if (this.isGameOver || this.isPaused) return false;
     let groundY = this.isOnTrain ? this.trainRoofY : 0;
     if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
-      groundY = 4.75;
+      groundY = 8.65;
     }
-    if (this.posY <= groundY + 0.25 && !this.powerups.jetpack) {
+    if (this.posY <= groundY + 0.25) {
       this.velocityY = 15.0;
       this.isJumping = true;
       this.isSliding = false;
@@ -175,10 +175,9 @@ export class GameEngine {
 
   slide() {
     if (this.isGameOver || this.isPaused) return false;
-    if (this.powerups.jetpack) return false;
 
     // Fast downward slam if currently in mid-air
-    const groundY = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) ? 4.75 : 0.3;
+    const groundY = (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) ? 8.65 : (this.isOnTrain ? this.trainRoofY : 0.3);
     if (this.isJumping || this.posY > groundY) {
       this.velocityY = -24;
     }
@@ -194,26 +193,31 @@ export class GameEngine {
     this.powerups.hoverboard = POWERUP_DURATIONS.hoverboard;
   }
 
-  activateJetpack(duration = 11) {
+  activateJetpack(duration = 14) {
     if (this.isGameOver || this.isPaused) return;
     this.powerups.jetpack = duration;
-    if (this.onPowerupCollect) this.onPowerupCollect('jetpack');
-  }
-
-  activateElevatedRoute() {
-    if (this.isGameOver || this.isPaused || this.elevatedRoute.active) return;
+    // Activate the Upper Skyway upon touching the Rocket!
     this.elevatedRoute.active = true;
     this.elevatedRoute.startDistance = this.distance;
     this.elevatedRoute.distance = 0;
+    this.elevatedRoute.duration = duration;
+    this.elevatedRoute.maxDistance = duration * (this.speed || 22);
     this.elevatedRoute.isLanding = false;
+    this.elevatedRoute.hasLeaped = false;
     if (this.onElevatedRouteStart) this.onElevatedRouteStart();
+    if (this.onPowerupCollect) this.onPowerupCollect('jetpack');
+  }
+
+  activateElevatedRoute(duration = 14) {
+    this.activateJetpack(duration);
   }
 
   completeElevatedRoute() {
     if (!this.elevatedRoute.active || this.elevatedRoute.isLanding) return;
     this.elevatedRoute.isLanding = true;
-    // Hero leaps forward off the upper floor edge down to the ground!
-    this.velocityY = 4.2;
+    this.powerups.jetpack = 0;
+    // Hero leaps forward off the upper skyway edge down to the ground tracks!
+    this.velocityY = 4.5;
     this.isJumping = true;
     this.isSliding = false;
     this.slideTimer = 0;
@@ -224,35 +228,22 @@ export class GameEngine {
     const laneChoices = [-1, 0, 1];
     const occupiedLanes = new Set();
 
-    // Periodic Elevated Floor Entrance Ramp on track (every ~280m of running distance)
-    const canSpawnElevatedRamp =
+    // Regular Rocket power-up spawning on track ("rocket type thing")
+    if (
+      this.distance - this.lastRocketDistance > 220 &&
       !this.elevatedRoute.active &&
-      (this.distance - this.lastElevatedDistance > 280 || (this.distance < 100 && this.lastElevatedDistance < -100 && Math.abs(z) > 130 && Math.abs(z) < 180)) &&
-      this.powerups.jetpack <= 0;
-
-    if (canSpawnElevatedRamp && Math.random() < 0.4) {
-      this.lastElevatedDistance = this.distance;
-      this.obstacles.push({
-        id: 'elevated_ramp_' + Math.random(),
-        type: 'elevated_ramp',
-        lane: 0,
-        x: 0,
-        y: 0,
-        z,
-        length: 16
+      this.powerups.jetpack <= 0
+    ) {
+      this.lastRocketDistance = this.distance;
+      const rocketLane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
+      occupiedLanes.add(rocketLane);
+      this.powerupsList.push({
+        id: 'rocket_' + Math.random(),
+        type: 'jetpack',
+        x: rocketLane * LANE_WIDTH,
+        y: 1.25,
+        z
       });
-
-      // Ascending trail of mango collectibles up the ramp
-      for (let rz = z - 6; rz <= z + 6; rz += 3) {
-        const progress = Math.max(0, Math.min(1, (rz - (z - 8)) / 16));
-        this.coinsList.push({
-          id: 'c_' + Math.random(),
-          x: 0,
-          y: 0.9 + progress * 3.8,
-          z: rz
-        });
-      }
-      return;
     }
 
     // Decide if spawning a train or static obstacles
@@ -451,18 +442,21 @@ export class GameEngine {
     }
     this.isOnTrain = standingOnAnyTrain;
 
-    // 500-Metre Elevated Route progression
+    // Upper Skyway progression (activated upon touching the rocket)
     if (this.elevatedRoute?.active) {
       this.elevatedRoute.distance = Math.floor(this.distance - this.elevatedRoute.startDistance);
 
       if (!this.elevatedRoute.isLanding) {
-        // Smoothly rise to upper floor (4.75m)
-        if (this.posY < 4.75 && !this.isJumping) {
-          this.posY = Math.min(4.75, this.posY + delta * 7.5);
+        // Soar up smoothly to Upper Skyway deck (8.65m)
+        if (this.posY < 8.65 && !this.isJumping) {
+          this.posY = Math.min(8.65, this.posY + delta * 12.0);
         }
 
-        // Endpoint reached (500m): hero runs off the upper floor edge and leaps down to ground!
-        if (this.elevatedRoute.distance >= 500) {
+        // Rocket flight ends: hero runs off the skyway edge and leaps down to ground!
+        if (
+          this.powerups.jetpack <= 0 ||
+          (this.elevatedRoute.maxDistance && this.elevatedRoute.distance >= this.elevatedRoute.maxDistance)
+        ) {
           this.completeElevatedRoute();
         }
       }
@@ -471,31 +465,25 @@ export class GameEngine {
     // 4. Stable Vertical Physics & Gravity
     let currentBaseY = this.isOnTrain ? this.trainRoofY : 0;
     if (this.elevatedRoute?.active && !this.elevatedRoute.isLanding) {
-      currentBaseY = 4.75;
+      currentBaseY = 8.65;
     }
 
-    if (this.powerups.jetpack > 0) {
-      this.posY = 6.2;
+    // Natural arcade gravity
+    this.velocityY += -34 * delta;
+    this.posY += this.velocityY * delta;
+
+    // Clean ground/skyway landing clamp
+    if (this.posY <= currentBaseY) {
+      this.posY = currentBaseY;
       this.velocityY = 0;
       this.isJumping = false;
-    } else {
-      // Natural arcade gravity
-      this.velocityY += -34 * delta;
-      this.posY += this.velocityY * delta;
 
-      // Clean ground/roof landing clamp
-      if (this.posY <= currentBaseY) {
-        this.posY = currentBaseY;
-        this.velocityY = 0;
-        this.isJumping = false;
-
-        // If hero was leaping down from the elevated route, touchdown on ground completed!
-        if (this.elevatedRoute?.isLanding) {
-          this.elevatedRoute.active = false;
-          this.elevatedRoute.isLanding = false;
-          if (this.onElevatedLanding) this.onElevatedLanding();
-          if (this.onElevatedRouteComplete) this.onElevatedRouteComplete();
-        }
+      // If hero was leaping down from the skyway, touchdown on ground completed!
+      if (this.elevatedRoute?.isLanding) {
+        this.elevatedRoute.active = false;
+        this.elevatedRoute.isLanding = false;
+        if (this.onElevatedLanding) this.onElevatedLanding();
+        if (this.onElevatedRouteComplete) this.onElevatedRouteComplete();
       }
     }
 
@@ -586,21 +574,12 @@ export class GameEngine {
   }
 
   checkObstacleCollisions() {
-    // Flying high in jetpack mode bypasses all ground/train obstacle collisions
-    if (this.powerups.jetpack > 0 || this.posY > 4.5) return;
+    // Running on upper skyway bypasses all ground/train obstacle collisions!
+    if (this.powerups.jetpack > 0 || this.posY > 5.0 || (this.elevatedRoute?.active && !this.elevatedRoute.isLanding)) return;
 
     const playerX = this.lane * LANE_WIDTH;
 
     for (const obs of this.obstacles) {
-      // 1. Elevated Floor Ramp check (covers all 3 lanes)
-      if (obs.type === 'elevated_ramp') {
-        if (obs.z >= -5.0 && obs.z <= 5.0) {
-          if (!this.elevatedRoute?.active) {
-            this.activateElevatedRoute();
-          }
-        }
-        continue;
-      }
 
       // Must be roughly in same lane
       if (Math.abs(playerX - obs.x) > 1.0) continue;

@@ -6,16 +6,13 @@ import Track from '../components/Track';
 import Obstacles from '../components/Obstacles';
 import MangoCollection from '../components/MangoCollection';
 import ChaseIntro from '../components/ChaseIntro';
-import UpperFloor from '../components/UpperFloor';
-import Jetpack from '../components/Jetpack';
-import JetpackCoins from '../components/JetpackCoins';
 import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceChase from '../components/PoliceChase';
 import { GameEngine } from './GameLogic';
 import { soundEffects } from '../audio/SoundEffects';
 
-function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevated, isLanding }) {
+function CameraFollow({ playerX, posY, isSliding, isOnTrain, isElevated, isLanding }) {
   const { camera } = useThree();
   const currentLookY = useRef(2.0);
 
@@ -25,19 +22,17 @@ function CameraFollow({ playerX, posY, isJetpack, isSliding, isOnTrain, isElevat
     const targetLookX = playerX * 0.75;
 
     // Smooth continuous vertical camera target (no discrete threshold jerks!)
-    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 4.75 : 0);
+    const baseGroundY = isOnTrain ? 3.2 : (isElevated && !isLanding ? 8.65 : 0);
     let targetCamY = 4.8;
-    if (isJetpack) {
-      targetCamY = 9.8;
-    } else if (isElevated && !isLanding) {
-      targetCamY = 4.75 + 4.8; // 9.55m elevation
+    if (isElevated && !isLanding) {
+      targetCamY = 8.65 + 4.8; // 13.45m elevation for Upper Skyway
     } else {
       // Gentle, continuous elevation following tracking during jump off floor to ground
       targetCamY = baseGroundY + 4.8 + Math.max(0, posY - baseGroundY) * 0.35;
       if (isSliding) targetCamY -= 0.4;
     }
 
-    const targetCamZ = isJetpack ? 9.8 : (isElevated && !isLanding ? 8.2 : 7.0);
+    const targetCamZ = isElevated && !isLanding ? 8.5 : 7.0;
 
     // Smooth lerp tracking
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, Math.min(1, delta * 9));
@@ -123,8 +118,7 @@ function Scene({
   });
 
   const playerX = engine ? engine.lane * 3.2 : 0;
-  const isJetpack = engine?.powerups.jetpack > 0;
-  const isElevated = engine?.elevatedRoute?.active;
+  const isSkyway = (engine?.powerups.jetpack > 0 || engine?.elevatedRoute?.active);
   const isLanding = engine?.elevatedRoute?.isLanding;
 
   return (
@@ -162,8 +156,7 @@ function Scene({
         <CameraFollow
           playerX={playerX}
           posY={engine?.posY || 0}
-          isJetpack={isJetpack}
-          isElevated={isElevated}
+          isElevated={isSkyway}
           isLanding={isLanding}
           isSliding={engine?.isSliding}
           isOnTrain={engine?.isOnTrain}
@@ -180,9 +173,9 @@ function Scene({
         </React.Suspense>
       )}
 
-      {/* Track Chunks */}
+      {/* Track Chunks (Gantries & wires cleared while on skyway) */}
       {engine?.chunks.map((chunk) => (
-        <Track key={chunk.id} position={[0, 0, chunk.z]} theme={theme} />
+        <Track key={chunk.id} position={[0, 0, chunk.z]} theme={theme} isSkyway={isSkyway} />
       ))}
 
       {/* Obstacles & Trains */}
@@ -195,35 +188,14 @@ function Scene({
         playerPosition={[playerX, engine?.posY || 0, 0]}
       />
 
-      {/* 500-Metre Continuous Elevated Running Route */}
+      {/* Upper Skyway Route (Activated EXCLUSIVELY by touching the Rocket) */}
       <ElevatedFloor
-        active={isElevated}
+        active={isSkyway}
         playerRef={playerGroupRef}
         speed={engine?.speed || 20}
         distanceTraveled={engine?.elevatedRoute?.distance || 0}
         onComplete={() => {
           if (engine) engine.completeElevatedRoute();
-        }}
-      />
-
-      {/* Part B: Jetpack System - Elevated Upper Floor Flying Path */}
-      <UpperFloor active={isJetpack} speed={engine?.speed || 20} />
-
-      {/* Part B: Jetpack Height Controller */}
-      <Jetpack active={isJetpack} playerRef={playerGroupRef} height={6.2} />
-
-      {/* Part B: Vertical Standing Sky Coins Formation */}
-      <JetpackCoins
-        active={isJetpack}
-        speed={engine?.speed || 20}
-        playerX={playerX}
-        playerY={engine?.posY || 6.2}
-        onCollect={(coin) => {
-          if (engine) {
-            engine.score += 10 * (engine.multiplier || 1);
-            engine.coins += 1;
-            if (engine.onCoinCollect) engine.onCoinCollect();
-          }
         }}
       />
 
@@ -236,7 +208,7 @@ function Scene({
             isJumping={engine?.isJumping}
             isSliding={engine?.isSliding}
             isOnTrain={engine?.isOnTrain}
-            isElevated={isElevated}
+            isElevated={isSkyway}
             isLanding={isLanding}
             isCrashing={engine?.isGameOver}
             characterName={selectedCharacter}
