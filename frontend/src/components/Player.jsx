@@ -37,6 +37,7 @@ export default function Player({
   const spriteMeshRef = useRef();
   const hoverboardRef = useRef();
   const footSparkRef = useRef();
+  const dustRef = useRef();
   const shadowRef = useRef();
 
   // Load custom 4K character texture
@@ -48,6 +49,7 @@ export default function Player({
   const char = CHARACTERS[characterName] || CHARACTERS.Bhargav || CHARACTERS.Jake;
   const isBhargav = characterName === 'Bhargav' || characterName === 'Dinesh';
   const isDinesh = isBhargav;
+  const isAirborneActive = isJumping || (posY > 0.5);
   const isYutani = !isBhargav && (char.isAlienSuit || characterName === 'Yutani');
   const isTricky = !isBhargav && (characterName === 'Tricky' || characterName === 'Luna');
   const isFresh = !isBhargav && (characterName === 'Fresh');
@@ -132,6 +134,14 @@ export default function Player({
     if (footSparkRef.current) {
       footSparkRef.current.scale.setScalar(0.9 + Math.sin(time * 25) * 0.25);
       footSparkRef.current.rotation.z = time * 12;
+    }
+
+    // Dynamic footstep dust puff animation
+    if (dustRef.current) {
+      const isChased = policeChasing || isIntro;
+      const sprintSpeed = isChased ? 26 : 20;
+      dustRef.current.position.x = Math.sin(time * sprintSpeed) * 0.22;
+      dustRef.current.scale.setScalar(0.8 + Math.abs(Math.sin(time * sprintSpeed)) * 0.35);
     }
 
     if (isCrashing) {
@@ -305,7 +315,7 @@ export default function Player({
       )}
 
       {/* Hoverboard Equipment */}
-      {powerups.hoverboard && !isDinesh && (
+      {powerups.hoverboard && (
         <group ref={hoverboardRef} position={[0, 0.15, 0]}>
           <mesh castShadow receiveShadow>
             <boxGeometry args={[0.7, 0.08, 1.8]} />
@@ -400,9 +410,9 @@ export default function Player({
             </mesh>
 
             {/* Dynamic Footstep Dust Puffs on Track while Running (Running on Foot, No Skateboard) */}
-            {!powerups.hoverboard && !powerups.jetpack && !isAirborne && !isSliding && (
-              <group position={[0, 0.06, -0.15]}>
-                <mesh position={[Math.sin((groupRef.current?.position.x || 0) * 4) * 0.18, 0, 0]}>
+            {!powerups.hoverboard && !powerups.jetpack && !isAirborneActive && !isSliding && (
+              <group ref={dustRef} position={[0, 0.06, -0.15]}>
+                <mesh>
                   <sphereGeometry args={[0.12, 8, 8]} />
                   <meshBasicMaterial color="#e2e8f0" transparent opacity={0.35} />
                 </mesh>
