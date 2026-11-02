@@ -9,6 +9,7 @@ import ChaseIntro from '../components/ChaseIntro';
 import ElevatedFloor from '../components/ElevatedFloor';
 import CollisionChaseManager from '../components/CollisionChaseManager';
 import PoliceCharacter from '../components/PoliceCharacter';
+import PoliceOfficer from '../components/PoliceOfficer';
 import RemoveDebugLines from '../components/RemoveDebugLines';
 import WorldThemes, { THEMES } from '../components/WorldThemes';
 import MangoShieldBar from '../components/MangoShieldBar';
@@ -86,10 +87,15 @@ function Scene({
   policeChasing = false,
   setPoliceChasing,
   onWorldChange,
-  shieldActive = false
+  shieldActive = false,
+  isCaught = false,
+  captureProgress = 0,
+  showGameOver = false
 }) {
   const [currentWorldTheme, setCurrentWorldTheme] = useState(THEMES[0]);
   const [particles, setParticles] = useState([]);
+  const [activeObstacles, setActiveObstacles] = useState(() => engine?.obstacles ? [...engine.obstacles] : []);
+  const lastObsLength = useRef(0);
   const playerGroupRef = useRef();
   const lastWarningKey = useRef('none');
   const lastStatsTick = useRef(0);
@@ -103,6 +109,11 @@ function Scene({
 
   useFrame((state, delta) => {
     if (!engine) return;
+
+    // Freeze normal gameplay during police capture sequence, game-over, or pause
+    if (isCaught || showGameOver || engine.isGameOver || engine.isPaused) {
+      return;
+    }
 
     // During intro, game physics update is paused
     if (!showIntro) {
@@ -144,6 +155,13 @@ function Scene({
     if (warnKey !== lastWarningKey.current) {
       lastWarningKey.current = warnKey;
       if (onWarningChange) onWarningChange(currentWarn ? { ...currentWarn } : null);
+    }
+
+    // Sync obstacle list for React mounting only when obstacles spawn or despawn (every ~1.5s)
+    // Individual obstacles move continuously at 60 FPS on GPU via their internal useFrame
+    if (engine && engine.obstacles.length !== lastObsLength.current) {
+      lastObsLength.current = engine.obstacles.length;
+      setActiveObstacles([...engine.obstacles]);
     }
 
     if (!showIntro && particles.length > 0) {
@@ -201,7 +219,7 @@ function Scene({
           isLanding={isLanding}
           isSliding={engine?.isSliding}
           isOnTrain={engine?.isOnTrain}
-          isCrashing={engine?.isGameOver}
+          isCrashing={isCaught || engine?.isGameOver}
         />
       )}
 
@@ -221,6 +239,7 @@ function Scene({
       {engine?.chunks.map((chunk) => (
         <Track
           key={chunk.id}
+          chunk={chunk}
           position={[0, 0, chunk.z]}
           theme={theme}
           isSkyway={isSkyway}
@@ -229,7 +248,7 @@ function Scene({
       ))}
 
       {/* Obstacles & Trains */}
-      <Obstacles obstacles={engine?.obstacles || []} />
+      <Obstacles obstacles={activeObstacles} />
 
       {/* 3D Mango Collectibles across all three lanes */}
       <MangoCollection
@@ -261,7 +280,7 @@ function Scene({
           isOnTrain={engine?.isOnTrain}
           isElevated={isSkyway}
           isLanding={isLanding}
-          isCrashing={engine?.isGameOver}
+          isCrashing={isCaught || engine?.isGameOver}
           shieldActive={shieldActive}
           characterName={selectedCharacter}
           powerups={engine?.powerups || {}}
@@ -271,7 +290,7 @@ function Scene({
       </React.Suspense>
 
       {/* Police Officer in hot pursuit when a side collision occurs */}
-      {!showIntro && (
+      {!showIntro && !isCaught && (
         <PoliceCharacter
           active={policeChasing}
           playerRef={playerGroupRef}
@@ -279,6 +298,13 @@ function Scene({
           followSpeed={4}
         />
       )}
+
+      {/* Police Officer Capture Sequence when hitting an obstacle */}
+      <PoliceOfficer
+        active={isCaught}
+        progress={captureProgress}
+        heroPosition={[playerX, engine?.posY || 0, 0]}
+      />
 
       {/* Collision Chase Manager (5s chase timer with retriggering on collisions) */}
       <CollisionChaseManager
@@ -306,7 +332,10 @@ const Game3DCanvas = React.memo(function Game3DCanvas({
   policeChasing,
   setPoliceChasing,
   onWorldChange,
-  shieldActive
+  shieldActive,
+  isCaught,
+  captureProgress,
+  showGameOver
 }) {
   return (
     <Canvas
@@ -334,6 +363,9 @@ const Game3DCanvas = React.memo(function Game3DCanvas({
           setPoliceChasing={setPoliceChasing}
           onWorldChange={onWorldChange}
           shieldActive={shieldActive}
+          isCaught={isCaught}
+          captureProgress={captureProgress}
+          showGameOver={showGameOver}
         />
       )}
     </Canvas>
@@ -355,6 +387,40 @@ function GameComponent({
   const [warningState, setWarningState] = useState(null);
   const announcementTimerRef = useRef(null);
   const engineRef = useRef(null);
+
+  // Police Chase & Capture Animation Sequence
+  const [isCaught, setIsCaught] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
+  const [captureProgress, setCaptureProgress] = useState(0);
+
+  const startPoliceCapture = (finalData) => {
+    if (isCaught) return; // prevent the collision from triggering repeatedly
+    setIsCaught(true);
+    setCaptureProgress(0);
+
+    soundEffects.playCrash();
+    soundEffects.playWhistle();
+
+    const startedAt = performance.now();
+    const duration = 1800; // capture animation duration in milliseconds
+
+    const animateCapture = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      setCaptureProgress(progress);
+
+      if (progress < 1) {
+        requestAnimationFrame(animateCapture);
+      } else {
+        setShowGameOver(true);
+        if (engineRef.current) {
+          engineRef.current.isGameOver = true;
+        }
+        if (onGameOver) onGameOver(finalData);
+      }
+    };
+
+    requestAnimationFrame(animateCapture);
+  };
 
   // Mango Challenge & Protective Shield System
   const {
@@ -432,9 +498,11 @@ function GameComponent({
     newEngine.onHoverboardBreak = () => soundEffects.playCrash();
     newEngine.onElevatedLeap = () => soundEffects.playJump();
     newEngine.onElevatedLanding = () => soundEffects.playLand();
+    newEngine.onCollision = (finalData) => {
+      startPoliceCapture(finalData);
+    };
     newEngine.onGameOver = (finalData) => {
-      soundEffects.playCrash();
-      if (onGameOver) onGameOver(finalData);
+      startPoliceCapture(finalData);
     };
 
     engineRef.current = newEngine;
@@ -453,29 +521,35 @@ function GameComponent({
 
   useEffect(() => {
     window.gameActions = {
-      moveLeft: () => !showIntro && engineRef.current?.moveLeft(),
-      moveRight: () => !showIntro && engineRef.current?.moveRight(),
+      moveLeft: () => !showIntro && !isCaught && engineRef.current?.moveLeft(),
+      moveRight: () => !showIntro && !isCaught && engineRef.current?.moveRight(),
       jump: () => {
         if (showIntro) {
           setShowIntro(false);
           return;
         }
-        if (engineRef.current?.jump()) soundEffects.playJump();
+        if (!isCaught && engineRef.current?.jump()) soundEffects.playJump();
       },
       slide: () => {
-        if (!showIntro && engineRef.current?.slide()) soundEffects.playSlide();
+        if (!showIntro && !isCaught && engineRef.current?.slide()) soundEffects.playSlide();
       },
       hoverboard: () => {
-        engineRef.current?.activateHoverboard();
-        soundEffects.playHoverboard();
+        if (!isCaught) {
+          engineRef.current?.activateHoverboard();
+          soundEffects.playHoverboard();
+        }
       },
       jetpack: () => {
-        engineRef.current?.activateJetpack();
-        soundEffects.playPowerup();
+        if (!isCaught) {
+          engineRef.current?.activateJetpack();
+          soundEffects.playPowerup();
+        }
       },
       elevatedRoute: () => {
-        engineRef.current?.activateElevatedRoute();
-        soundEffects.playPowerup();
+        if (!isCaught) {
+          engineRef.current?.activateElevatedRoute();
+          soundEffects.playPowerup();
+        }
       },
       skipIntro: () => setShowIntro(false)
     };
@@ -483,7 +557,7 @@ function GameComponent({
     return () => {
       delete window.gameActions;
     };
-  }, [showIntro]);
+  }, [showIntro, isCaught]);
 
   return (
     <div className="w-full h-full relative">
@@ -513,6 +587,9 @@ function GameComponent({
         setPoliceChasing={setPoliceChasing}
         onWorldChange={handleWorldChange}
         shieldActive={shieldActive}
+        isCaught={isCaught}
+        captureProgress={captureProgress}
+        showGameOver={showGameOver}
       />
 
       {/* World Tour Location Announcement Floating Card */}

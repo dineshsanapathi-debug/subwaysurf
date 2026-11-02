@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import IndianTrain from './IndianTrain';
 
 export function LowBarrier({ position = [0, 0, 0] }) {
@@ -294,44 +295,43 @@ export function OverheadBeam({ position = [0, 0, 0] }) {
   );
 }
 
+function ObstacleItem({ obs }) {
+  const itemRef = useRef();
+
+  // 60 FPS frame-perfect obstacle movement directly on GPU via useFrame
+  useFrame(() => {
+    if (itemRef.current) {
+      itemRef.current.position.set(obs.x, obs.y, obs.z);
+    }
+  });
+
+  return (
+    <group ref={itemRef} position={[obs.x, obs.y, obs.z]}>
+      {obs.type === 'train' && (
+        <IndianTrain
+          position={[0, 0, 0]}
+          length={obs.length || 28}
+          hasRamp={obs.hasRamp}
+          isMoving={obs.isMoving}
+        />
+      )}
+      {obs.type === 'elevated_ramp' && <ElevatedRamp position={[0, 0, 0]} />}
+      {obs.type === 'low_barrier' && <LowBarrier position={[0, 0, 0]} />}
+      {obs.type === 'high_barrier' && <HighBarrier position={[0, 0, 0]} />}
+      {obs.type === 'roadblock' && <Roadblock position={[0, 0, 0]} />}
+      {obs.type === 'sky_laser_gate' && <SkyLaserGate position={[0, 0, 0]} />}
+      {obs.type === 'sky_drone' && <SkyDrone position={[0, 0, 0]} />}
+      {obs.type === 'overhead_beam' && <OverheadBeam position={[0, 0, 0]} />}
+    </group>
+  );
+}
+
 export default function Obstacles({ obstacles = [] }) {
   return (
     <group>
-      {obstacles.map((obs) => {
-        if (obs.type === 'train') {
-          return (
-            <IndianTrain
-              key={obs.id}
-              position={[obs.x, obs.y, obs.z]}
-              length={obs.length || 28}
-              hasRamp={obs.hasRamp}
-              isMoving={obs.isMoving}
-            />
-          );
-        }
-        if (obs.type === 'elevated_ramp') {
-          return <ElevatedRamp key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'low_barrier') {
-          return <LowBarrier key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'high_barrier') {
-          return <HighBarrier key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'roadblock') {
-          return <Roadblock key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'sky_laser_gate') {
-          return <SkyLaserGate key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'sky_drone') {
-          return <SkyDrone key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        if (obs.type === 'overhead_beam') {
-          return <OverheadBeam key={obs.id} position={[obs.x, obs.y, obs.z]} />;
-        }
-        return null;
-      })}
+      {obstacles.map((obs) => (
+        <ObstacleItem key={obs.id} obs={obs} />
+      ))}
     </group>
   );
 }

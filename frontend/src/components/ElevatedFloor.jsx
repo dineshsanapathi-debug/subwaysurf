@@ -74,6 +74,10 @@ export default function ElevatedFloor({
       currentDist = Math.max(currentDist, currentOffsetZ.current);
     }
 
+    if (floorGroupRef.current) {
+      floorGroupRef.current.position.z = -250 + currentDist;
+    }
+
     if (currentDist >= 500 && !completed.current) {
       completed.current = true;
       onComplete?.();

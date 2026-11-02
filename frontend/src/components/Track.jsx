@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useLayoutEffect } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const TRACK_WIDTH = 11.6;
@@ -224,7 +225,22 @@ function InstancedWindows({ buildings }) {
   return <instancedMesh ref={meshRef} args={[windowPlaneGeo, windowMat, count]} />;
 }
 
-export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false, currentTheme = null }) {
+export default function Track({
+  chunk = null,
+  position = [0, 0, 0],
+  theme = 'sunset',
+  isSkyway = false,
+  currentTheme = null
+}) {
+  const groupRef = useRef();
+
+  // 60 FPS frame-perfect track movement directly on GPU via useFrame without React re-render lag
+  useFrame(() => {
+    if (groupRef.current && chunk) {
+      groupRef.current.position.z = chunk.z;
+    }
+  });
+
   // Extract theme parameters with sensible fallbacks
   const groundColor = currentTheme?.ground || '#854d0e';
   const sleeperColor = currentTheme?.sleeper || '#9a3412';
@@ -277,7 +293,7 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
   }, [currentTheme, accentColor]);
 
   return (
-    <group position={position}>
+    <group ref={groupRef} position={position}>
       {/* 1. Track Bed Ground */}
       <mesh position={[0, -0.06, 0]} receiveShadow>
         <boxGeometry args={[TRACK_WIDTH, 0.12, CHUNK_LENGTH]} />
