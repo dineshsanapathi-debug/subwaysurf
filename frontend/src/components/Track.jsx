@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useLayoutEffect } from 'react';
 import * as THREE from 'three';
 
 const TRACK_WIDTH = 11.6;
