@@ -485,29 +485,32 @@ export class GameEngine {
   update(delta) {
     if (this.isGameOver || this.isPaused) return;
 
-    this.runStats.timePlayed += delta;
+    // Frame-time safety: cap delta to 0.05s (50ms) to prevent position jumps and collision tunneling
+    const dt = Math.min(0.05, delta);
+
+    this.runStats.timePlayed += dt;
 
     // Invulnerability decay after hoverboard crash
     if (this.invulnerableTimer > 0) {
-      this.invulnerableTimer -= delta;
+      this.invulnerableTimer -= dt;
     }
     if (this.sideBumpCooldown > 0) {
-      this.sideBumpCooldown -= delta;
+      this.sideBumpCooldown -= dt;
     }
 
     // Power-ups countdown
     Object.keys(this.powerups).forEach((k) => {
       if (this.powerups[k] > 0) {
-        this.powerups[k] = Math.max(0, this.powerups[k] - delta);
+        this.powerups[k] = Math.max(0, this.powerups[k] - dt);
       }
     });
 
     // Speed progression
-    this.speed = Math.min(this.speedMax, this.speed + this.acceleration * delta * 0.1);
+    this.speed = Math.min(this.speedMax, this.speed + this.acceleration * dt * 0.1);
 
     // Slide timer
     if (this.isSliding) {
-      this.slideTimer -= delta;
+      this.slideTimer -= dt;
       if (this.slideTimer <= 0) {
         this.isSliding = false;
       }
@@ -517,7 +520,7 @@ export class GameEngine {
     this.multiplier = this.powerups.multiplier > 0 ? 2 : 1;
 
     // Distance & Score
-    const moveDist = this.speed * delta;
+    const moveDist = this.speed * dt;
     this.distance += moveDist;
     this.score += Math.floor(moveDist * 2.5 * this.multiplier);
 
@@ -645,10 +648,13 @@ export class GameEngine {
       this.nextSpawnZ -= this.obstacleGap;
     }
 
-    // Remove passed obstacles & items
-    this.obstacles = this.obstacles.filter((obs) => obs.z < 25);
-    this.coinsList = this.coinsList.filter((c) => c.z < 10);
-    this.powerupsList = this.powerupsList.filter((p) => p.z < 10);
+    // Remove passed obstacles & items immediately after passing behind the camera (camera is at z = 7)
+    this.obstacles = this.obstacles.filter((obs) => {
+      const maxZ = obs.type === 'train' ? 22 : 12;
+      return obs.z < maxZ;
+    });
+    this.coinsList = this.coinsList.filter((c) => c.z < 8);
+    this.powerupsList = this.powerupsList.filter((p) => p.z < 8);
 
     // Coin collection check
     this.checkCoinCollections();

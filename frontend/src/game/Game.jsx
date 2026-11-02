@@ -53,15 +53,23 @@ function CameraFollow({ playerX, posY, isSliding, isOnTrain, isElevated, isLandi
   return null;
 }
 
+// Pre-allocated particle geometry & material to eliminate GC churn
+const particleGeo = new THREE.SphereGeometry(0.12, 6, 6);
+const particleMat = new THREE.MeshBasicMaterial({ color: '#facc15', transparent: true, opacity: 0.8 });
+
 // Particle effects system
 function ParticleSystem({ particles = [] }) {
+  if (particles.length === 0) return null;
   return (
     <group>
       {particles.map((p) => (
-        <mesh key={p.id} position={[p.x, p.y, p.z]}>
-          <sphereGeometry args={[p.size || 0.12, 8, 8]} />
-          <meshBasicMaterial color={p.color || '#facc15'} transparent opacity={p.opacity || 0.8} />
-        </mesh>
+        <mesh
+          key={p.id}
+          position={[p.x, p.y, p.z]}
+          geometry={particleGeo}
+          material={particleMat}
+          scale={p.size ? p.size / 0.12 : 1}
+        />
       ))}
     </group>
   );
@@ -98,13 +106,13 @@ function Scene({
 
     // During intro, game physics update is paused
     if (!showIntro) {
-      engine.update(Math.min(delta, 0.1));
+      engine.update(Math.min(delta, 0.05));
     }
 
-    // Performance Optimization: Throttle React HUD updates to 10Hz (every 100ms) or on game-over/pause
+    // Performance Optimization: Throttle React HUD updates to 120ms (every 0.12s) or on game-over/pause
     // Eliminates 60fps root React re-render bottleneck and micro-stutters
     const now = state.clock.getElapsedTime();
-    if (now - lastStatsTick.current >= 0.1 || engine.isGameOver || engine.isPaused) {
+    if (now - lastStatsTick.current >= 0.12 || engine.isGameOver || engine.isPaused) {
       lastStatsTick.current = now;
       if (onEngineTick) {
         onEngineTick({
