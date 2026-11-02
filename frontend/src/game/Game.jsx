@@ -174,20 +174,11 @@ function Scene({
       {/* Ambient Light with themed tint */}
       <ambientLight intensity={currentWorldTheme.ambientIntensity} color={currentWorldTheme.ambientLight} />
 
-      {/* Themed Directional Sunlight casting crisp shadows */}
+      {/* Themed Directional Sunlight */}
       <directionalLight
         position={[14, 24, 16]}
         intensity={currentWorldTheme.sunIntensity}
         color={currentWorldTheme.sunLight}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-near={0.5}
-        shadow-camera-far={75}
-        shadow-camera-left={-18}
-        shadow-camera-right={18}
-        shadow-camera-top={18}
-        shadow-camera-bottom={-18}
       />
 
       {/* Themed Skylight Fill */}
@@ -293,6 +284,53 @@ function Scene({
     </>
   );
 }
+
+// Total Render Isolation: 3D WebGL Canvas is memoized so 10Hz HUD updates (shieldTime, mangoProgress, warningState)
+// never trigger Canvas reconciliation or Three.js scene re-evaluation
+const Game3DCanvas = React.memo(function Game3DCanvas({
+  engine,
+  onEngineTick,
+  onWarningChange,
+  selectedCharacter,
+  theme,
+  showIntro,
+  onIntroComplete,
+  policeChasing,
+  setPoliceChasing,
+  onWorldChange,
+  shieldActive
+}) {
+  return (
+    <Canvas
+      shadows={false}
+      dpr={1}
+      camera={{ position: [0, 4.8, 7.0], fov: 62 }}
+      gl={{
+        antialias: false,
+        powerPreference: 'high-performance',
+        stencil: false,
+        depth: true
+      }}
+    >
+      <RemoveDebugLines />
+      {engine && (
+        <Scene
+          engine={engine}
+          onEngineTick={onEngineTick}
+          onWarningChange={onWarningChange}
+          selectedCharacter={selectedCharacter}
+          theme={theme}
+          showIntro={showIntro}
+          onIntroComplete={onIntroComplete}
+          policeChasing={policeChasing}
+          setPoliceChasing={setPoliceChasing}
+          onWorldChange={onWorldChange}
+          shieldActive={shieldActive}
+        />
+      )}
+    </Canvas>
+  );
+});
 
 function GameComponent({
   selectedCharacter = 'Dash',
@@ -455,34 +493,19 @@ function GameComponent({
         />
       )}
 
-      <Canvas
-        shadows
-        dpr={[1, 1.25]}
-        camera={{ position: [0, 4.8, 7.0], fov: 62 }}
-        gl={{
-          antialias: false,
-          powerPreference: 'high-performance',
-          stencil: false,
-          depth: true
-        }}
-      >
-        <RemoveDebugLines />
-        {engine && (
-          <Scene
-            engine={engine}
-            onEngineTick={onUpdateStats}
-            onWarningChange={setWarningState}
-            selectedCharacter={selectedCharacter}
-            theme={theme}
-            showIntro={showIntro}
-            onIntroComplete={() => setShowIntro(false)}
-            policeChasing={policeChasing}
-            setPoliceChasing={setPoliceChasing}
-            onWorldChange={handleWorldChange}
-            shieldActive={shieldActive}
-          />
-        )}
-      </Canvas>
+      <Game3DCanvas
+        engine={engine}
+        onEngineTick={onUpdateStats}
+        onWarningChange={setWarningState}
+        selectedCharacter={selectedCharacter}
+        theme={theme}
+        showIntro={showIntro}
+        onIntroComplete={() => setShowIntro(false)}
+        policeChasing={policeChasing}
+        setPoliceChasing={setPoliceChasing}
+        onWorldChange={handleWorldChange}
+        shieldActive={shieldActive}
+      />
 
       {/* World Tour Location Announcement Floating Card */}
       {worldAnnouncement && !showIntro && (

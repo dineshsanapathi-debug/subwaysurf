@@ -192,6 +192,38 @@ const windowMat = new THREE.MeshStandardMaterial({
 });
 const bannerGeo = new THREE.PlaneGeometry(1.2, 2.4);
 
+// High-performance Instanced Windows (Replaces 162 individual window meshes with 1 draw call per chunk)
+function InstancedWindows({ buildings }) {
+  const meshRef = useRef();
+  const count = buildings.length * 6;
+
+  useLayoutEffect(() => {
+    if (!meshRef.current) return;
+    const dummy = new THREE.Object3D();
+    let idx = 0;
+    const offsets = [-2.5, 0, 2.5];
+    for (const b of buildings) {
+      // Left building windows facing track
+      for (const oz of offsets) {
+        dummy.position.set(-6.98, b.heightL / 2 + 6.2, b.z + oz);
+        dummy.rotation.set(0, Math.PI / 2, 0);
+        dummy.updateMatrix();
+        meshRef.current.setMatrixAt(idx++, dummy.matrix);
+      }
+      // Right building windows facing track
+      for (const oz of offsets) {
+        dummy.position.set(6.98, b.heightR / 2 + 6.2, b.z + oz);
+        dummy.rotation.set(0, -Math.PI / 2, 0);
+        dummy.updateMatrix();
+        meshRef.current.setMatrixAt(idx++, dummy.matrix);
+      }
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  }, [buildings]);
+
+  return <instancedMesh ref={meshRef} args={[windowPlaneGeo, windowMat, count]} />;
+}
+
 export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway = false, currentTheme = null }) {
   // Extract theme parameters with sensible fallbacks
   const groundColor = currentTheme?.ground || '#854d0e';
@@ -321,19 +353,18 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
           {/* 5. Green Cartoon Grass Tufts along the bottom of the walls (Instanced for 1 draw call per chunk) */}
           <InstancedGrass grassTufts={grassTufts} />
 
-          {/* 6. Upper Promenade & Colorful European Buildings */}
+          {/* 6. High-performance Instanced Windows for all buildings in chunk (1 draw call) */}
+          <InstancedWindows buildings={buildings} />
+
+          {/* Upper Promenade & Colorful European Buildings */}
           {buildings.map((b, i) => (
             <React.Fragment key={i}>
               {/* Left Skyscraper / City House */}
               <group position={[-11.5, b.heightL / 2 + 5.2, b.z]}>
-                <mesh receiveShadow>
+                <mesh>
                   <boxGeometry args={[9, b.heightL, 9.5]} />
                   <meshStandardMaterial color={b.colorL} roughness={0.5} />
                 </mesh>
-                {/* White Windows Grid */}
-                {[-2.5, 0, 2.5].map((wx, wIdx) => (
-                  <mesh key={wIdx} position={[4.52, 1, wx]} geometry={windowPlaneGeo} material={windowMat} />
-                ))}
                 {/* Hanging Banner / Pennant */}
                 <mesh position={[4.6, -1.8, 1.5]} rotation={[0, Math.PI / 2, 0]} geometry={bannerGeo}>
                   <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
@@ -342,14 +373,10 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
 
               {/* Right Skyscraper / City House */}
               <group position={[11.5, b.heightR / 2 + 5.2, b.z]}>
-                <mesh receiveShadow>
+                <mesh>
                   <boxGeometry args={[9, b.heightR, 9.5]} />
                   <meshStandardMaterial color={b.colorR} roughness={0.5} />
                 </mesh>
-                {/* White Windows Grid */}
-                {[-2.5, 0, 2.5].map((wx, wIdx) => (
-                  <mesh key={wIdx} position={[-4.52, 1, wx]} rotation={[0, Math.PI, 0]} geometry={windowPlaneGeo} material={windowMat} />
-                ))}
                 {/* Hanging Banner / Pennant */}
                 <mesh position={[-4.6, -1.8, -1.5]} rotation={[0, -Math.PI / 2, 0]} geometry={bannerGeo}>
                   <meshStandardMaterial color={b.bannerColor} side={THREE.DoubleSide} />
@@ -360,8 +387,8 @@ export default function Track({ position = [0, 0, 0], theme = 'sunset', isSkyway
         </>
       )}
 
-      {/* 7. Overhead Gantries & Themed Station Signage (cleared during upper skyway flight) */}
-      {!isSkyway && [-CHUNK_LENGTH / 3, CHUNK_LENGTH / 3].map((gantryZ, gi) => (
+      {/* 7. Overhead Gantry & Themed Station Signage (1 per chunk, cleared during upper skyway flight) */}
+      {!isSkyway && [0].map((gantryZ, gi) => (
         <group key={gi} position={[0, 0, gantryZ]}>
           {/* Main Crossbeam Arch */}
           <mesh position={[0, 6.8, 0]}>

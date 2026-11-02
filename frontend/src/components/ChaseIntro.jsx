@@ -1,15 +1,12 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getCachedPoliceTexture } from './PoliceCharacter';
 
 // Subway Surfers Police Inspector Cutout Sprite
 function StylizedPoliceInspector() {
   const meshRef = useRef();
-  const texture = useMemo(() => {
-    const tex = new THREE.TextureLoader().load('/images/police.png');
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  }, []);
+  const texture = useMemo(() => getCachedPoliceTexture(), []);
 
   useFrame((state) => {
     if (!meshRef.current) return;

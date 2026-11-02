@@ -10,6 +10,18 @@ try {
   // Preload fallback
 }
 
+// Global cached transparent police officer texture
+let cachedPoliceTex = null;
+export function getCachedPoliceTexture() {
+  if (!cachedPoliceTex) {
+    cachedPoliceTex = new THREE.TextureLoader().load('/images/police.png');
+    cachedPoliceTex.colorSpace = THREE.SRGBColorSpace;
+    cachedPoliceTex.minFilter = THREE.LinearFilter;
+    cachedPoliceTex.magFilter = THREE.LinearFilter;
+  }
+  return cachedPoliceTex;
+}
+
 /**
  * PoliceCharacter Component
  * Replaces the old 3D procedural police with the high-resolution 2D Subway Surfers Police Inspector cutout.
@@ -31,15 +43,8 @@ export default function PoliceCharacter({
   const shadowRef = useRef();
   const currentPos = useRef(new THREE.Vector3(...initialPosition));
 
-  // Load transparent police officer texture
-  const texture = useMemo(() => {
-    const loader = new THREE.TextureLoader();
-    const tex = loader.load('/images/police.png');
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
-    return tex;
-  }, []);
+  // Retrieve transparent police officer texture from cache
+  const texture = useMemo(() => getCachedPoliceTexture(), []);
 
   useFrame((state, delta) => {
     if (!policeRef.current) return;

@@ -87,16 +87,26 @@ export default function App() {
     soundEffects.startMusic();
   };
 
+  // Memoized Controls Callbacks
+  const handleMoveLeft = useCallback(() => window.gameActions?.moveLeft(), []);
+  const handleMoveRight = useCallback(() => window.gameActions?.moveRight(), []);
+  const handleJump = useCallback(() => window.gameActions?.jump(), []);
+  const handleSlide = useCallback(() => window.gameActions?.slide(), []);
+  const handleHoverboard = useCallback(() => window.gameActions?.hoverboard(), []);
+
   // Pause / Resume
-  const handleTogglePause = () => {
-    if (screen === 'playing') {
-      setScreen('pause');
-      soundEffects.stopMusic();
-    } else if (screen === 'pause') {
-      setScreen('playing');
-      soundEffects.startMusic();
-    }
-  };
+  const handleTogglePause = useCallback(() => {
+    setScreen((prev) => {
+      if (prev === 'playing') {
+        soundEffects.stopMusic();
+        return 'pause';
+      } else if (prev === 'pause') {
+        soundEffects.startMusic();
+        return 'playing';
+      }
+      return prev;
+    });
+  }, []);
 
   const handleResumeGame = () => {
     setScreen('playing');
@@ -302,11 +312,11 @@ export default function App() {
       {/* Controls Overlay (Keyboard & Touch Swipes) */}
       {screen === 'playing' && (
         <Controls
-          onMoveLeft={() => window.gameActions?.moveLeft()}
-          onMoveRight={() => window.gameActions?.moveRight()}
-          onJump={() => window.gameActions?.jump()}
-          onSlide={() => window.gameActions?.slide()}
-          onHoverboard={() => window.gameActions?.hoverboard()}
+          onMoveLeft={handleMoveLeft}
+          onMoveRight={handleMoveRight}
+          onJump={handleJump}
+          onSlide={handleSlide}
+          onHoverboard={handleHoverboard}
           onTogglePause={handleTogglePause}
           isPlaying={screen === 'playing'}
         />
