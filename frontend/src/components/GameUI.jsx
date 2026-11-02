@@ -627,8 +627,11 @@ export default function GameUI({
                             {screen === 'gameover' && (
                               <div className="w-full h-full flex items-center justify-center p-4 pointer-events-auto bg-slate-950/85 backdrop-blur-md overflow-y-auto">
                                 <div className="bg-slate-900 border border-slate-700/80 rounded-3xl p-6 max-w-lg w-full text-center shadow-2xl my-auto">
-                                  <span className="text-rose-500 font-black text-sm uppercase tracking-widest">CRASH IMPACT!</span>
-                                  <h2 className="text-4xl font-black text-white mt-1">RUN OVER</h2>
+                                  <span className="text-rose-500 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-1.5">
+                                    🚨 CAUGHT BY POLICE!
+                                  </span>
+                                  <h2 className="text-4xl font-black text-white mt-1">GAME OVER</h2>
+                                  <p className="text-slate-400 text-xs mt-1">The officer caught up with you. Your run is over.</p>
 
                                   {/* Run Score Card */}
                                   <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 mt-4 grid grid-cols-3 gap-2">
@@ -698,7 +701,7 @@ export default function GameUI({
                                       className="py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-amber-500 text-white font-black text-lg active:scale-95 shadow-xl transition-all flex items-center justify-center gap-2"
                                     >
                                       <RotateCcw size={20} />
-                                      <span>PLAY AGAIN</span>
+                                      <span>RUN AGAIN</span>
                                     </button>
                                     <button
                                       onClick={onOpenMenu}
