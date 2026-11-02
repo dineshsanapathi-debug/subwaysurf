@@ -1,98 +1,83 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { getCachedPoliceTexture } from './PoliceCharacter';
 
 /**
  * PoliceOfficer Component
- * 3D Police Officer for the Subway Surfers-style capture sequence.
+ * Renders the authentic Indian Police Officer cutout image ("Image Boy") during the Subway-style capture sequence.
  * Features:
- * - Runs up from behind the hero (Z = heroPosition[2] + 5 approaching to + 0.7)
- * - Leans forward while sprinting with running bob
- * - Stretches arms forward to catch and escort the hero as progress approaches 1.0
- * - Follows hero across all 3 lanes and elevated heights
+ * - High-resolution Indian Police Officer cutout (/images/police.png) matching ChaseIntro and PoliceCharacter
+ * - Sprints up directly from behind the hero to execute the capture
+ * - Smooth running stride bobbing and forward lean
+ * - Approaches right up to the hero (Z = heroPosition[2] + 0.75) and secures the catch as progress reaches 1.0
+ * - Dynamic ground shadow aligned to track/surface height
+ * - NEVER changes to a generic animated/3D police model
  */
 export default function PoliceOfficer({ active, progress = 0, heroPosition = [0, 0, 0] }) {
-  const officer = useRef();
+  const officerRef = useRef();
+  const spriteRef = useRef();
+  const shadowRef = useRef();
+  const currentZ = useRef(heroPosition[2] + 5.0);
 
-  useFrame((_, delta) => {
-    if (!officer.current || !active) return;
+  // Retrieve cached police officer ("Image Boy") texture
+  const texture = useMemo(() => getCachedPoliceTexture(), []);
 
-    // Move the officer from behind the hero towards the hero
-    const targetZ = heroPosition[2] + 0.7;
-    officer.current.position.z +=
-      (targetZ - officer.current.position.z) * Math.min(1, delta * 5);
+  useFrame((state, delta) => {
+    if (!officerRef.current || !active) return;
+    const time = state.clock.getElapsedTime();
 
-    // Keep aligned in hero's lane and vertical elevation
-    officer.current.position.x = heroPosition[0];
+    // Smoothly advance officer from behind the hero towards the capture spot
+    // At progress = 0: distance is ~4.5m behind; at progress = 1: distance is ~0.75m behind (securing the catch)
+    const targetZ = THREE.MathUtils.lerp(heroPosition[2] + 4.5, heroPosition[2] + 0.75, Math.min(1, progress * 1.35));
+    currentZ.current = THREE.MathUtils.lerp(currentZ.current, targetZ, Math.min(1, delta * 8));
 
-    // Lean forward while running; straighten up at the end
-    officer.current.rotation.x = progress < 0.8 ? -0.12 : 0;
-    officer.current.position.y = progress < 0.8
-      ? (heroPosition[1] || 0) + 0.04 * Math.sin(performance.now() / 80)
-      : (heroPosition[1] || 0);
+    // Follow hero's lane and vertical surface height
+    officerRef.current.position.x = heroPosition[0];
+    officerRef.current.position.y = heroPosition[1] || 0;
+    officerRef.current.position.z = currentZ.current;
+
+    // Direct orientation: Officer faces directly toward the hero while catching
+    officerRef.current.lookAt(heroPosition[0], officerRef.current.position.y, heroPosition[2]);
+
+    // Energetic running bobbing during sprint, stabilizing into firm capture stance
+    const isSprinting = progress < 0.85;
+    const bobY = isSprinting ? Math.abs(Math.sin(time * 18)) * 0.12 : 0;
+    const swayZ = isSprinting ? Math.sin(time * 9) * 0.04 : 0;
+    const sprintLean = isSprinting ? -0.16 : -0.04;
+
+    if (spriteRef.current) {
+      spriteRef.current.position.y = 1.6 + bobY;
+      spriteRef.current.rotation.set(sprintLean, 0, swayZ);
+    }
+
+    // Dynamic ground shadow under officer's feet
+    if (shadowRef.current) {
+      shadowRef.current.position.y = 0.03;
+      shadowRef.current.scale.setScalar(0.95 + (isSprinting ? Math.sin(time * 16) * 0.08 : 0));
+    }
   });
 
   if (!active) return null;
 
   return (
-    <group
-      ref={officer}
-      position={[heroPosition[0], heroPosition[1] || 0, heroPosition[2] + 5]}
-      scale={1}
-    >
-      {/* legs */}
-      <mesh position={[-0.16, 0.35, 0]} castShadow>
-        <boxGeometry args={[0.16, 0.55, 0.18]} />
-        <meshStandardMaterial color="#172b55" />
-      </mesh>
-      <mesh position={[0.16, 0.35, 0]} castShadow>
-        <boxGeometry args={[0.16, 0.55, 0.18]} />
-        <meshStandardMaterial color="#172b55" />
+    <group ref={officerRef} position={[heroPosition[0], heroPosition[1] || 0, heroPosition[2] + 5.0]}>
+      {/* Dynamic Ground Shadow */}
+      <mesh ref={shadowRef} position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.8, 0.9]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.4} />
       </mesh>
 
-      {/* uniform body */}
-      <mesh position={[0, 0.95, 0]} castShadow>
-        <boxGeometry args={[0.62, 0.72, 0.32]} />
-        <meshStandardMaterial color="#183b78" />
-      </mesh>
-
-      {/* arms: reach forward to grab/escort hero when catching up */}
-      <mesh
-        position={[-0.34, 0.95, progress > 0.6 ? -0.22 : 0]}
-        rotation={[progress > 0.6 ? 0.85 : 0, 0, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.14, 0.52, 0.14]} />
-        <meshStandardMaterial color="#183b78" />
-      </mesh>
-      <mesh
-        position={[0.34, 0.95, progress > 0.6 ? -0.22 : 0]}
-        rotation={[progress > 0.6 ? 0.85 : 0, 0, 0]}
-        castShadow
-      >
-        <boxGeometry args={[0.14, 0.52, 0.14]} />
-        <meshStandardMaterial color="#183b78" />
-      </mesh>
-
-      {/* head */}
-      <mesh position={[0, 1.48, 0]} castShadow>
-        <sphereGeometry args={[0.22, 16, 16]} />
-        <meshStandardMaterial color="#c98f68" />
-      </mesh>
-
-      {/* police cap */}
-      <mesh position={[0, 1.68, 0]} castShadow>
-        <cylinderGeometry args={[0.24, 0.24, 0.12, 16]} />
-        <meshStandardMaterial color="#10264c" />
-      </mesh>
-      <mesh position={[0, 1.61, 0.13]} castShadow>
-        <boxGeometry args={[0.3, 0.04, 0.2]} />
-        <meshStandardMaterial color="#10264c" />
-      </mesh>
-
-      {/* badge */}
-      <mesh position={[0.2, 1.08, 0.17]}>
-        <boxGeometry args={[0.1, 0.13, 0.025]} />
-        <meshStandardMaterial color="#f4cf55" metalness={0.5} />
+      {/* Indian Police Officer ("Image Boy") Cutout Sprite */}
+      <mesh ref={spriteRef} position={[0, 1.6, 0]} rotation={[-0.14, 0, 0]}>
+        <planeGeometry args={[2.06, 3.2]} />
+        <meshBasicMaterial
+          map={texture}
+          transparent={true}
+          alphaTest={0.05}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );
