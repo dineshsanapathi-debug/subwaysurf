@@ -2455,609 +2455,463 @@
         "timePlayed": 38.060799999773614,
         "mangoes": 67
       }
+    },
+    {
+      "id": "sc_1793618937137",
+      "username": "Guest Runner",
+      "score": 245,
+      "distance": 189,
+      "coins": 19,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:28:57.137Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 19,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 8.19430000060796,
+        "mangoes": 19
+      }
+    },
+    {
+      "id": "sc_1793618947233",
+      "username": "Guest Runner",
+      "score": 21,
+      "distance": 24,
+      "coins": 0,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:29:07.233Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 0,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 1.0655000000596044
+      }
+    },
+    {
+      "id": "sc_1793619011434",
+      "username": "Guest Runner",
+      "score": 457,
+      "distance": 189,
+      "coins": 36,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:30:11.434Z",
+      "runStats": {
+        "jumps": 2,
+        "slides": 0,
+        "coins": 36,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 8.18899999910592,
+        "mangoes": 36
+      }
+    },
+    {
+      "id": "sc_1793619017248",
+      "username": "Guest Runner",
+      "score": 35,
+      "distance": 60,
+      "coins": 0,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:30:17.248Z",
+      "runStats": {
+        "jumps": 3,
+        "slides": 0,
+        "coins": 0,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 2.608300000369548
+      }
+    },
+    {
+      "id": "sc_1793619026304",
+      "username": "Guest Runner",
+      "score": 287,
+      "distance": 159,
+      "coins": 20,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:30:26.304Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 20,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 6.904799999713888,
+        "mangoes": 20
+      }
+    },
+    {
+      "id": "sc_1793619090937",
+      "username": "Guest Runner",
+      "score": 25,
+      "distance": 44,
+      "coins": 1,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:31:30.937Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 1,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 1.920399999797343,
+        "mangoes": 1
+      }
+    },
+    {
+      "id": "sc_1793619105639",
+      "username": "Guest Runner",
+      "score": 61,
+      "distance": 59,
+      "coins": 5,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:31:45.639Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 5,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "roadblock",
+        "timePlayed": 2.581399999976155,
+        "mangoes": 5
+      }
+    },
+    {
+      "id": "sc_1793619115608",
+      "username": "Guest Runner",
+      "score": 102,
+      "distance": 85,
+      "coins": 9,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:31:55.608Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 9,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 3.7124000003933926,
+        "mangoes": 9
+      }
+    },
+    {
+      "id": "sc_1793619165488",
+      "username": "Guest Runner",
+      "score": 315,
+      "distance": 163,
+      "coins": 27,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:32:45.488Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 0,
+        "coins": 27,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "roadblock",
+        "timePlayed": 7.076700001001357,
+        "mangoes": 27
+      }
+    },
+    {
+      "id": "sc_1793619181516",
+      "username": "Guest Runner",
+      "score": 285,
+      "distance": 138,
+      "coins": 19,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:33:01.516Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 1,
+        "coins": 19,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 5.970099999904626,
+        "mangoes": 19
+      }
+    },
+    {
+      "id": "sc_1793619195453",
+      "username": "Guest Runner",
+      "score": 188,
+      "distance": 163,
+      "coins": 16,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:33:15.453Z",
+      "runStats": {
+        "jumps": 3,
+        "slides": 5,
+        "coins": 16,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 7.074900000214571,
+        "mangoes": 16
+      }
+    },
+    {
+      "id": "sc_1793620292667",
+      "username": "Guest Runner",
+      "score": 782,
+      "distance": 673,
+      "coins": 43,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:51:32.667Z",
+      "runStats": {
+        "jumps": 7,
+        "slides": 1,
+        "coins": 43,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "overhead_beam",
+        "timePlayed": 28.5908000008463,
+        "mangoes": 43
+      }
+    },
+    {
+      "id": "sc_1793620308229",
+      "username": "Guest Runner",
+      "score": 379,
+      "distance": 137,
+      "coins": 29,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:51:48.229Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 29,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 5.956999999940391,
+        "mangoes": 29
+      }
+    },
+    {
+      "id": "sc_1793620318691",
+      "username": "Guest Runner",
+      "score": 163,
+      "distance": 121,
+      "coins": 13,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:51:58.691Z",
+      "runStats": {
+        "jumps": 2,
+        "slides": 2,
+        "coins": 13,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 5.250099999546999,
+        "mangoes": 13
+      }
+    },
+    {
+      "id": "sc_1793620340676",
+      "username": "Guest Runner",
+      "score": 752,
+      "distance": 453,
+      "coins": 53,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:52:20.676Z",
+      "runStats": {
+        "jumps": 6,
+        "slides": 2,
+        "coins": 53,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 19.404600000798748,
+        "mangoes": 53
+      }
+    },
+    {
+      "id": "sc_1793620347120",
+      "username": "Guest Runner",
+      "score": 54,
+      "distance": 59,
+      "coins": 5,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:52:27.120Z",
+      "runStats": {
+        "jumps": 2,
+        "slides": 0,
+        "coins": 5,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "roadblock",
+        "timePlayed": 2.5806999992132167,
+        "mangoes": 5
+      }
+    },
+    {
+      "id": "sc_1793620367264",
+      "username": "Guest Runner",
+      "score": 468,
+      "distance": 297,
+      "coins": 41,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T11:52:47.264Z",
+      "runStats": {
+        "jumps": 3,
+        "slides": 1,
+        "coins": 41,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 12.804899998962876,
+        "mangoes": 41
+      }
+    },
+    {
+      "id": "sc_1793622821856",
+      "username": "Guest Runner",
+      "score": 233,
+      "distance": 136,
+      "coins": 18,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:33:41.857Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 1,
+        "coins": 18,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 5.945899999916546,
+        "mangoes": 18
+      }
+    },
+    {
+      "id": "sc_1793622821877",
+      "username": "Guest Runner",
+      "score": 233,
+      "distance": 136,
+      "coins": 18,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:33:41.877Z",
+      "runStats": {
+        "jumps": 0,
+        "slides": 1,
+        "coins": 18,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "train",
+        "timePlayed": 5.945899999916546,
+        "mangoes": 18
+      }
+    },
+    {
+      "id": "sc_1793622833932",
+      "username": "Guest Runner",
+      "score": 96,
+      "distance": 59,
+      "coins": 8,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:33:53.932Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 8,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 2.590499999523163,
+        "mangoes": 8
+      }
+    },
+    {
+      "id": "sc_1793622854265",
+      "username": "Guest Runner",
+      "score": 361,
+      "distance": 297,
+      "coins": 29,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:34:14.265Z",
+      "runStats": {
+        "jumps": 7,
+        "slides": 1,
+        "coins": 29,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 12.807600000321864,
+        "mangoes": 29
+      }
+    },
+    {
+      "id": "sc_1793623614483",
+      "username": "Guest Runner",
+      "score": 1221,
+      "distance": 673,
+      "coins": 84,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:46:54.483Z",
+      "runStats": {
+        "jumps": 3,
+        "slides": 0,
+        "coins": 84,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "overhead_beam",
+        "timePlayed": 28.5876999990343,
+        "mangoes": 84
+      }
+    },
+    {
+      "id": "sc_1793623622219",
+      "username": "Guest Runner",
+      "score": 28,
+      "distance": 33,
+      "coins": 2,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:47:02.219Z",
+      "runStats": {
+        "jumps": 1,
+        "slides": 0,
+        "coins": 2,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "low_barrier",
+        "timePlayed": 1.47099999988079,
+        "mangoes": 2
+      }
+    },
+    {
+      "id": "sc_1793623691146",
+      "username": "Guest Runner",
+      "score": 2893,
+      "distance": 1519,
+      "coins": 100,
+      "characterUsed": "Bhargav",
+      "date": "2026-11-02T12:48:11.146Z",
+      "runStats": {
+        "jumps": 25,
+        "slides": 1,
+        "coins": 100,
+        "trainsDodged": 0,
+        "nearMisses": 0,
+        "causeOfDeath": "high_barrier",
+        "timePlayed": 62.66969999957195,
+        "mangoes": 100
+      }
     }
   ],
   "analytics": [
-    {
-      "id": "an_1793517996674",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 5741,
-        "distance": 1545,
-        "coins": 250,
-        "characterUsed": "Yutani",
-        "jumps": 16,
-        "slides": 18,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "B",
-        "headline": "🛹 Getting in the Groove!",
-        "feedback": "Good run! You cleared 1545m, but that train caught you off guard.",
-        "proTip": "Pick up the Coin Magnet to gather coins while keeping your eyes locked ahead.",
-        "challenge": "Collect at least 40 coins in your next run with Yutani.",
-        "rewardCoins": 60,
-        "difficultyRecommendation": "Medium"
-      },
-      "timestamp": "2026-11-01T07:26:36.674Z"
-    },
-    {
-      "id": "an_1793518050694",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 3669,
-        "distance": 928,
-        "coins": 92,
-        "characterUsed": "Yutani",
-        "jumps": 8,
-        "slides": 0,
-        "hitObstacleType": "high_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 928m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T07:27:30.694Z"
-    },
-    {
-      "id": "an_1793518572013",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 64,
-        "distance": 47,
-        "coins": 0,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 47m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T07:36:12.013Z"
-    },
-    {
-      "id": "an_1793518580442",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 56,
-        "distance": 106,
-        "coins": 2,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 106m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T07:36:20.442Z"
-    },
-    {
-      "id": "an_1793518694705",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 3116,
-        "distance": 712,
-        "coins": 95,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "roadblock"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 712m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T07:38:14.705Z"
-    },
-    {
-      "id": "an_1793518787544",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 737,
-        "distance": 332,
-        "coins": 61,
-        "characterUsed": "Dinesh",
-        "jumps": 2,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 332m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T07:39:47.544Z"
-    },
-    {
-      "id": "an_1793521877552",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 65,
-        "distance": 34,
-        "coins": 0,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "roadblock"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:31:17.552Z"
-    },
-    {
-      "id": "an_1793521946015",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 3417,
-        "distance": 1108,
-        "coins": 140,
-        "characterUsed": "Dinesh",
-        "jumps": 14,
-        "slides": 1,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 1108m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:32:26.015Z"
-    },
-    {
-      "id": "an_1793521959297",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 346,
-        "distance": 178,
-        "coins": 0,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "high_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 178m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:32:39.297Z"
-    },
-    {
-      "id": "an_1793522463764",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 2021,
-        "distance": 640,
-        "coins": 88,
-        "characterUsed": "Dinesh",
-        "jumps": 3,
-        "slides": 1,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 640m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:41:03.764Z"
-    },
-    {
-      "id": "an_1793522468722",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 85,
-        "distance": 48,
-        "coins": 0,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 48m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:41:08.722Z"
-    },
-    {
-      "id": "an_1793522499864",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 194,
-        "distance": 70,
-        "coins": 7,
-        "characterUsed": "Dinesh",
-        "jumps": 1,
-        "slides": 0,
-        "hitObstacleType": "roadblock"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 70m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:41:39.864Z"
-    },
-    {
-      "id": "an_1793522524629",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 2362,
-        "distance": 388,
-        "coins": 64,
-        "characterUsed": "Dinesh",
-        "jumps": 7,
-        "slides": 0,
-        "hitObstacleType": "high_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 388m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:42:04.629Z"
-    },
-    {
-      "id": "an_1793522701499",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 768,
-        "distance": 228,
-        "coins": 36,
-        "characterUsed": "Dinesh",
-        "jumps": 2,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 228m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:45:01.499Z"
-    },
-    {
-      "id": "an_1793523068038",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 40,
-        "distance": 34,
-        "coins": 2,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:51:08.038Z"
-    },
-    {
-      "id": "an_1793523078840",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 114,
-        "distance": 70,
-        "coins": 9,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "high_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 70m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:51:18.840Z"
-    },
-    {
-      "id": "an_1793523100811",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 433,
-        "distance": 223,
-        "coins": 33,
-        "characterUsed": "Dinesh",
-        "jumps": 6,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 223m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T08:51:40.811Z"
-    },
-    {
-      "id": "an_1793524963698",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 2,
-        "distance": 34,
-        "coins": 0,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "roadblock"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T09:22:43.698Z"
-    },
-    {
-      "id": "an_1793524984684",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 186,
-        "distance": 105,
-        "coins": 7,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 1,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 105m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T09:23:04.684Z"
-    },
-    {
-      "id": "an_1793524993585",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 42,
-        "distance": 34,
-        "coins": 2,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 34m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T09:23:13.585Z"
-    },
-    {
-      "id": "an_1793525052910",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 2114,
-        "distance": 892,
-        "coins": 130,
-        "characterUsed": "Dinesh",
-        "jumps": 6,
-        "slides": 4,
-        "hitObstacleType": "high_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 892m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T09:24:12.910Z"
-    },
-    {
-      "id": "an_1793525063802",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 72,
-        "distance": 47,
-        "coins": 7,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "train"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 47m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T09:24:23.802Z"
-    },
-    {
-      "id": "an_1793527351233",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 76,
-        "distance": 70,
-        "coins": 7,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 0,
-        "hitObstacleType": "roadblock"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 70m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T10:02:31.233Z"
-    },
-    {
-      "id": "an_1793527368509",
-      "username": "Guest",
-      "runData": {
-        "username": "Guest",
-        "score": 163,
-        "distance": 106,
-        "coins": 16,
-        "characterUsed": "Dinesh",
-        "jumps": 0,
-        "slides": 1,
-        "hitObstacleType": "low_barrier"
-      },
-      "feedback": {
-        "source": "AI Coach Engine",
-        "rating": "C",
-        "headline": "🚀 Warm-Up Lap Complete!",
-        "feedback": "You took an early bump at 106m. Quick reflexes come with practice!",
-        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
-        "challenge": "Survive at least 500 meters without crashing.",
-        "rewardCoins": 40,
-        "difficultyRecommendation": "Easy"
-      },
-      "timestamp": "2026-11-01T10:02:48.509Z"
-    },
     {
       "id": "an_1793527423740",
       "username": "Guest",
@@ -4957,6 +4811,606 @@
         "difficultyRecommendation": "Easy"
       },
       "timestamp": "2026-11-01T18:45:42.650Z"
+    },
+    {
+      "id": "an_1793618937152",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 245,
+        "distance": 189,
+        "coins": 19,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 189m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:28:57.152Z"
+    },
+    {
+      "id": "an_1793618947242",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 21,
+        "distance": 24,
+        "coins": 0,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 24m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:29:07.242Z"
+    },
+    {
+      "id": "an_1793619011428",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 457,
+        "distance": 189,
+        "coins": 36,
+        "characterUsed": "Bhargav",
+        "jumps": 2,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 189m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:30:11.428Z"
+    },
+    {
+      "id": "an_1793619017257",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 35,
+        "distance": 60,
+        "coins": 0,
+        "characterUsed": "Bhargav",
+        "jumps": 3,
+        "slides": 0,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 60m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:30:17.257Z"
+    },
+    {
+      "id": "an_1793619026313",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 287,
+        "distance": 159,
+        "coins": 20,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 159m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:30:26.313Z"
+    },
+    {
+      "id": "an_1793619090945",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 25,
+        "distance": 44,
+        "coins": 1,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 44m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:31:30.945Z"
+    },
+    {
+      "id": "an_1793619105631",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 61,
+        "distance": 59,
+        "coins": 5,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "roadblock"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 59m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:31:45.631Z"
+    },
+    {
+      "id": "an_1793619115599",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 102,
+        "distance": 85,
+        "coins": 9,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 85m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:31:55.599Z"
+    },
+    {
+      "id": "an_1793619165496",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 315,
+        "distance": 163,
+        "coins": 27,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 0,
+        "hitObstacleType": "roadblock"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 163m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:32:45.496Z"
+    },
+    {
+      "id": "an_1793619181522",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 285,
+        "distance": 138,
+        "coins": 19,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 1,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 138m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:33:01.522Z"
+    },
+    {
+      "id": "an_1793619195463",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 188,
+        "distance": 163,
+        "coins": 16,
+        "characterUsed": "Bhargav",
+        "jumps": 3,
+        "slides": 5,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 163m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:33:15.463Z"
+    },
+    {
+      "id": "an_1793620292672",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 782,
+        "distance": 673,
+        "coins": 43,
+        "characterUsed": "Bhargav",
+        "jumps": 7,
+        "slides": 1,
+        "hitObstacleType": "overhead_beam"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 673m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:51:32.672Z"
+    },
+    {
+      "id": "an_1793620308238",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 379,
+        "distance": 137,
+        "coins": 29,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 137m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:51:48.238Z"
+    },
+    {
+      "id": "an_1793620318685",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 163,
+        "distance": 121,
+        "coins": 13,
+        "characterUsed": "Bhargav",
+        "jumps": 2,
+        "slides": 2,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 121m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:51:58.685Z"
+    },
+    {
+      "id": "an_1793620340684",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 752,
+        "distance": 453,
+        "coins": 53,
+        "characterUsed": "Bhargav",
+        "jumps": 6,
+        "slides": 2,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 453m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:52:20.684Z"
+    },
+    {
+      "id": "an_1793620347113",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 54,
+        "distance": 59,
+        "coins": 5,
+        "characterUsed": "Bhargav",
+        "jumps": 2,
+        "slides": 0,
+        "hitObstacleType": "roadblock"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 59m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:52:27.113Z"
+    },
+    {
+      "id": "an_1793620367271",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 468,
+        "distance": 297,
+        "coins": 41,
+        "characterUsed": "Bhargav",
+        "jumps": 3,
+        "slides": 1,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 297m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T11:52:47.271Z"
+    },
+    {
+      "id": "an_1793622821867",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 233,
+        "distance": 136,
+        "coins": 18,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 1,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 136m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:33:41.867Z"
+    },
+    {
+      "id": "an_1793622821896",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 233,
+        "distance": 136,
+        "coins": 18,
+        "characterUsed": "Bhargav",
+        "jumps": 0,
+        "slides": 1,
+        "hitObstacleType": "train"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 136m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:33:41.896Z"
+    },
+    {
+      "id": "an_1793622833938",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 96,
+        "distance": 59,
+        "coins": 8,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 59m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:33:53.938Z"
+    },
+    {
+      "id": "an_1793622854275",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 361,
+        "distance": 297,
+        "coins": 29,
+        "characterUsed": "Bhargav",
+        "jumps": 7,
+        "slides": 1,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 297m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:34:14.275Z"
+    },
+    {
+      "id": "an_1793623614476",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 1221,
+        "distance": 673,
+        "coins": 84,
+        "characterUsed": "Bhargav",
+        "jumps": 3,
+        "slides": 0,
+        "hitObstacleType": "overhead_beam"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 673m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:46:54.476Z"
+    },
+    {
+      "id": "an_1793623622229",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 28,
+        "distance": 33,
+        "coins": 2,
+        "characterUsed": "Bhargav",
+        "jumps": 1,
+        "slides": 0,
+        "hitObstacleType": "low_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 33m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:47:02.229Z"
+    },
+    {
+      "id": "an_1793623691151",
+      "username": "Guest",
+      "runData": {
+        "username": "Guest",
+        "score": 2893,
+        "distance": 1519,
+        "coins": 100,
+        "characterUsed": "Bhargav",
+        "jumps": 25,
+        "slides": 1,
+        "hitObstacleType": "high_barrier"
+      },
+      "feedback": {
+        "source": "AI Coach Engine",
+        "rating": "C",
+        "headline": "🚀 Warm-Up Lap Complete!",
+        "feedback": "You took an early bump at 1519m. Quick reflexes come with practice!",
+        "proTip": "Keep your character centered when unfamiliar obstacles appear so you have 2 exit lanes.",
+        "challenge": "Survive at least 500 meters without crashing.",
+        "rewardCoins": 40,
+        "difficultyRecommendation": "Easy"
+      },
+      "timestamp": "2026-11-02T12:48:11.151Z"
     }
   ]
 }

@@ -229,7 +229,9 @@ export class GameEngine {
     this.elevatedRoute.startDistance = this.distance;
     this.elevatedRoute.distance = 0;
     this.elevatedRoute.duration = duration;
-    this.elevatedRoute.maxDistance = duration * (this.speed || 22);
+    this.elevatedRoute.maxDistance = 500;
+    this.elevatedRoute.warningShown = false;
+    this.elevatedRoute.finished = false;
     this.elevatedRoute.isLanding = false;
     this.elevatedRoute.hasLeaped = false;
 
@@ -260,6 +262,7 @@ export class GameEngine {
   completeElevatedRoute() {
     if (!this.elevatedRoute.active || this.elevatedRoute.isLanding) return;
     this.elevatedRoute.isLanding = true;
+    this.elevatedRoute.finished = false;
     this.powerups.jetpack = 0;
     // Hero leaps forward off the upper skyway edge down to the ground tracks!
     this.velocityY = 4.5;
@@ -519,10 +522,13 @@ export class GameEngine {
     // Multiplier
     this.multiplier = this.powerups.multiplier > 0 ? 2 : 1;
 
-    // Distance & Score
-    const moveDist = this.speed * dt;
-    this.distance += moveDist;
-    this.score += Math.floor(moveDist * 2.5 * this.multiplier);
+    // Distance & Score (Stops sky-run forward movement when exactly 500m is reached)
+    const isSkyRunPaused = Boolean(this.elevatedRoute?.active && this.elevatedRoute?.finished);
+    const moveDist = isSkyRunPaused ? 0 : this.speed * dt;
+    if (!isSkyRunPaused) {
+      this.distance += moveDist;
+      this.score += Math.floor(moveDist * 2.5 * this.multiplier);
+    }
 
     // 1. Move track chunks forward (+z toward player)
     for (const chunk of this.chunks) {
@@ -573,24 +579,32 @@ export class GameEngine {
     }
     this.isOnTrain = standingOnAnyTrain;
 
-    // Upper Skyway progression (activated upon touching the rocket)
+    // Upper Skyway progression (Sky Run: Exact 500-Metre Finish)
     if (this.elevatedRoute?.active) {
-      this.elevatedRoute.distance = Math.floor(this.distance - this.elevatedRoute.startDistance);
+      if (!this.elevatedRoute.finished) {
+        // Measure actual forward distance in metres from speed * dt
+        const travelled = this.speed * dt;
+        const nextDistance = Math.min(500, (this.elevatedRoute.distance || 0) + travelled);
+        this.elevatedRoute.distance = nextDistance;
+
+        if (nextDistance >= 450) {
+          this.elevatedRoute.warningShown = true;
+          if (this.onSkyRunWarning) this.onSkyRunWarning();
+        }
+
+        if (nextDistance >= 500) {
+          this.elevatedRoute.distance = 500;
+          this.elevatedRoute.finished = true;
+          if (this.onSkyRunFinish) this.onSkyRunFinish();
+        }
+      }
 
       if (!this.elevatedRoute.isLanding) {
         // Smooth rocket ascent up to Upper Skyway deck (8.65m)
         if (this.posY < 8.65) {
-          this.posY = Math.min(8.65, this.posY + delta * 20.0);
+          this.posY = Math.min(8.65, this.posY + dt * 20.0);
           this.velocityY = 0;
           this.isJumping = true;
-        }
-
-        // Rocket flight ends: hero runs off the skyway edge and leaps down to ground!
-        if (
-          this.powerups.jetpack <= 0 ||
-          (this.elevatedRoute.maxDistance && this.elevatedRoute.distance >= this.elevatedRoute.maxDistance)
-        ) {
-          this.completeElevatedRoute();
         }
       }
     }
@@ -961,16 +975,31 @@ export class GameEngine {
       return;
     }
 
-    this.isGameOver = true;
+    // Stop forward running immediately upon collision
+    this.speed = 0;
     this.runStats.causeOfDeath = obstacleType;
-    if (this.onGameOver) {
-      this.onGameOver({
+
+    // Trigger police capture sequence if listener attached, otherwise trigger game over
+    if (this.onCollision) {
+      this.onCollision({
+        obstacleType,
         score: this.score,
         distance: Math.floor(this.distance),
         coins: this.coins,
         characterUsed: this.character,
         runStats: this.runStats
       });
+    } else {
+      this.isGameOver = true;
+      if (this.onGameOver) {
+        this.onGameOver({
+          score: this.score,
+          distance: Math.floor(this.distance),
+          coins: this.coins,
+          characterUsed: this.character,
+          runStats: this.runStats
+        });
+      }
     }
   }
 }

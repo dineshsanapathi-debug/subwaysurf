@@ -119,8 +119,9 @@ export default function App() {
     }
   };
 
-  // Start Game with "Hey you!" voice announcement
+  // Start Game with "Hey you!" voice announcement & Sky Run reset
   const handleStartGame = () => {
+    window.gameActions?.resetSkyRun?.();
     playStartVoice();
     setScreen('playing');
     soundEffects.startMusic();
@@ -153,6 +154,7 @@ export default function App() {
   };
 
   const handleRestartGame = () => {
+    window.gameActions?.resetSkyRun?.();
     playStartVoice();
     setScreen('playing');
     soundEffects.startMusic();

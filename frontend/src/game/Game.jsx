@@ -393,6 +393,39 @@ function GameComponent({
   const [showGameOver, setShowGameOver] = useState(false);
   const [captureProgress, setCaptureProgress] = useState(0);
 
+  // Sky Run: Exact 500-Metre Finish state and refs
+  const SKY_RUN_LIMIT = 500;
+  const SKY_RUN_WARNING_AT = 450;
+
+  const [skyRunDistance, setSkyRunDistance] = useState(0);
+  const [skyRunWarningShown, setSkyRunWarningShown] = useState(false);
+  const [skyRunFinished, setSkyRunFinished] = useState(false);
+
+  const skyRunDistanceRef = useRef(0);
+  const skyRunFinishedRef = useRef(false);
+
+  const resetSkyRun = useCallback(() => {
+    skyRunDistanceRef.current = 0;
+    skyRunFinishedRef.current = false;
+    setSkyRunDistance(0);
+    setSkyRunWarningShown(false);
+    setSkyRunFinished(false);
+    if (engineRef.current?.elevatedRoute) {
+      engineRef.current.elevatedRoute.distance = 0;
+      engineRef.current.elevatedRoute.warningShown = false;
+      engineRef.current.elevatedRoute.finished = false;
+    }
+  }, []);
+
+  const continueAfterSkyRun = useCallback(() => {
+    setSkyRunFinished(false);
+    skyRunFinishedRef.current = false;
+    if (engineRef.current) {
+      engineRef.current.completeElevatedRoute();
+    }
+    soundEffects.playJump();
+  }, []);
+
   const startPoliceCapture = (finalData) => {
     if (isCaught) return; // prevent the collision from triggering repeatedly
     setIsCaught(true);
@@ -498,6 +531,18 @@ function GameComponent({
     newEngine.onHoverboardBreak = () => soundEffects.playCrash();
     newEngine.onElevatedLeap = () => soundEffects.playJump();
     newEngine.onElevatedLanding = () => soundEffects.playLand();
+    newEngine.onElevatedRouteStart = () => {
+      resetSkyRun();
+    };
+    newEngine.onSkyRunWarning = () => {
+      setSkyRunWarningShown(true);
+    };
+    newEngine.onSkyRunFinish = () => {
+      skyRunFinishedRef.current = true;
+      setSkyRunDistance(SKY_RUN_LIMIT);
+      setSkyRunFinished(true);
+      soundEffects.playPowerup();
+    };
     newEngine.onCollision = (finalData) => {
       startPoliceCapture(finalData);
     };
@@ -547,10 +592,13 @@ function GameComponent({
       },
       elevatedRoute: () => {
         if (!isCaught) {
+          resetSkyRun();
           engineRef.current?.activateElevatedRoute();
           soundEffects.playPowerup();
         }
       },
+      resetSkyRun,
+      continueAfterSkyRun,
       skipIntro: () => setShowIntro(false)
     };
 
@@ -650,15 +698,32 @@ function GameComponent({
               <span>⚡</span> 500M UPPER SKYWAY
             </span>
             <span className="text-white font-black text-sm tabular-nums">
-              {Math.min(500, Math.floor(engine.elevatedRoute.distance))} / 500 M
+              {Math.min(500, Math.floor(skyRunDistance || engine.elevatedRoute.distance || 0))} / 500 M
             </span>
           </div>
           <div className="w-full bg-slate-900/85 rounded-full h-2 mt-1.5 border border-cyan-500/40 overflow-hidden shadow-inner">
             <div
               className="bg-gradient-to-r from-cyan-500 via-sky-400 to-emerald-400 h-full rounded-full transition-all duration-75 shadow-[0_0_12px_#06b6d4]"
-              style={{ width: `${(Math.min(500, engine.elevatedRoute.distance) / 500) * 100}%` }}
+              style={{ width: `${(Math.min(500, skyRunDistance || engine.elevatedRoute.distance || 0) / 500) * 100}%` }}
             />
           </div>
+        </div>
+      )}
+
+      {/* Sky Run: 450 m Warning */}
+      {skyRunWarningShown && !skyRunFinished && engine?.elevatedRoute?.active && (
+        <div className="sky-run-warning" role="alert">
+          ⚠️ FINAL 50 METRES!
+          <span>Sky run ends at 500 m</span>
+        </div>
+      )}
+
+      {/* Sky Run: Exact 500-Metre Completion Notice */}
+      {skyRunFinished && (
+        <div className="sky-run-finish" role="status">
+          <h2>SKY RUN COMPLETE!</h2>
+          <p>You reached exactly 500 metres.</p>
+          <button onClick={continueAfterSkyRun}>CONTINUE</button>
         </div>
       )}
 
