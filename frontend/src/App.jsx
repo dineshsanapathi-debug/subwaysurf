@@ -81,8 +81,47 @@ export default function App() {
     }
   };
 
-  // Start Game
+  // Energetic & friendly START voice announcement ("Hey you!") via browser SpeechSynthesis API
+  const playStartVoice = () => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      console.log('Voice synthesis is not supported in this browser');
+      return;
+    }
+
+    try {
+      // Cancel any previous speech
+      window.speechSynthesis.cancel();
+
+      const message = new SpeechSynthesisUtterance('Hey you!');
+      message.lang = 'en-US';
+      message.rate = 1.05; // Energetic, brisk pace
+      message.pitch = 1.25; // Friendly, youthful pitch
+      message.volume = 1.0; // Maximum volume
+
+      // Choose natural English voice if available on user device
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        const bestVoice = voices.find(
+          (v) => (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('David')) && v.lang.startsWith('en')
+        ) || voices.find((v) => v.lang.startsWith('en'));
+        if (bestVoice) {
+          message.voice = bestVoice;
+        }
+      }
+
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+
+      window.speechSynthesis.speak(message);
+    } catch (err) {
+      console.warn('SpeechSynthesis error:', err);
+    }
+  };
+
+  // Start Game with "Hey you!" voice announcement
   const handleStartGame = () => {
+    playStartVoice();
     setScreen('playing');
     soundEffects.startMusic();
   };
@@ -114,6 +153,7 @@ export default function App() {
   };
 
   const handleRestartGame = () => {
+    playStartVoice();
     setScreen('playing');
     soundEffects.startMusic();
   };
