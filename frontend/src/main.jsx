@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
     this.setState({ hasError: false, error: null, errorInfo: null });
     try {
       localStorage.removeItem('rail_rush_last_error');
-    } catch (e) {}
+    } catch (e) { }
     window.location.reload();
   };
 
